@@ -1,0 +1,18 @@
+int some_var;
+
+int some_arr[10];
+
+int some_func(int a, int b[10]);
+
+int some_func(int a, int b[10])
+{
+	int c;
+	c = a + 10;
+	return c;
+}
+
+int main()
+{
+	int another_func(int a, int b[10]);
+	return 0;
+}
