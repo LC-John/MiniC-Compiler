@@ -4,7 +4,22 @@ This repo is a series of labs from Compiler Lab, EECS, PKU, which aims for a com
 
 ![pooh](images/pooh.jpg)
 
+The work flow is shown below.
+
 ```
-The flow of work
 MiniC => (Type Checking) => Eeyore => Tigger => RISC-V
 ```
+
+## Phase 1. MiniC2Eeyore & Type Checking
+
+In progress...
+
+Now, the parse tree is built using Flex & Bison. Type Checking & parse tree transformation will be finished soon.
+
+## Phase 2. Eeyore2Tigger
+
+To be continued...
+
+## Phase 3. Tigger2RISC-V
+
+To be continued...
