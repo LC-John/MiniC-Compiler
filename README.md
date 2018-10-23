@@ -17,7 +17,9 @@ MiniC => (Type Checking) => Eeyore => Tigger => RISC-V
 
 In progress...
 
-Now, the parse tree is built using Flex & Bison. Type Checking & parse tree transformation will be finished soon.
+Now, the parse tree is built using Flex & Bison. A symbol table (including all variables and functions) is extracted while building the parse tree.
+
+Type Checking & parse tree transformation will be finished soon.
 
 ## Phase 2. Eeyore2Tigger
 
