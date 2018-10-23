@@ -103,7 +103,7 @@ void print_treenode(struct TreeNode* arg_node, char* arg_prefix)
 	printf(" I = %d\n", arg_node->child_idx);
 }
 
-void init()
+void init_tree()
 {
 	n_treenode = 0;
 }

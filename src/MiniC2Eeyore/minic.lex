@@ -11,7 +11,7 @@ int lineno = 1;
 %%
 
 [ \t]+
-[\n]+	{ lineno++; }
+[\n]	{ lineno++; }
 
 "int"	{ yylval.name = strdup(yytext); return TYPE; }
 "main"	{ yylval.name = strdup(yytext); return MAIN; }
@@ -36,14 +36,14 @@ int lineno = 1;
 "%"	{ yylval.name = strdup(yytext); return OP_2; }
 "!"	{ yylval.name = strdup(yytext); return OP_1; }
 
-"("	{ return PRN_L; }
-")"	{ return PRN_R; }
-"["	{ return ARR_L; }
-"]"	{ return ARR_R; }
-"{"	{ return BRC_L; }
-"}"	{ return BRC_R; }
-","	{ return COMMA; }
-";"	{ return EOL; }
+"("	{ yylval.value = lineno; return PRN_L; }
+")"	{ yylval.value = lineno; return PRN_R; }
+"["	{ yylval.value = lineno; return ARR_L; }
+"]"	{ yylval.value = lineno; return ARR_R; }
+"{"	{ yylval.value = lineno; return BRC_L; }
+"}"	{ yylval.value = lineno; return BRC_R; }
+","	{ yylval.value = lineno; return COMMA; }
+";"	{ yylval.value = lineno; return EOL; }
 
 . {
 	yyerror("ERROR: Unrecognized input!");

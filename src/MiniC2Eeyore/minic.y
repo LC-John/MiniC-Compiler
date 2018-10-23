@@ -4,9 +4,11 @@
 #include <math.h>
 #include <string.h>
 #include "tree.h"
+#include "symtab.h"
 
 int yylex(void);
 void yyerror(char*);
+
 extern FILE* yyin;
 extern int lineno;
 struct TreeNode* root;
@@ -19,7 +21,7 @@ struct TreeNode* root;
 };
 
 %token <name> MAIN IF ELSE WHILE RETURN
-%token <name> PRN_L PRN_R ARR_L ARR_R BRC_L BRC_R COMMA EOL
+%token <value> PRN_R ARR_L ARR_R BRC_R COMMA EOL PRN_L BRC_L
 %token <value> NUM
 %token <name> ID TYPE
 
@@ -54,6 +56,7 @@ Goal	: BeforeMain MainFunc {
 		}
 		$$->child[1] = $2; $2->parent = $$; $2->child_idx = 1;
 		root = $$;
+		set_death(0, lineno);
 	}
 	;
 
@@ -96,12 +99,14 @@ MainFunc	: Type MAIN PRN_L PRN_R BRC_L FuncDeclStmtList BRC_R {
 			tmp_node->parent = $$;
 			tmp_node->child_idx = 3;
 		}
+		set_death($3, lineno);
+		alloc_symbol($1->lineno, ST_FUNC, "main", $$);
 	}
 	;
 
 FuncDefn	: Type Identifier PRN_L PRN_R BRC_L FuncDeclStmtList BRC_R {
 		struct TreeNode* tmp_node;
-		$$ = alloc_treenode(lineno, TN_FUNCDEFN, NULL);
+		$$ = alloc_treenode($1->lineno, TN_FUNCDEFN, NULL);
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = $2; $2->parent = $$; $2->child_idx = 1;
 		$$->child[2] = NULL;
@@ -117,10 +122,12 @@ FuncDefn	: Type Identifier PRN_L PRN_R BRC_L FuncDeclStmtList BRC_R {
 			tmp_node->parent = $$;
 			tmp_node->child_idx = 3;
 		}
+		set_death($3, lineno);
+		alloc_symbol($1->lineno, ST_FUNC, $2->name, $$);
 	}
 	| Type Identifier PRN_L ParamDeclList PRN_R BRC_L FuncDeclStmtList BRC_R {
 		struct TreeNode* tmp_node;
-		$$ = alloc_treenode(lineno, TN_FUNCDEFN, NULL);
+		$$ = alloc_treenode($1->lineno, TN_FUNCDEFN, NULL);
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = $2; $2->parent = $$; $2->child_idx = 1;
 		tmp_node = $4;
@@ -142,6 +149,8 @@ FuncDefn	: Type Identifier PRN_L PRN_R BRC_L FuncDeclStmtList BRC_R {
 			tmp_node->parent = $$;
 			tmp_node->child_idx = 3;
 		}
+		set_death($3, lineno);
+		alloc_symbol($1->lineno, ST_FUNC, $2->name, $$);
 	}
 	;
 
@@ -150,6 +159,9 @@ FuncDecl	: Type Identifier PRN_L PRN_R EOL {
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = $2; $2->parent = $$; $2->child_idx = 1;
 		$$->child[2] = NULL;
+		if (strcmp($1->name, "int") == 0
+		    && (strcmp($2->name, "getint") == 0 || strcmp($2->name, "getchar") == 0))
+			alloc_symbol($1->lineno, ST_FUNC, $2->name, $$);
 	}
 	| Type Identifier PRN_L ParamDeclList PRN_R EOL {
 		struct TreeNode* tmp_node;
@@ -163,6 +175,16 @@ FuncDecl	: Type Identifier PRN_L PRN_R EOL {
 			tmp_node = tmp_node->sibling_l;
 		}
 		$$->child[2] = tmp_node; tmp_node->parent = $$; tmp_node->child_idx = 2;
+		if (strcmp($1->name, "int") == 0
+		    && (strcmp($2->name, "putint") == 0 || strcmp($2->name, "putchar") == 0)
+		    && (strcmp($4->child[0]->name, "int") == 0 && $4->child[2] == NULL)
+		    && $4->sibling_r == NULL)
+		{
+			set_death($3, lineno);
+			alloc_symbol($1->lineno, ST_FUNC, $2->name, $$);
+		}
+		else
+			purge_var($3, lineno);
 	}
 	;
 
@@ -194,12 +216,14 @@ VarDefn	: Type Identifier EOL {
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = $2; $2->parent = $$; $2->child_idx = 1;
 		$$->child[2] = NULL;
+		alloc_symbol($1->lineno, ST_INT, $2->name, $$);
 	}
 	| Type Identifier ARR_L Integer ARR_R EOL {
 		$$ = alloc_treenode(lineno, TN_VARDEFN, NULL);
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = $2; $2->parent = $$; $2->child_idx = 1;
 		$$->child[2] = $4; $4->parent = $$; $4->child_idx = 2;
+		alloc_symbol($1->lineno, ST_ARR, $2->name, $$);
 	}
 	;
 
@@ -208,12 +232,14 @@ VarDecl	: Type Identifier {
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = $2; $2->parent = $$; $2->child_idx = 1;
 		$$->child[2] = NULL;
+		alloc_symbol($1->lineno, ST_INT, $2->name, $$);
 	}
 	| Type Identifier ARR_L Integer ARR_R {
 		$$ = alloc_treenode(lineno, TN_VARDECL, NULL);
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = $2; $2->parent = $$; $2->child_idx = 1;
 		$$->child[2] = $4; $4->parent = $$; $4->child_idx = 2;
+		alloc_symbol($1->lineno, ST_ARR, $2->name, $$);
 	}
 	;
 
@@ -232,23 +258,28 @@ Stmt	: BRC_L StmtList BRC_R {
 			tmp_node->parent = $$;
 			tmp_node->child_idx = 0;
 		}
+		set_death($1, lineno);
 	}
 	| IF PRN_L Expr PRN_R Stmt {
 		$$ = alloc_treenode(lineno, TN_STMT_IF, NULL);
 		$$->child[0] = $3; $3->parent = $$; $3->child_idx = 0;
 		$$->child[1] = $5; $5->parent = $$; $5->child_idx = 1;
 		$$->child[2] = NULL;
+		set_death($2, lineno);
 	}
 	| IF PRN_L Expr PRN_R Stmt ELSE Stmt {
 		$$ = alloc_treenode(lineno, TN_STMT_IF, NULL);
 		$$->child[0] = $3; $3->parent = $$; $3->child_idx = 0;
 		$$->child[1] = $5; $5->parent = $$; $5->child_idx = 1;
 		$$->child[2] = $7; $7->parent = $$; $7->child_idx = 2;
+		set_death($2, $7->lineno-1);
+		set_death($7->lineno, lineno);
 	}
 	| WHILE PRN_L Expr PRN_R Stmt {
 		$$ = alloc_treenode(lineno, TN_STMT_WHILE, NULL);
 		$$->child[0] = $3; $3->parent = $$; $3->child_idx = 0;
 		$$->child[1] = $5; $5->parent = $$; $5->child_idx = 1;
+		set_death($2, lineno);
 	}
 	| Identifier OP_7 Expr EOL {
 		$$ = alloc_treenode(lineno, TN_STMT_VARASSN, NULL);
@@ -370,16 +401,43 @@ Identifier	: ID { $$ = alloc_treenode(lineno, TN_IDENTIFIER, strdup($1)); }
 
 void yyerror(char* s)
 {
-	fprintf(stderr, ">> Error: %s\n", s);
+	fprintf(stderr, ">> ERR@L%d: %s\n", lineno, s);
 }
 
 int main(int argc, char** argv)
 {
-	if (argc != 2)
+	if (argc < 2)
 		return -1;
 	yyin = fopen(argv[1], "r");
-	init();
+	if (yyin == NULL)
+	{
+		printf("Cannot open file: %s\nPlease check if it is valid\n", argv[1]);
+		return -1;
+	}
+	for (int i = 2; i < argc; i++)
+	{
+		if (strcmp(argv[i], "-T") == 0 || strcmp(argv[i], "--tree") == 0)
+			continue;
+		if (strcmp(argv[i], "-S") == 0 || strcmp(argv[i], "--symtab") == 0)
+			continue;
+		printf("Unknown option: %s", argv[i]);
+		return -2;
+	}
+	init_tree();
+	init_symtab();
 	yyparse();
-	print_tree(root, 0);
+	for (int i = 2; i < argc; i++)
+	{
+		if (strcmp(argv[i], "-T") == 0 || strcmp(argv[i], "--tree") == 0)
+		{
+			printf("\nMiniC parse tree of %s\n", argv[1]);
+			print_tree(root, 0);
+		}
+		if (strcmp(argv[i], "-S") == 0 || strcmp(argv[i], "--symtab") == 0)
+		{
+			printf("\nSymbol table of %s\n", argv[1]);
+			print_symtab();
+		}
+	}
 	return 0;
 }

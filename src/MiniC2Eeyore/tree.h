@@ -72,7 +72,7 @@ struct TreeNode* alloc_treenode(int, int, char*);
 void free_treenode(struct TreeNode*);
 void print_treenode(struct TreeNode*, char*);
 
-void init();
+void init_tree();
 void print_tree(struct TreeNode*, int);
 
 #endif
