@@ -5,6 +5,7 @@
 #include <string.h>
 #include "tree.h"
 #include "symtab.h"
+#include "error.h"
 
 int yylex(void);
 void yyerror(char*);
@@ -56,7 +57,6 @@ Goal	: BeforeMain MainFunc {
 		}
 		$$->child[1] = $2; $2->parent = $$; $2->child_idx = 1;
 		root = $$;
-		set_death(0, lineno);
 	}
 	;
 
@@ -101,6 +101,15 @@ MainFunc	: Type MAIN PRN_L PRN_R BRC_L FuncDeclStmtList BRC_R {
 		}
 		set_death($3, lineno);
 		alloc_symbol($1->lineno, ST_FUNC, "main", $$);
+		if ($6 == NULL)
+			alloc_ew(WARN_NO_RETURN, $$, NULL, NULL);
+		else
+		{
+			for (tmp_node = $6; tmp_node->sibling_r != NULL;
+				tmp_node = tmp_node->sibling_r);
+			if (tmp_node->type != TN_STMT_RETURN)
+				alloc_ew(WARN_NO_RETURN, $$, NULL, NULL);
+		}
 	}
 	;
 
@@ -124,6 +133,15 @@ FuncDefn	: Type Identifier PRN_L PRN_R BRC_L FuncDeclStmtList BRC_R {
 		}
 		set_death($3, lineno);
 		alloc_symbol($1->lineno, ST_FUNC, $2->name, $$);
+		if ($6 == NULL)
+			alloc_ew(WARN_NO_RETURN, $$, NULL, NULL);
+		else
+		{
+			for (tmp_node = $6; tmp_node->sibling_r != NULL;
+				tmp_node = tmp_node->sibling_r);
+			if (tmp_node->type != TN_STMT_RETURN)
+				alloc_ew(WARN_NO_RETURN, $$, NULL, NULL);
+		}
 	}
 	| Type Identifier PRN_L ParamDeclList PRN_R BRC_L FuncDeclStmtList BRC_R {
 		struct TreeNode* tmp_node;
@@ -151,6 +169,15 @@ FuncDefn	: Type Identifier PRN_L PRN_R BRC_L FuncDeclStmtList BRC_R {
 		}
 		set_death($3, lineno);
 		alloc_symbol($1->lineno, ST_FUNC, $2->name, $$);
+		if ($7 == NULL)
+			alloc_ew(WARN_NO_RETURN, $$, NULL, NULL);
+		else
+		{
+			for (tmp_node = $7; tmp_node->sibling_r != NULL;
+				tmp_node = tmp_node->sibling_r);
+			if (tmp_node->type != TN_STMT_RETURN)
+				alloc_ew(WARN_NO_RETURN, $$, NULL, NULL);
+		}
 	}
 	;
 
@@ -207,6 +234,7 @@ FuncDeclStmtList	: FuncDeclStmtList Stmt	{
 			$1->sibling_r = $2;
 		$2->sibling_l = $1;
 		$$ = $2;
+		alloc_ew(WARN_FUNCDECL_IN_BODY, $2, NULL, NULL);
 	}
 	|  { $$ = NULL; }
 	;
@@ -266,6 +294,9 @@ Stmt	: BRC_L StmtList BRC_R {
 		$$->child[1] = $5; $5->parent = $$; $5->child_idx = 1;
 		$$->child[2] = NULL;
 		set_death($2, lineno);
+		if ($3->type != TN_EXPR_BILOGIC && $3->type != TN_EXPR_UNI
+			&& ($3->type == TN_EXPR_UNI && strcmp($3->name, "!") != 0))
+			alloc_ew(WARN_MIXED_EXPR, $3, NULL, NULL);
 	}
 	| IF PRN_L Expr PRN_R Stmt ELSE Stmt {
 		$$ = alloc_treenode(lineno, TN_STMT_IF, NULL);
@@ -274,23 +305,42 @@ Stmt	: BRC_L StmtList BRC_R {
 		$$->child[2] = $7; $7->parent = $$; $7->child_idx = 2;
 		set_death($2, $7->lineno-1);
 		set_death($7->lineno, lineno);
+		if ($3->type != TN_EXPR_BILOGIC && $3->type != TN_EXPR_UNI
+			&& ($3->type == TN_EXPR_UNI && strcmp($3->name, "!") != 0))
+			alloc_ew(WARN_MIXED_EXPR, $3, NULL, NULL);
 	}
 	| WHILE PRN_L Expr PRN_R Stmt {
 		$$ = alloc_treenode(lineno, TN_STMT_WHILE, NULL);
 		$$->child[0] = $3; $3->parent = $$; $3->child_idx = 0;
 		$$->child[1] = $5; $5->parent = $$; $5->child_idx = 1;
 		set_death($2, lineno);
+		if ($3->type != TN_EXPR_BILOGIC && $3->type != TN_EXPR_UNI
+			&& ($3->type == TN_EXPR_UNI && strcmp($3->name, "!") != 0))
+			alloc_ew(WARN_MIXED_EXPR, $3, NULL, NULL);
 	}
 	| Identifier OP_7 Expr EOL {
 		$$ = alloc_treenode(lineno, TN_STMT_VARASSN, NULL);
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = $3; $3->parent = $$; $3->child_idx = 1;
+		if ($3->type == TN_EXPR_BILOGIC
+			|| ($3->type == TN_EXPR_UNI && strcmp($3->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, $3, NULL, NULL);
+		if (find_var(ST_INT, $1) == 0)
+			print_ew();
 	}
 	| Identifier ARR_L Expr ARR_R OP_7 Expr EOL {
 		$$ = alloc_treenode(lineno, TN_STMT_ARRASSN, NULL);
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = $3; $3->parent = $$; $3->child_idx = 1;
 		$$->child[2] = $6; $6->parent = $$; $6->child_idx = 2;
+		if ($3->type == TN_EXPR_BILOGIC
+			|| ($3->type == TN_EXPR_UNI && strcmp($3->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, $3, NULL, NULL);
+		if ($6->type == TN_EXPR_BILOGIC
+			|| ($6->type == TN_EXPR_UNI && strcmp($6->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, $6, NULL, NULL);
+		if (find_var(ST_ARR, $1) == 0)
+			print_ew();
 	}
 	| VarDefn {
 		$$ = alloc_treenode(lineno, TN_STMT_VARDEFN, NULL);
@@ -299,6 +349,9 @@ Stmt	: BRC_L StmtList BRC_R {
 	| RETURN Expr EOL {
 		$$ = alloc_treenode(lineno, TN_STMT_RETURN, NULL);
 		$$->child[0] = $2; $2->parent = $$; $2->child_idx = 0;
+		if ($2->type == TN_EXPR_BILOGIC
+			|| ($2->type == TN_EXPR_UNI && strcmp($2->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, $2, NULL, NULL);
 	}
 	;
 
@@ -315,31 +368,61 @@ Expr	: Expr OP_6 Expr {
 		$$ = alloc_treenode(lineno, TN_EXPR_BILOGIC, strdup($2));
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = $3; $3->parent = $$; $3->child_idx = 1;
+		if (($1->type != TN_EXPR_BILOGIC && $1->type != TN_EXPR_UNI
+				&& ($1->type == TN_EXPR_UNI && strcmp($1->name, "!") != 0))
+			|| ($3->type != TN_EXPR_BILOGIC && $3->type != TN_EXPR_UNI
+				&& ($3->type == TN_EXPR_UNI && strcmp($3->name, "!") != 0)))
+			alloc_ew(WARN_MIXED_EXPR, $$, NULL, NULL);
 	}
 	| Expr OP_5 Expr {
 		$$ = alloc_treenode(lineno, TN_EXPR_BILOGIC, strdup($2));
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = $3; $3->parent = $$; $3->child_idx = 1;
+		if ($1->type == TN_EXPR_BILOGIC
+				|| ($1->type == TN_EXPR_UNI && strcmp($1->name, "!") == 0)
+			|| $3->type == TN_EXPR_BILOGIC
+				|| ($3->type == TN_EXPR_UNI && strcmp($3->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, $$, NULL, NULL);
 	}
 	| Expr OP_4 Expr {
 		$$ = alloc_treenode(lineno, TN_EXPR_BILOGIC, strdup($2));
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = $3; $3->parent = $$; $3->child_idx = 1;
+		if ($1->type == TN_EXPR_BILOGIC
+				|| ($1->type == TN_EXPR_UNI && strcmp($1->name, "!") == 0)
+			|| $3->type == TN_EXPR_BILOGIC
+				|| ($3->type == TN_EXPR_UNI && strcmp($3->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, $$, NULL, NULL);
 	}
 	| Expr OP_3 Expr {
 		$$ = alloc_treenode(lineno, TN_EXPR_BIARITH, strdup($2));
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = $3; $3->parent = $$; $3->child_idx = 1;
+		if ($1->type == TN_EXPR_BILOGIC
+				|| ($1->type == TN_EXPR_UNI && strcmp($1->name, "!") == 0)
+			|| $3->type == TN_EXPR_BILOGIC
+				|| ($3->type == TN_EXPR_UNI && strcmp($3->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, $$, NULL, NULL);
 	}
 	| Expr OP_2 Expr {
 		$$ = alloc_treenode(lineno, TN_EXPR_BIARITH, strdup($2));
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = $3; $3->parent = $$; $3->child_idx = 1;
+		if ($1->type == TN_EXPR_BILOGIC
+				|| ($1->type == TN_EXPR_UNI && strcmp($1->name, "!") == 0)
+			|| $3->type == TN_EXPR_BILOGIC
+				|| ($3->type == TN_EXPR_UNI && strcmp($3->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, $$, NULL, NULL);
 	}
-	| Expr ARR_L Expr ARR_R {
+	| Identifier ARR_L Expr ARR_R {
 		$$ = alloc_treenode(lineno, TN_EXPR_ARR, NULL);
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = $3; $3->parent = $$; $3->child_idx = 1;
+		if ($3->type == TN_EXPR_BILOGIC
+				|| ($3->type == TN_EXPR_UNI && strcmp($3->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, $3, NULL, NULL);
+		if (find_var(ST_ARR, $1))
+			print_ew();
 	}
 	| Integer {
 		$$ = alloc_treenode(lineno, TN_EXPR_INTEGER, NULL);
@@ -348,19 +431,29 @@ Expr	: Expr OP_6 Expr {
 	| Identifier {
 		$$ = alloc_treenode(lineno, TN_EXPR_IDENTIFIER, NULL);
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
+		if (find_var(ST_INT, $1) == 0)
+			print_ew();
 	}
 	| OP_3 Expr {
 		$$ = alloc_treenode(lineno, TN_EXPR_UNI, strdup($1));
 		$$->child[0] = $2; $2->parent = $$; $2->child_idx = 0;
+		if ($2->type == TN_EXPR_BILOGIC
+			|| ($2->type == TN_EXPR_UNI && strcmp($2->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, $$, NULL, NULL);
 	}
 	| OP_1 Expr {
 		$$ = alloc_treenode(lineno, TN_EXPR_UNI, strdup($1));
 		$$->child[0] = $2; $2->parent = $$; $2->child_idx = 0;
+		if ($2->type != TN_EXPR_BILOGIC && $2->type != TN_EXPR_UNI
+			&& ($2->type == TN_EXPR_UNI && strcmp($2->name, "!") != 0))
+			alloc_ew(WARN_MIXED_EXPR, $$, NULL, NULL);
 	}
 	| Identifier PRN_L PRN_R {
 		$$ = alloc_treenode(lineno, TN_EXPR_CALL, NULL);
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = NULL;
+		if (find_func($$) == 0)
+			print_ew();
 	}
 	| Identifier PRN_L ParamList PRN_R {
 		struct TreeNode *tmp_node;
@@ -373,6 +466,8 @@ Expr	: Expr OP_6 Expr {
 			tmp_node = tmp_node->sibling_l;
 		}
 		$$->child[1] = tmp_node; tmp_node->parent = $$; tmp_node->child_idx = 1;
+		if (find_func($$) == 0)
+			print_ew();
 	}
 	| PRN_L Expr PRN_R { $$ = $2; }
 	;
@@ -401,7 +496,8 @@ Identifier	: ID { $$ = alloc_treenode(lineno, TN_IDENTIFIER, strdup($1)); }
 
 void yyerror(char* s)
 {
-	fprintf(stderr, ">> ERR@L%d: %s\n", lineno, s);
+	fprintf(stderr, ">> ERROR@L%d: %s\n", lineno, s);
+	exit(-3);
 }
 
 int main(int argc, char** argv)
@@ -425,7 +521,10 @@ int main(int argc, char** argv)
 	}
 	init_tree();
 	init_symtab();
+	init_ew();
 	yyparse();
+	find_conflict();
+	print_ew();
 	for (int i = 2; i < argc; i++)
 	{
 		if (strcmp(argv[i], "-T") == 0 || strcmp(argv[i], "--tree") == 0)

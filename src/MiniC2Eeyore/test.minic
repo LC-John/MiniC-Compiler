@@ -3,16 +3,16 @@ int some_var;
 int some_arr[10];
 
 int some_func(int a, int b[10]);
+int getchar();
 
 int some_func(int a, int b[10])
 {
-	int c;
-	c = a + 10;
-	return c;
+	return 0;
 }
 
 int main()
 {
-	int another_func(int a, int b[10]);
+	some_var = 0 + 1;
+	some_var = some_var + some_func(some_var, some_var);
 	return 0;
 }

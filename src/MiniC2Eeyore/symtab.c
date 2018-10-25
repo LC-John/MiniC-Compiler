@@ -55,13 +55,14 @@ void init_symtab()
 	tail = symtab;
 }
 
-struct Symbol* find_sym(int arg_lineno, int arg_type, char* arg_name)
+struct Symbol* get_sym(int arg_lineno, char* arg_name)
 {
 	struct Symbol* sym = symtab->nxt, *res = NULL;
 	while(sym != NULL)
 	{
-		if (strcmp(sym->name, arg_name) == 0 && arg_type == sym->type
-		    && arg_lineno >= sym->bornAt && arg_lineno <= sym->dieAt)
+		if (strcmp(sym->name, arg_name) == 0
+			&& arg_lineno >= sym->bornAt
+			&& (arg_lineno <= sym->dieAt || sym->dieAt == -1))
 		{
 			if (res == NULL)
 				res = sym;
@@ -104,15 +105,15 @@ void print_symtab()
 	{
 		switch(sym->type)
 		{
-		case ST_INT: printf("%d\t[INT]\t%s\tL%d-L%d\n",
+		case ST_INT: printf("%d\t[INT] \t%-12s\tL%d~L%d\n",
 			sym->idx, sym->name, sym->bornAt, sym->dieAt); break;
-		case ST_ARR: printf("%d\t[ARR]\t%s\tL%d-L%d\n",
+		case ST_ARR: printf("%d\t[ARR] \t%-12s\tL%d~L%d\n",
 			sym->idx, sym->name, sym->bornAt, sym->dieAt); break;
-		case ST_FUNC: printf("%d\t[FUNC]\t%s\tL%d-L%d\n",
+		case ST_FUNC: printf("%d\t[FUNC]\t%-12s\tL%d~L%d\n",
 			sym->idx, sym->name, sym->bornAt, sym->dieAt); break;
-		case ST_INIT: printf("%d\t{ERR}\t%s\tL%d-L%d\n",
+		case ST_INIT: printf("%d\t{ERR}  \t%-12s\tL%d~L%d\n",
 			sym->idx, sym->name, sym->bornAt, sym->dieAt); break;
-		default: printf("%d\tINT\t%s\tL%d-L%d\n",
+		default: printf("%d\t{ERR}  \t%-12s\tL%d~L%d\n",
 			sym->idx, sym->name, sym->bornAt, sym->dieAt); break;
 		}
 		sym = sym->nxt;

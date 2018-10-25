@@ -28,7 +28,7 @@ struct Symbol* alloc_symbol(int, int, char*, struct TreeNode*);
 void free_symbol(struct Symbol*);
 
 void init_symtab();
-struct Symbol* find_var(int, int, char*);
+struct Symbol* get_sym(int, char*);
 void set_death(int, int);
 void purge_var(int, int);
 void print_symtab();

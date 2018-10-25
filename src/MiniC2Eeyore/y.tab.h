@@ -100,7 +100,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 17 "minic.y" /* yacc.c:1909  */
+#line 18 "minic.y" /* yacc.c:1909  */
 
 	int value;
 	char* name;

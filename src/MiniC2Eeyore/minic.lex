@@ -18,7 +18,7 @@ int lineno = 1;
 "if"	{ yylval.name = strdup(yytext); return IF; }
 "else"	{ yylval.name = strdup(yytext); return ELSE; }
 "while"	{ yylval.name = strdup(yytext); return WHILE; }
-"return"			{ yylval.name = strdup(yytext); return RETURN; }
+"return"	{ yylval.name = strdup(yytext); return RETURN; }
 [a-zA-Z_]([a-zA-Z0-9_])*	{ yylval.name = strdup(yytext); return ID; }
 [0-9]+	{ yylval.value = atoi(yytext); return NUM; }
 
@@ -46,7 +46,9 @@ int lineno = 1;
 ";"	{ yylval.value = lineno; return EOL; }
 
 . {
-	yyerror("ERROR: Unrecognized input!");
+	char msg[100] = "unrecognized input ";
+	strcat(msg, yytext);
+	yyerror(msg);
 }
 
 %%

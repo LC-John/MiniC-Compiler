@@ -19,7 +19,22 @@ In progress...
 
 Now, the parse tree is built using Flex & Bison. A symbol table (including all variables and functions) is extracted while building the parse tree.
 
-Type Checking & parse tree transformation will be finished soon.
+Error/warning checking is performed. The following errors/warning will be detected.
+
+```
+ERROR
+	Conflict variables	-- Variables have the same name in the same scope
+	Conflict function(s)	-- Functions or functions and variable have the same name even in different scope
+	Wrong assignment	-- Assigning to invalid integer variable, or even not-a-variable
+	Wrong parameter(s)	-- Assigning invalid actual parameters to the function call
+	Wrong function call	-- Call a invalid function
+WARNING	
+	Mixed expression	-- Mix the logical and arithmatic expressions
+	No return		-- The last statement in the function body is not a return
+	Function declarition in function body	-- Declare a function inside another function body, which is allowed, but highly unrecommended!
+```
+
+Parse tree transformation will be finished soon.
 
 ## Phase 2. Eeyore2Tigger
 

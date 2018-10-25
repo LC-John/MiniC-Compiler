@@ -947,15 +947,17 @@ case 32:
 YY_RULE_SETUP
 #line 48 "minic.lex"
 {
-	yyerror("ERROR: Unrecognized input!");
+	char msg[100] = "unrecognized input ";
+	strcat(msg, yytext);
+	yyerror(msg);
 }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 52 "minic.lex"
+#line 54 "minic.lex"
 ECHO;
 	YY_BREAK
-#line 959 "lex.yy.c"
+#line 961 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1956,7 +1958,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 52 "minic.lex"
+#line 54 "minic.lex"
 
 
 
