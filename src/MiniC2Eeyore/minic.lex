@@ -45,6 +45,8 @@ int lineno = 1;
 ","	{ yylval.value = lineno; return COMMA; }
 ";"	{ yylval.value = lineno; return EOL; }
 
+"//"[^\n]*	{ ; }
+
 . {
 	char msg[100] = "unrecognized input ";
 	strcat(msg, yytext);

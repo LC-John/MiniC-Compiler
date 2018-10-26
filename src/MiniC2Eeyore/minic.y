@@ -452,8 +452,6 @@ Expr	: Expr OP_6 Expr {
 		$$ = alloc_treenode(lineno, TN_EXPR_CALL, NULL);
 		$$->child[0] = $1; $1->parent = $$; $1->child_idx = 0;
 		$$->child[1] = NULL;
-		if (find_func($$) == 0)
-			print_ew();
 	}
 	| Identifier PRN_L ParamList PRN_R {
 		struct TreeNode *tmp_node;
@@ -466,8 +464,6 @@ Expr	: Expr OP_6 Expr {
 			tmp_node = tmp_node->sibling_l;
 		}
 		$$->child[1] = tmp_node; tmp_node->parent = $$; tmp_node->child_idx = 1;
-		if (find_func($$) == 0)
-			print_ew();
 	}
 	| PRN_L Expr PRN_R { $$ = $2; }
 	;
@@ -523,6 +519,7 @@ int main(int argc, char** argv)
 	init_symtab();
 	init_ew();
 	yyparse();
+	find_wrong_call(root);
 	find_conflict();
 	print_ew();
 	for (int i = 2; i < argc; i++)

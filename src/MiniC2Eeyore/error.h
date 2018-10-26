@@ -36,8 +36,10 @@ struct ErrorWarning* alloc_ew(int, struct TreeNode*, struct Symbol*, struct Symb
 void free_ew(struct ErrorWarning*);
 void print_ew();
 
-int find_conflict();
 int find_var(int, struct TreeNode*);
 int find_func(struct TreeNode*);
+
+int find_conflict();
+void find_wrong_call(struct TreeNode*);
 
 #endif

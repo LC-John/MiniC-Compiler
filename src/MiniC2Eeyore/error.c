@@ -147,8 +147,6 @@ int find_var(int arg_type, struct TreeNode* arg_node)
 	}
 	else if (sym->type != arg_type)
 	{
-		printf("%d %s\n", sym->type, sym->name);
-		print_symtab();
 		alloc_ew(ERR_WRONG_ASSN, arg_node, NULL, NULL);
 		return 0;
 	}
@@ -193,4 +191,15 @@ int find_func(struct TreeNode* arg_node)
 		return 0;
 	}
 	return 1;
+}
+
+void find_wrong_call(struct TreeNode* arg_node)
+{
+	if (arg_node == NULL)
+		return;
+	if (arg_node->type == TN_EXPR_CALL && find_func(arg_node) == 0)
+		print_ew();
+	find_wrong_call(arg_node->sibling_r);
+	for (int i = 0; i < arg_node->n_child; i++)
+		find_wrong_call(arg_node->sibling_r);
 }
