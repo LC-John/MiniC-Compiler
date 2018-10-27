@@ -54,7 +54,8 @@ int minic2eeyore(struct TreeNode* arg_node, char* arg_prefix)
 		}
 		else
 		{
-			fprintf(yyout, "%svar %d T%d\n", arg_prefix, arg_node->child[2]->val, T_idx);
+			fprintf(yyout, "%svar %d T%d\n", arg_prefix,
+				arg_node->child[2]->val*4, T_idx);
 			tmp_sym = get_sym(arg_node->lineno, arg_node->child[1]->name);
 		}
 		tmp_sym->eeyore_var_idx = T_idx++;
@@ -137,9 +138,12 @@ int minic2eeyore(struct TreeNode* arg_node, char* arg_prefix)
 	case TN_STMT_ARRASSN:
 		tmp_l = minic2eeyore(arg_node->child[1], arg_prefix);
 		tmp_r = minic2eeyore(arg_node->child[2], arg_prefix);
+		tmp = t_idx++;
+		fprintf(yyout, "%svar t%d\n", arg_prefix, tmp);
+		fprintf(yyout, "%st%d = t%d * 4\n", arg_prefix, tmp, tmp_l);
 		tmp_sym = get_sym(arg_node->child[0]->lineno, arg_node->child[0]->name);
 		fprintf(yyout, "%s%c%d [t%d] = t%d\n", arg_prefix,
-			tmp_sym->eeyore_var_type, tmp_sym->eeyore_var_idx, tmp_l, tmp_r);
+			tmp_sym->eeyore_var_type, tmp_sym->eeyore_var_idx, tmp, tmp_r);
 		free(prefix);
 		return -1;
 	case TN_STMT_VARDEFN:
@@ -156,25 +160,32 @@ int minic2eeyore(struct TreeNode* arg_node, char* arg_prefix)
 		tmp_l = minic2eeyore(arg_node->child[0], arg_prefix);
 		tmp_r = minic2eeyore(arg_node->child[1], arg_prefix);
 		tmp = t_idx++;
+		fprintf(yyout, "%svar t%d\n", arg_prefix, tmp);
 		fprintf(yyout, "%st%d = t%d %s t%d\n", arg_prefix, tmp, tmp_l, arg_node->name, tmp_r);
 		free(prefix);
 		return tmp;
 	case TN_EXPR_ARR:
 		tmp_sym = get_sym(arg_node->child[0]->lineno, arg_node->child[0]->name);
 		tmp_l = minic2eeyore(arg_node->child[1], arg_prefix);
+		tmp_r = t_idx++;
+		fprintf(yyout, "%svar t%d\n", arg_prefix, tmp_r);
+		fprintf(yyout, "%st%d = t%d * 4\n", arg_prefix, tmp_r, tmp_l);
 		tmp = t_idx++;
+		fprintf(yyout, "%svar t%d\n", arg_prefix, tmp);
 		fprintf(yyout, "%st%d = %c%d [t%d]\n", arg_prefix, tmp,
-			tmp_sym->eeyore_var_type, tmp_sym->eeyore_var_idx, tmp_l);
+			tmp_sym->eeyore_var_type, tmp_sym->eeyore_var_idx, tmp_r);
 		free(prefix);
 		return tmp;
 	case TN_EXPR_INTEGER:
 		tmp = t_idx++;
+		fprintf(yyout, "%svar t%d\n", arg_prefix, tmp);
 		fprintf(yyout, "%st%d = %d\n", arg_prefix, tmp, arg_node->child[0]->val);
 		free(prefix);
 		return tmp;
 	case TN_EXPR_IDENTIFIER:
 		tmp_sym = get_sym(arg_node->child[0]->lineno, arg_node->child[0]->name);
 		tmp = t_idx++;
+		fprintf(yyout, "%svar t%d\n", arg_prefix, tmp);
 		fprintf(yyout, "%st%d = %c%d\n", arg_prefix, tmp,
 			tmp_sym->eeyore_var_type, tmp_sym->eeyore_var_idx);
 		free(prefix);
@@ -182,11 +193,13 @@ int minic2eeyore(struct TreeNode* arg_node, char* arg_prefix)
 	case TN_EXPR_UNI:
 		tmp_r = minic2eeyore(arg_node->child[1], arg_prefix);
 		tmp = t_idx++;
+		fprintf(yyout, "%svar t%d\n", arg_prefix, tmp);
 		fprintf(yyout, "%st%d = %s t%d\n", arg_prefix, tmp, arg_node->name, tmp_r);
 		free(prefix);
 		return tmp;
 	case TN_EXPR_CALL:
 		tmp = t_idx++;
+		fprintf(yyout, "%svar t%d\n", arg_prefix, tmp);
 		for (tmp_node = arg_node->child[1]; tmp_node != NULL; tmp_node = tmp_node->sibling_r)
 		{
 			tmp_sym = get_sym(tmp_node->lineno, tmp_node->name);
