@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
+#ifndef YY_YY_HOME_LC_DOWNLOADS_MINIC_COMPILER_SIMULATORS_SRC_CODE_SRC_TIGGER_SIMULATOR_TIGGER_TAB_HPP_INCLUDED
+# define YY_YY_HOME_LC_DOWNLOADS_MINIC_COMPILER_SIMULATORS_SRC_CODE_SRC_TIGGER_SIMULATOR_TIGGER_TAB_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -39,74 +39,54 @@
 #if YYDEBUG
 extern int yydebug;
 #endif
+/* "%code requires" blocks.  */
+#line 10 "tigger.y" /* yacc.c:1909  */
+
+void yyerror(const char *s);
+#define REGNUM 28
+extern const char *str_reg[REGNUM];
+
+#line 50 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.hpp" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    MAIN = 258,
-    IF = 259,
-    ELSE = 260,
-    WHILE = 261,
-    RETURN = 262,
-    PRN_R = 263,
-    ARR_L = 264,
-    ARR_R = 265,
-    BRC_R = 266,
-    COMMA = 267,
-    EOL = 268,
-    PRN_L = 269,
-    BRC_L = 270,
-    NUM = 271,
-    ID = 272,
-    TYPE = 273,
-    OP_7 = 274,
-    OP_6 = 275,
-    OP_5 = 276,
-    OP_4 = 277,
-    OP_3 = 278,
-    OP_2 = 279,
-    OP_1 = 280
+    INT_CONSTANT = 258,
+    GVAR = 259,
+    LABEL = 260,
+    REGISTER = 261,
+    FUNCTION = 262,
+    END = 263,
+    IF = 264,
+    GOTO = 265,
+    CALL = 266,
+    LOAD = 267,
+    STORE = 268,
+    MALLOC = 269,
+    LOADADDR = 270,
+    RETURN = 271,
+    GE = 272,
+    LE = 273,
+    AND = 274,
+    OR = 275,
+    NE = 276,
+    EQ = 277
   };
 #endif
-/* Tokens.  */
-#define MAIN 258
-#define IF 259
-#define ELSE 260
-#define WHILE 261
-#define RETURN 262
-#define PRN_R 263
-#define ARR_L 264
-#define ARR_R 265
-#define BRC_R 266
-#define COMMA 267
-#define EOL 268
-#define PRN_L 269
-#define BRC_L 270
-#define NUM 271
-#define ID 272
-#define TYPE 273
-#define OP_7 274
-#define OP_6 275
-#define OP_5 276
-#define OP_4 277
-#define OP_3 278
-#define OP_2 279
-#define OP_1 280
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 20 "minic.y" /* yacc.c:1909  */
+#line 16 "tigger.y" /* yacc.c:1909  */
 
-	int value;
-	char* name;
-	struct TreeNode* node;
+    char *vstr;
+    int vint;
 
-#line 110 "y.tab.h" /* yacc.c:1909  */
+#line 90 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -119,4 +99,4 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
+#endif /* !YY_YY_HOME_LC_DOWNLOADS_MINIC_COMPILER_SIMULATORS_SRC_CODE_SRC_TIGGER_SIMULATOR_TIGGER_TAB_HPP_INCLUDED  */

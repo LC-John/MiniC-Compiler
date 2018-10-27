@@ -557,6 +557,7 @@ int main(int argc, char** argv)
 	init_tree();
 	init_symtab();
 	init_ew();
+	init_trans();
 	yyparse();
 	find_wrong_call(root);
 	find_conflict();

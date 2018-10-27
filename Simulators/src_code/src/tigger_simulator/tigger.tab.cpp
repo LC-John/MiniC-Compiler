@@ -62,26 +62,16 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 1 "minic.y" /* yacc.c:339  */
+#line 1 "tigger.y" /* yacc.c:339  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-#include "tree.h"
-#include "symtab.h"
-#include "error.h"
-#include "transform.h"
-
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include "yaccTypes.h"
 int yylex(void);
-void yyerror(char*);
+extern int yylineno;
 
-extern FILE* yyin;
-extern FILE* yyout;
-extern int lineno;
-struct TreeNode* root;
-
-#line 85 "y.tab.c" /* yacc.c:339  */
+#line 75 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -100,9 +90,9 @@ struct TreeNode* root;
 #endif
 
 /* In a future release of Bison, this section will be replaced
-   by #include "y.tab.h".  */
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
+   by #include "tigger.tab.hpp".  */
+#ifndef YY_YY_HOME_LC_DOWNLOADS_MINIC_COMPILER_SIMULATORS_SRC_CODE_SRC_TIGGER_SIMULATOR_TIGGER_TAB_HPP_INCLUDED
+# define YY_YY_HOME_LC_DOWNLOADS_MINIC_COMPILER_SIMULATORS_SRC_CODE_SRC_TIGGER_SIMULATOR_TIGGER_TAB_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -110,74 +100,54 @@ struct TreeNode* root;
 #if YYDEBUG
 extern int yydebug;
 #endif
+/* "%code requires" blocks.  */
+#line 10 "tigger.y" /* yacc.c:355  */
+
+void yyerror(const char *s);
+#define REGNUM 28
+extern const char *str_reg[REGNUM];
+
+#line 111 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:355  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    MAIN = 258,
-    IF = 259,
-    ELSE = 260,
-    WHILE = 261,
-    RETURN = 262,
-    PRN_R = 263,
-    ARR_L = 264,
-    ARR_R = 265,
-    BRC_R = 266,
-    COMMA = 267,
-    EOL = 268,
-    PRN_L = 269,
-    BRC_L = 270,
-    NUM = 271,
-    ID = 272,
-    TYPE = 273,
-    OP_7 = 274,
-    OP_6 = 275,
-    OP_5 = 276,
-    OP_4 = 277,
-    OP_3 = 278,
-    OP_2 = 279,
-    OP_1 = 280
+    INT_CONSTANT = 258,
+    GVAR = 259,
+    LABEL = 260,
+    REGISTER = 261,
+    FUNCTION = 262,
+    END = 263,
+    IF = 264,
+    GOTO = 265,
+    CALL = 266,
+    LOAD = 267,
+    STORE = 268,
+    MALLOC = 269,
+    LOADADDR = 270,
+    RETURN = 271,
+    GE = 272,
+    LE = 273,
+    AND = 274,
+    OR = 275,
+    NE = 276,
+    EQ = 277
   };
 #endif
-/* Tokens.  */
-#define MAIN 258
-#define IF 259
-#define ELSE 260
-#define WHILE 261
-#define RETURN 262
-#define PRN_R 263
-#define ARR_L 264
-#define ARR_R 265
-#define BRC_R 266
-#define COMMA 267
-#define EOL 268
-#define PRN_L 269
-#define BRC_L 270
-#define NUM 271
-#define ID 272
-#define TYPE 273
-#define OP_7 274
-#define OP_6 275
-#define OP_5 276
-#define OP_4 277
-#define OP_3 278
-#define OP_2 279
-#define OP_1 280
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 20 "minic.y" /* yacc.c:355  */
+#line 16 "tigger.y" /* yacc.c:355  */
 
-	int value;
-	char* name;
-	struct TreeNode* node;
+    char *vstr;
+    int vint;
 
-#line 181 "y.tab.c" /* yacc.c:355  */
+#line 151 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -190,11 +160,11 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
+#endif /* !YY_YY_HOME_LC_DOWNLOADS_MINIC_COMPILER_SIMULATORS_SRC_CODE_SRC_TIGGER_SIMULATOR_TIGGER_TAB_HPP_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
-#line 198 "y.tab.c" /* yacc.c:358  */
+#line 168 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -434,23 +404,23 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  3
+#define YYFINAL  9
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   207
+#define YYLAST   107
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  26
+#define YYNTOKENS  35
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  17
+#define YYNNTS  10
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  48
+#define YYNRULES  46
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  113
+#define YYNSTATES  86
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   280
+#define YYMAXUTOK   277
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -462,13 +432,13 @@ static const yytype_uint8 yytranslate[] =
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,    33,     2,     2,     2,    30,     2,     2,
+       2,     2,    28,    27,     2,    25,     2,    29,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,    34,     2,
+      32,    26,    31,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,    23,     2,    24,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -486,19 +456,18 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25
+      15,    16,    17,    18,    19,    20,    21,    22
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_uint16 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,    45,    45,    65,    71,    77,    83,    86,   118,   148,
-     186,   195,   220,   221,   228,   234,   241,   244,   251,   260,
-     267,   276,   293,   306,   320,   332,   342,   356,   360,   369,
-     375,   378,   388,   398,   408,   418,   428,   438,   442,   448,
-     455,   462,   467,   479,   482,   483,   490,   493,   499
+       0,    31,    31,    32,    35,    36,    37,    38,    41,    41,
+      50,    51,    53,    54,    57,    58,    61,    62,    63,    64,
+      65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
+      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
+      87,    88,    90,    91,    92,    93,    94
 };
 #endif
 
@@ -507,12 +476,13 @@ static const yytype_uint16 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "MAIN", "IF", "ELSE", "WHILE", "RETURN",
-  "PRN_R", "ARR_L", "ARR_R", "BRC_R", "COMMA", "EOL", "PRN_L", "BRC_L",
-  "NUM", "ID", "TYPE", "OP_7", "OP_6", "OP_5", "OP_4", "OP_3", "OP_2",
-  "OP_1", "$accept", "Goal", "BeforeMain", "MainFunc", "FuncDefn",
-  "FuncDecl", "ParamDeclList", "FuncDeclStmtList", "VarDefn", "VarDecl",
-  "Stmt", "StmtList", "Expr", "ParamList", "Type", "Integer", "Identifier", YY_NULLPTR
+  "$end", "error", "$undefined", "INT_CONSTANT", "GVAR", "LABEL",
+  "REGISTER", "FUNCTION", "END", "IF", "GOTO", "CALL", "LOAD", "STORE",
+  "MALLOC", "LOADADDR", "RETURN", "GE", "LE", "AND", "OR", "NE", "EQ",
+  "'['", "']'", "'-'", "'='", "'+'", "'*'", "'/'", "'%'", "'>'", "'<'",
+  "'!'", "':'", "$accept", "start", "block", "function_declare", "$@1",
+  "integer", "global_var_declare", "expression_list", "operator",
+  "expression", YY_NULLPTR
 };
 #endif
 
@@ -523,14 +493,15 @@ static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,   279,   280
+     275,   276,   277,    91,    93,    45,    61,    43,    42,    47,
+      37,    62,    60,    33,    58
 };
 # endif
 
-#define YYPACT_NINF -52
+#define YYPACT_NINF -39
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-52)))
+  (!!((Yystate) == (-39)))
 
 #define YYTABLE_NINF -1
 
@@ -539,20 +510,17 @@ static const yytype_uint16 yytoknum[] =
 
   /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
      STATE-NUM.  */
-static const yytype_int16 yypact[] =
+static const yytype_int8 yypact[] =
 {
-     -52,     5,    -6,   -52,   -52,   -52,   -52,   -52,   -52,     4,
-       9,   -52,    -3,     1,    15,   -52,    -5,    31,   -52,    49,
-      43,    65,   -52,    50,   -52,    79,   -52,   -52,    57,    -6,
-      86,    87,   -52,   102,   -52,   -52,   -52,    15,    98,   104,
-     182,   -52,   -52,   -52,   -52,   -52,    50,    17,   -52,   117,
-      90,   182,   182,   182,   182,   182,   163,   -52,    46,   132,
-      40,   182,   182,   -52,   -52,    -4,    61,    66,    77,   -52,
-     -52,   182,   182,   182,   182,   182,   182,    30,   -52,   -52,
-      50,    21,   131,   168,   152,   152,   -52,   141,   107,    55,
-      77,   -52,   151,   -52,    95,   -52,   101,   109,   103,    97,
-     -52,   120,   -52,   -52,   -52,    50,   113,   182,   152,   -52,
-     180,   -52,   -52
+       1,   -19,   -13,    32,     1,   -39,   -39,    -1,    33,   -39,
+     -39,   -39,   -39,    42,    44,   -39,    37,   -39,   -39,    39,
+      61,    50,   -39,   -39,    67,    47,   -17,    77,    79,    81,
+      80,    18,    82,    31,   -39,   -39,   -39,    86,    -2,   -39,
+      38,   -39,   -39,    84,    85,    89,    87,    88,    71,    21,
+     -39,   -39,   -39,   -39,   -39,   -39,    44,   -39,   -39,   -39,
+     -39,   -39,   -39,   -39,   -39,    90,   -39,    91,   -39,   -39,
+     -39,   -39,   -39,    72,    96,     8,   -39,    92,    94,    83,
+     -39,   -39,    98,   -39,   -39,   -39
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -560,32 +528,27 @@ static const yytype_int16 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       6,     0,     0,     1,    46,     2,     4,     5,     3,     0,
-       0,    48,     0,     0,     0,    17,     0,     0,    47,     0,
-       0,     0,    12,     0,    16,     0,    10,    16,     0,     0,
-      19,     0,    18,     0,    11,    16,    13,     0,     0,     0,
-       0,     7,    30,    15,    27,    14,     0,     0,     8,     0,
-       0,     0,     0,     0,     0,     0,     0,    37,    38,     0,
-       0,     0,     0,     9,    20,     0,     0,     0,    39,    40,
-      28,     0,     0,     0,     0,     0,     0,     0,    21,    29,
-       0,     0,     0,     0,     0,     0,    43,    31,    32,    33,
-      34,    35,     0,    41,     0,    44,     0,     0,     0,     0,
-      25,    22,    24,    36,    42,     0,     0,     0,     0,    45,
-       0,    23,    26
+       3,     0,     0,     0,     2,     4,     5,     0,     0,     1,
+       6,     7,    10,     0,     0,    13,     0,    12,    11,     0,
+       0,     0,     8,    14,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,    46,    15,    39,     0,     0,     9,
+       0,    38,    40,     0,     0,     0,     0,     0,     0,    34,
+      25,    24,    26,    27,    28,    29,    17,    16,    18,    19,
+      20,    21,    22,    23,    30,     0,    17,     0,    42,    43,
+      41,    44,    45,     0,     0,     0,    33,     0,     0,     0,
+      31,    32,     0,    35,    36,    37
 };
 
   /* YYPGOTO[NTERM-NUM].  */
-static const yytype_int16 yypgoto[] =
+static const yytype_int8 yypgoto[] =
 {
-     -52,   -52,   -52,   -52,   -52,   125,    52,     0,   135,   111,
-     -51,   -52,   -10,   -52,    -1,   -12,    -9
+     -39,   -39,   -39,    97,   -39,   -38,   100,   -39,   -37,   -39
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     1,     2,     5,     6,    43,    21,    31,    44,    22,
-      45,    59,    56,    94,    80,    57,    58
+      -1,     3,     4,     5,    23,    15,     6,    24,    65,    35
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -593,90 +556,67 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      12,     9,    19,    20,    84,     3,    14,    10,    79,    17,
-      15,    16,     4,     4,    30,    23,    71,    72,    73,    74,
-      75,    11,    47,    13,    47,    50,    61,    33,    23,    97,
-      46,    18,    46,   101,   102,    49,    62,    60,    93,     4,
-      47,    65,    66,    67,    68,    69,    24,    11,    46,    14,
-      47,    82,    83,    15,    81,    76,    26,   111,    27,    25,
-      77,    87,    88,    89,    90,    91,    92,    11,    95,    85,
-      34,    96,    35,    28,    86,    47,    47,    29,    74,    75,
-      23,    71,    72,    73,    74,    75,    71,    72,    73,    74,
-      75,    38,    32,    39,    40,    37,   109,   110,    41,    47,
-      64,    75,    42,   104,    11,     4,    38,   105,    39,    40,
-      14,   106,    51,    48,    15,    29,   107,    42,    52,    11,
-       4,    38,    26,    39,    40,   108,    34,     7,    63,    73,
-      74,    75,    42,    98,    11,     4,    38,     8,    39,    40,
-      36,    99,     0,    78,     0,     0,     0,    42,     0,    11,
-       4,    71,    72,    73,    74,    75,    38,     0,    39,    40,
-       0,   103,    72,    73,    74,    75,     0,    42,     0,    11,
-       4,    71,    72,    73,    74,    75,    70,     0,     0,     0,
-       0,   100,     0,    71,    72,    73,    74,    75,    71,    72,
-      73,    74,    75,   112,     0,     0,    53,     0,    18,    11,
-      71,    72,    73,    74,    75,    54,     0,    55
+      64,    12,    12,    67,    49,     1,    37,     7,     2,    38,
+       8,    12,    75,    13,    80,    50,    51,    52,    53,    54,
+      55,    43,    44,    56,    14,    57,    58,    59,    60,    61,
+      62,    63,     9,    14,    46,    47,    16,    81,    50,    51,
+      52,    53,    54,    55,    74,    17,    66,    18,    57,    58,
+      59,    60,    61,    62,    63,    50,    51,    52,    53,    54,
+      55,    19,    20,    66,    21,    57,    58,    59,    60,    61,
+      62,    63,    25,    26,    22,    27,    28,    29,    30,    31,
+      32,    36,    33,    34,    39,    40,    41,    42,    45,    48,
+      68,    69,    70,    71,    72,    73,    76,    77,    78,    79,
+      83,    10,    82,    85,    11,     0,     0,    84
 };
 
 static const yytype_int8 yycheck[] =
 {
-       9,     2,    14,     8,     8,     0,     9,     3,    59,     8,
-      13,    14,    18,    18,    23,    16,    20,    21,    22,    23,
-      24,    17,    31,    14,    33,    37,     9,    27,    29,     8,
-      31,    16,    33,    84,    85,    35,    19,    46,     8,    18,
-      49,    51,    52,    53,    54,    55,    15,    17,    49,     9,
-      59,    61,    62,    13,    14,     9,    13,   108,    15,    10,
-      14,    71,    72,    73,    74,    75,    76,    17,    77,     8,
-      13,    80,    15,     8,     8,    84,    85,    12,    23,    24,
-      81,    20,    21,    22,    23,    24,    20,    21,    22,    23,
-      24,     4,    13,     6,     7,     9,   105,   107,    11,   108,
-      10,    24,    15,     8,    17,    18,     4,    12,     6,     7,
-       9,     8,    14,    11,    13,    12,    19,    15,    14,    17,
-      18,     4,    13,     6,     7,     5,    13,     2,    11,    22,
-      23,    24,    15,    81,    17,    18,     4,     2,     6,     7,
-      29,    10,    -1,    11,    -1,    -1,    -1,    15,    -1,    17,
-      18,    20,    21,    22,    23,    24,     4,    -1,     6,     7,
-      -1,    10,    21,    22,    23,    24,    -1,    15,    -1,    17,
-      18,    20,    21,    22,    23,    24,    13,    -1,    -1,    -1,
-      -1,    13,    -1,    20,    21,    22,    23,    24,    20,    21,
-      22,    23,    24,    13,    -1,    -1,    14,    -1,    16,    17,
-      20,    21,    22,    23,    24,    23,    -1,    25
+      38,     3,     3,    40,     6,     4,    23,    26,     7,    26,
+      23,     3,    49,    14,     6,    17,    18,    19,    20,    21,
+      22,     3,     4,    25,    25,    27,    28,    29,    30,    31,
+      32,    33,     0,    25,     3,     4,     3,    75,    17,    18,
+      19,    20,    21,    22,    23,     3,    25,     3,    27,    28,
+      29,    30,    31,    32,    33,    17,    18,    19,    20,    21,
+      22,    24,    23,    25,     3,    27,    28,    29,    30,    31,
+      32,    33,     5,     6,    24,     8,     9,    10,    11,    12,
+      13,    34,    15,    16,     7,     6,     5,     7,     6,     3,
+       6,     6,     3,     6,     6,    24,     6,     6,    26,     3,
+       6,     4,    10,     5,     4,    -1,    -1,    24
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,    27,    28,     0,    18,    29,    30,    31,    34,    40,
-       3,    17,    42,    14,     9,    13,    14,     8,    16,    41,
-       8,    32,    35,    40,    15,    10,    13,    15,     8,    12,
-      42,    33,    13,    33,    13,    15,    35,     9,     4,     6,
-       7,    11,    15,    31,    34,    36,    40,    42,    11,    33,
-      41,    14,    14,    14,    23,    25,    38,    41,    42,    37,
-      42,     9,    19,    11,    10,    38,    38,    38,    38,    38,
-      13,    20,    21,    22,    23,    24,     9,    14,    11,    36,
-      40,    14,    38,    38,     8,     8,     8,    38,    38,    38,
-      38,    38,    38,     8,    39,    42,    42,     8,    32,    10,
-      13,    36,    36,    10,     8,    12,     8,    19,     5,    42,
-      38,    36,    13
+       0,     4,     7,    36,    37,    38,    41,    26,    23,     0,
+      38,    41,     3,    14,    25,    40,     3,     3,     3,    24,
+      23,     3,    24,    39,    42,     5,     6,     8,     9,    10,
+      11,    12,    13,    15,    16,    44,    34,    23,    26,     7,
+       6,     5,     7,     3,     4,     6,     3,     4,     3,     6,
+      17,    18,    19,    20,    21,    22,    25,    27,    28,    29,
+      30,    31,    32,    33,    40,    43,    25,    43,     6,     6,
+       3,     6,     6,    24,    23,    43,     6,     6,    26,     3,
+       6,    40,    10,     6,    24,     5
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    26,    27,    28,    28,    28,    28,    29,    30,    30,
-      31,    31,    32,    32,    33,    33,    33,    34,    34,    35,
-      35,    36,    36,    36,    36,    36,    36,    36,    36,    37,
-      37,    38,    38,    38,    38,    38,    38,    38,    38,    38,
-      38,    38,    38,    38,    39,    39,    40,    41,    42
+       0,    35,    36,    36,    37,    37,    37,    37,    39,    38,
+      40,    40,    41,    41,    42,    42,    43,    43,    43,    43,
+      43,    43,    43,    43,    43,    43,    43,    43,    43,    43,
+      44,    44,    44,    44,    44,    44,    44,    44,    44,    44,
+      44,    44,    44,    44,    44,    44,    44
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     2,     2,     2,     2,     0,     7,     7,     8,
-       5,     6,     1,     3,     2,     2,     0,     3,     6,     2,
-       5,     3,     5,     7,     5,     4,     7,     1,     3,     2,
-       0,     3,     3,     3,     3,     3,     4,     1,     1,     2,
-       2,     3,     4,     3,     1,     3,     1,     1,     1
+       0,     2,     1,     0,     1,     1,     2,     2,     0,    11,
+       1,     2,     4,     3,     0,     2,     1,     1,     1,     1,
+       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
+       3,     5,     5,     4,     3,     6,     6,     6,     2,     2,
+       2,     3,     3,     3,     3,     3,     1
 };
 
 
@@ -1352,668 +1292,236 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 2:
-#line 45 "minic.y" /* yacc.c:1646  */
+        case 8:
+#line 41 "tigger.y" /* yacc.c:1646  */
     {
-		struct TreeNode* tmp_node;
-		(yyval.node) = alloc_treenode(lineno, TN_ROOT, NULL);
-		tmp_node = (yyvsp[-1].node);
-		while(tmp_node != NULL && tmp_node->sibling_l != NULL)
-		{
-			tmp_node->parent = (yyval.node); tmp_node->child_idx = 0;
-			tmp_node = tmp_node->sibling_l;
-		}
-		(yyval.node)->child[0] = tmp_node;
-		if (tmp_node != NULL)
-		{
-			tmp_node->parent = (yyval.node);
-			tmp_node->child_idx = 0;
-		}
-		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
-		root = (yyval.node);
-	}
-#line 1376 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 3:
-#line 65 "minic.y" /* yacc.c:1646  */
-    {
-		if ((yyvsp[-1].node) != NULL)
-			(yyvsp[-1].node)->sibling_r = (yyvsp[0].node);
-		(yyvsp[0].node)->sibling_l = (yyvsp[-1].node);
-		(yyval.node) = (yyvsp[0].node);
-	}
-#line 1387 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 4:
-#line 71 "minic.y" /* yacc.c:1646  */
-    {
-		if ((yyvsp[-1].node) != NULL)
-			(yyvsp[-1].node)->sibling_r = (yyvsp[0].node);
-		(yyvsp[0].node)->sibling_l = (yyvsp[-1].node);
-		(yyval.node) = (yyvsp[0].node);
-	}
-#line 1398 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 5:
-#line 77 "minic.y" /* yacc.c:1646  */
-    {
-		if ((yyvsp[-1].node) != NULL)
-			(yyvsp[-1].node)->sibling_r = (yyvsp[0].node);
-		(yyvsp[0].node)->sibling_l = (yyvsp[-1].node);
-		(yyval.node) = (yyvsp[0].node);
-	}
-#line 1409 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 6:
-#line 83 "minic.y" /* yacc.c:1646  */
-    { (yyval.node) = NULL; }
-#line 1415 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 7:
-#line 86 "minic.y" /* yacc.c:1646  */
-    {
-		struct TreeNode* tmp_node = alloc_treenode((yyvsp[-6].node)->lineno, TN_IDENTIFIER, strdup("main"));
-		(yyval.node) = alloc_treenode(lineno, TN_FUNCDEFN, NULL);
-		(yyval.node)->child[0] = (yyvsp[-6].node); (yyvsp[-6].node)->parent = (yyval.node); (yyvsp[-6].node)->child_idx = 0;
-		(yyval.node)->child[1] = tmp_node; tmp_node->parent = (yyval.node); tmp_node->child_idx = 1;
-		(yyval.node)->child[2] = NULL;
-		tmp_node = (yyvsp[-1].node);
-		while(tmp_node != NULL && tmp_node->sibling_l != NULL)
-		{
-			tmp_node->parent = (yyval.node); tmp_node->child_idx = 3;
-			tmp_node = tmp_node->sibling_l;
-		}
-		(yyval.node)->child[3] = tmp_node;
-		if (tmp_node != NULL)
-		{
-			tmp_node->parent = (yyval.node);
-			tmp_node->child_idx = 3;
-		}
-		set_death((yyvsp[-4].value), lineno);
-		alloc_symbol((yyvsp[-6].node)->lineno, ST_FUNC, "main", (yyval.node));
-		if ((yyvsp[-1].node) == NULL)
-			alloc_ew(WARN_NO_RETURN, (yyval.node), NULL, NULL);
-		else
-		{
-			for (tmp_node = (yyvsp[-1].node); tmp_node->sibling_r != NULL;
-				tmp_node = tmp_node->sibling_r);
-			if (tmp_node->type != TN_STMT_RETURN)
-				alloc_ew(WARN_NO_RETURN, (yyval.node), NULL, NULL);
-		}
-	}
-#line 1450 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 8:
-#line 118 "minic.y" /* yacc.c:1646  */
-    {
-		struct TreeNode* tmp_node;
-		(yyval.node) = alloc_treenode((yyvsp[-6].node)->lineno, TN_FUNCDEFN, NULL);
-		(yyval.node)->child[0] = (yyvsp[-6].node); (yyvsp[-6].node)->parent = (yyval.node); (yyvsp[-6].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[-5].node); (yyvsp[-5].node)->parent = (yyval.node); (yyvsp[-5].node)->child_idx = 1;
-		(yyval.node)->child[2] = NULL;
-		tmp_node = (yyvsp[-1].node);
-		while(tmp_node != NULL && tmp_node->sibling_l != NULL)
-		{
-			tmp_node->parent = (yyval.node); tmp_node->child_idx = 3;
-			tmp_node = tmp_node->sibling_l;
-		}
-		(yyval.node)->child[3] = tmp_node;
-		if (tmp_node != NULL)
-		{
-			tmp_node->parent = (yyval.node);
-			tmp_node->child_idx = 3;
-		}
-		set_death((yyvsp[-4].value), lineno);
-		alloc_symbol((yyvsp[-6].node)->lineno, ST_FUNC, (yyvsp[-5].node)->name, (yyval.node));
-		if ((yyvsp[-1].node) == NULL)
-			alloc_ew(WARN_NO_RETURN, (yyval.node), NULL, NULL);
-		else
-		{
-			for (tmp_node = (yyvsp[-1].node); tmp_node->sibling_r != NULL;
-				tmp_node = tmp_node->sibling_r);
-			if (tmp_node->type != TN_STMT_RETURN)
-				alloc_ew(WARN_NO_RETURN, (yyval.node), NULL, NULL);
-		}
-	}
-#line 1485 "y.tab.c" /* yacc.c:1646  */
+                        add_func_begin((yyvsp[-6].vstr), (yyvsp[-4].vint), (yyvsp[-1].vint));
+                    }
+#line 1301 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 148 "minic.y" /* yacc.c:1646  */
+#line 43 "tigger.y" /* yacc.c:1646  */
     {
-		struct TreeNode* tmp_node;
-		(yyval.node) = alloc_treenode((yyvsp[-7].node)->lineno, TN_FUNCDEFN, NULL);
-		(yyval.node)->child[0] = (yyvsp[-7].node); (yyvsp[-7].node)->parent = (yyval.node); (yyvsp[-7].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[-6].node); (yyvsp[-6].node)->parent = (yyval.node); (yyvsp[-6].node)->child_idx = 1;
-		tmp_node = (yyvsp[-4].node);
-		while(tmp_node->sibling_l != NULL)
-		{
-			tmp_node->parent = (yyval.node); tmp_node->child_idx = 2;
-			tmp_node = tmp_node->sibling_l;
-		}
-		(yyval.node)->child[2] = tmp_node; tmp_node->parent = (yyval.node); tmp_node->child_idx = 2;
-		tmp_node = (yyvsp[-1].node);
-		while(tmp_node != NULL && tmp_node->sibling_l != NULL)
-		{
-			tmp_node->parent = (yyval.node); tmp_node->child_idx = 3;
-			tmp_node = tmp_node->sibling_l;
-		}
-		(yyval.node)->child[3] = tmp_node;
-		if (tmp_node != NULL)
-		{
-			tmp_node->parent = (yyval.node);
-			tmp_node->child_idx = 3;
-		}
-		set_death((yyvsp[-5].value), lineno);
-		alloc_symbol((yyvsp[-7].node)->lineno, ST_FUNC, (yyvsp[-6].node)->name, (yyval.node));
-		if ((yyvsp[-1].node) == NULL)
-			alloc_ew(WARN_NO_RETURN, (yyval.node), NULL, NULL);
-		else
-		{
-			for (tmp_node = (yyvsp[-1].node); tmp_node->sibling_r != NULL;
-				tmp_node = tmp_node->sibling_r);
-			if (tmp_node->type != TN_STMT_RETURN)
-				alloc_ew(WARN_NO_RETURN, (yyval.node), NULL, NULL);
-		}
-	}
-#line 1526 "y.tab.c" /* yacc.c:1646  */
+                        if (strcmp((yyvsp[-10].vstr), (yyvsp[0].vstr)) != 0)
+                            yyerror("function declare name not match");
+                        stmts.push_back(new stmt_func_end((yyvsp[-10].vstr)));
+                    }
+#line 1311 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 186 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_FUNCDECL, NULL);
-		(yyval.node)->child[0] = (yyvsp[-4].node); (yyvsp[-4].node)->parent = (yyval.node); (yyvsp[-4].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[-3].node); (yyvsp[-3].node)->parent = (yyval.node); (yyvsp[-3].node)->child_idx = 1;
-		(yyval.node)->child[2] = NULL;
-		if (strcmp((yyvsp[-4].node)->name, "int") == 0
-		    && (strcmp((yyvsp[-3].node)->name, "getint") == 0 || strcmp((yyvsp[-3].node)->name, "getchar") == 0))
-			alloc_symbol((yyvsp[-4].node)->lineno, ST_FUNC, (yyvsp[-3].node)->name, (yyval.node));
-	}
-#line 1540 "y.tab.c" /* yacc.c:1646  */
+#line 50 "tigger.y" /* yacc.c:1646  */
+    {(yyval.vint)=(yyvsp[0].vint);}
+#line 1317 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 195 "minic.y" /* yacc.c:1646  */
-    {
-		struct TreeNode* tmp_node;
-		(yyval.node) = alloc_treenode(lineno, TN_FUNCDECL, NULL);
-		(yyval.node)->child[0] = (yyvsp[-5].node); (yyvsp[-5].node)->parent = (yyval.node); (yyvsp[-5].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[-4].node); (yyvsp[-4].node)->parent = (yyval.node); (yyvsp[-4].node)->child_idx = 1;
-		tmp_node = (yyvsp[-2].node);
-		while(tmp_node->sibling_l != NULL)
-		{
-			tmp_node->parent = (yyval.node); tmp_node->child_idx = 2;
-			tmp_node = tmp_node->sibling_l;
-		}
-		(yyval.node)->child[2] = tmp_node; tmp_node->parent = (yyval.node); tmp_node->child_idx = 2;
-		if (strcmp((yyvsp[-5].node)->name, "int") == 0
-		    && (strcmp((yyvsp[-4].node)->name, "putint") == 0 || strcmp((yyvsp[-4].node)->name, "putchar") == 0)
-		    && (strcmp((yyvsp[-2].node)->child[0]->name, "int") == 0 && (yyvsp[-2].node)->child[2] == NULL)
-		    && (yyvsp[-2].node)->sibling_r == NULL)
-		{
-			set_death((yyvsp[-3].value), lineno);
-			alloc_symbol((yyvsp[-5].node)->lineno, ST_FUNC, (yyvsp[-4].node)->name, (yyval.node));
-		}
-		else
-			purge_var((yyvsp[-3].value), lineno);
-	}
-#line 1568 "y.tab.c" /* yacc.c:1646  */
+#line 51 "tigger.y" /* yacc.c:1646  */
+    {(yyval.vint)=-(yyvsp[0].vint);}
+#line 1323 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 220 "minic.y" /* yacc.c:1646  */
-    { (yyval.node) = (yyvsp[0].node); }
-#line 1574 "y.tab.c" /* yacc.c:1646  */
+#line 53 "tigger.y" /* yacc.c:1646  */
+    { add_gvar_array((yyvsp[-3].vint), (yyvsp[0].vint)); }
+#line 1329 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 221 "minic.y" /* yacc.c:1646  */
-    {
-		(yyvsp[-2].node)->sibling_r = (yyvsp[0].node);
-		(yyvsp[0].node)->sibling_l = (yyvsp[-2].node);
-		(yyval.node) = (yyvsp[0].node);
-	}
-#line 1584 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 14:
-#line 228 "minic.y" /* yacc.c:1646  */
-    {
-		if ((yyvsp[-1].node) != NULL)
-			(yyvsp[-1].node)->sibling_r = (yyvsp[0].node);
-		(yyvsp[0].node)->sibling_l = (yyvsp[-1].node);
-		(yyval.node) = (yyvsp[0].node);
-	}
-#line 1595 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 15:
-#line 234 "minic.y" /* yacc.c:1646  */
-    {
-		if ((yyvsp[-1].node) != NULL)
-			(yyvsp[-1].node)->sibling_r = (yyvsp[0].node);
-		(yyvsp[0].node)->sibling_l = (yyvsp[-1].node);
-		(yyval.node) = (yyvsp[0].node);
-		alloc_ew(WARN_FUNCDECL_IN_BODY, (yyvsp[0].node), NULL, NULL);
-	}
-#line 1607 "y.tab.c" /* yacc.c:1646  */
+#line 54 "tigger.y" /* yacc.c:1646  */
+    { add_gvar_int((yyvsp[-2].vint), (yyvsp[0].vint)); }
+#line 1335 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 241 "minic.y" /* yacc.c:1646  */
-    { (yyval.node) = NULL; }
-#line 1613 "y.tab.c" /* yacc.c:1646  */
+#line 61 "tigger.y" /* yacc.c:1646  */
+    {(yyval.vstr)=strdup("+");}
+#line 1341 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 244 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_VARDEFN, NULL);
-		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[-1].node); (yyvsp[-1].node)->parent = (yyval.node); (yyvsp[-1].node)->child_idx = 1;
-		(yyval.node)->child[2] = NULL;
-		alloc_symbol((yyvsp[-2].node)->lineno, ST_INT, (yyvsp[-1].node)->name, (yyval.node));
-	}
-#line 1625 "y.tab.c" /* yacc.c:1646  */
+#line 62 "tigger.y" /* yacc.c:1646  */
+    {(yyval.vstr)=strdup("-");}
+#line 1347 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 251 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_VARDEFN, NULL);
-		(yyval.node)->child[0] = (yyvsp[-5].node); (yyvsp[-5].node)->parent = (yyval.node); (yyvsp[-5].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[-4].node); (yyvsp[-4].node)->parent = (yyval.node); (yyvsp[-4].node)->child_idx = 1;
-		(yyval.node)->child[2] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 2;
-		alloc_symbol((yyvsp[-5].node)->lineno, ST_ARR, (yyvsp[-4].node)->name, (yyval.node));
-	}
-#line 1637 "y.tab.c" /* yacc.c:1646  */
+#line 63 "tigger.y" /* yacc.c:1646  */
+    {(yyval.vstr)=strdup("*");}
+#line 1353 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 260 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_VARDECL, NULL);
-		(yyval.node)->child[0] = (yyvsp[-1].node); (yyvsp[-1].node)->parent = (yyval.node); (yyvsp[-1].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
-		(yyval.node)->child[2] = NULL;
-		alloc_symbol((yyvsp[-1].node)->lineno, ST_INT, (yyvsp[0].node)->name, (yyval.node));
-	}
-#line 1649 "y.tab.c" /* yacc.c:1646  */
+#line 64 "tigger.y" /* yacc.c:1646  */
+    {(yyval.vstr)=strdup("/");}
+#line 1359 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 267 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_VARDECL, NULL);
-		(yyval.node)->child[0] = (yyvsp[-4].node); (yyvsp[-4].node)->parent = (yyval.node); (yyvsp[-4].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[-3].node); (yyvsp[-3].node)->parent = (yyval.node); (yyvsp[-3].node)->child_idx = 1;
-		(yyval.node)->child[2] = (yyvsp[-1].node); (yyvsp[-1].node)->parent = (yyval.node); (yyvsp[-1].node)->child_idx = 2;
-		alloc_symbol((yyvsp[-4].node)->lineno, ST_ARR, (yyvsp[-3].node)->name, (yyval.node));
-	}
-#line 1661 "y.tab.c" /* yacc.c:1646  */
+#line 65 "tigger.y" /* yacc.c:1646  */
+    {(yyval.vstr)=strdup("%");}
+#line 1365 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 276 "minic.y" /* yacc.c:1646  */
-    {
-		struct TreeNode* tmp_node;
-		(yyval.node) = alloc_treenode(lineno, TN_STMT_BLOCK, NULL);
-		tmp_node = (yyvsp[-1].node);
-		while(tmp_node != NULL && tmp_node->sibling_l != NULL)
-		{
-			tmp_node->parent = (yyval.node); tmp_node->child_idx = 1;
-			tmp_node = tmp_node->sibling_l;
-		}
-		(yyval.node)->child[0] = tmp_node;
-		if (tmp_node != NULL)
-		{
-			tmp_node->parent = (yyval.node);
-			tmp_node->child_idx = 0;
-		}
-		set_death((yyvsp[-2].value), lineno);
-	}
-#line 1683 "y.tab.c" /* yacc.c:1646  */
+#line 66 "tigger.y" /* yacc.c:1646  */
+    {(yyval.vstr)=strdup(">");}
+#line 1371 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 293 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_STMT_IF, NULL);
-		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
-		(yyval.node)->child[2] = NULL;
-		set_death((yyvsp[-3].value), lineno);
-		if ((yyvsp[-2].node)->type != TN_EXPR_BILOGIC
-			&& !((yyvsp[-2].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-2].node)->name, "!") == 0))
-		{
-			alloc_ew(ERR_WRONG_EXPR, (yyvsp[-2].node), NULL, NULL);
-			print_ew();
-		}
-	}
-#line 1701 "y.tab.c" /* yacc.c:1646  */
+#line 67 "tigger.y" /* yacc.c:1646  */
+    {(yyval.vstr)=strdup("<");}
+#line 1377 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 306 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_STMT_IF, NULL);
-		(yyval.node)->child[0] = (yyvsp[-4].node); (yyvsp[-4].node)->parent = (yyval.node); (yyvsp[-4].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 1;
-		(yyval.node)->child[2] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 2;
-		set_death((yyvsp[-5].value), (yyvsp[0].node)->lineno-1);
-		set_death((yyvsp[0].node)->lineno, lineno);
-		if ((yyvsp[-4].node)->type != TN_EXPR_BILOGIC
-			&& !((yyvsp[-4].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-4].node)->name, "!") == 0))
-		{
-			alloc_ew(ERR_WRONG_EXPR, (yyvsp[-4].node), NULL, NULL);
-			print_ew();
-		}
-	}
-#line 1720 "y.tab.c" /* yacc.c:1646  */
+#line 68 "tigger.y" /* yacc.c:1646  */
+    {(yyval.vstr)=strdup("!");}
+#line 1383 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 320 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_STMT_WHILE, NULL);
-		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
-		set_death((yyvsp[-3].value), lineno);
-		if ((yyvsp[-2].node)->type != TN_EXPR_BILOGIC
-			&& !((yyvsp[-2].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-2].node)->name, "!") == 0))
-		{
-			alloc_ew(ERR_WRONG_EXPR, (yyvsp[-2].node), NULL, NULL);
-			print_ew();
-		}
-	}
-#line 1737 "y.tab.c" /* yacc.c:1646  */
+#line 69 "tigger.y" /* yacc.c:1646  */
+    {(yyval.vstr)=strdup("<=");}
+#line 1389 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 332 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_STMT_VARASSN, NULL);
-		(yyval.node)->child[0] = (yyvsp[-3].node); (yyvsp[-3].node)->parent = (yyval.node); (yyvsp[-3].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[-1].node); (yyvsp[-1].node)->parent = (yyval.node); (yyvsp[-1].node)->child_idx = 1;
-		if ((yyvsp[-1].node)->type == TN_EXPR_BILOGIC
-			|| ((yyvsp[-1].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-1].node)->name, "!") == 0))
-			alloc_ew(WARN_MIXED_EXPR, (yyvsp[-1].node), NULL, NULL);
-		if (find_var(ST_INT, (yyvsp[-3].node)) == 0)
-			print_ew();
-	}
-#line 1752 "y.tab.c" /* yacc.c:1646  */
+#line 70 "tigger.y" /* yacc.c:1646  */
+    {(yyval.vstr)=strdup(">=");}
+#line 1395 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 342 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_STMT_ARRASSN, NULL);
-		(yyval.node)->child[0] = (yyvsp[-6].node); (yyvsp[-6].node)->parent = (yyval.node); (yyvsp[-6].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[-4].node); (yyvsp[-4].node)->parent = (yyval.node); (yyvsp[-4].node)->child_idx = 1;
-		(yyval.node)->child[2] = (yyvsp[-1].node); (yyvsp[-1].node)->parent = (yyval.node); (yyvsp[-1].node)->child_idx = 2;
-		if ((yyvsp[-4].node)->type == TN_EXPR_BILOGIC
-			|| ((yyvsp[-4].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-4].node)->name, "!") == 0))
-			alloc_ew(WARN_MIXED_EXPR, (yyvsp[-4].node), NULL, NULL);
-		if ((yyvsp[-1].node)->type == TN_EXPR_BILOGIC
-			|| ((yyvsp[-1].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-1].node)->name, "!") == 0))
-			alloc_ew(WARN_MIXED_EXPR, (yyvsp[-1].node), NULL, NULL);
-		if (find_var(ST_ARR, (yyvsp[-6].node)) == 0)
-			print_ew();
-	}
-#line 1771 "y.tab.c" /* yacc.c:1646  */
+#line 71 "tigger.y" /* yacc.c:1646  */
+    {(yyval.vstr)=strdup("&&");}
+#line 1401 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 356 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_STMT_VARDEFN, NULL);
-		(yyval.node)->child[0] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 0;
-	}
-#line 1780 "y.tab.c" /* yacc.c:1646  */
+#line 72 "tigger.y" /* yacc.c:1646  */
+    {(yyval.vstr)=strdup("||");}
+#line 1407 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 360 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_STMT_RETURN, NULL);
-		(yyval.node)->child[0] = (yyvsp[-1].node); (yyvsp[-1].node)->parent = (yyval.node); (yyvsp[-1].node)->child_idx = 0;
-		if ((yyvsp[-1].node)->type == TN_EXPR_BILOGIC
-			|| ((yyvsp[-1].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-1].node)->name, "!") == 0))
-			alloc_ew(WARN_MIXED_EXPR, (yyvsp[-1].node), NULL, NULL);
-	}
-#line 1792 "y.tab.c" /* yacc.c:1646  */
+#line 73 "tigger.y" /* yacc.c:1646  */
+    {(yyval.vstr)=strdup("!=");}
+#line 1413 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 369 "minic.y" /* yacc.c:1646  */
-    {
-		if ((yyvsp[-1].node) != NULL)
-			(yyvsp[-1].node)->sibling_r = (yyvsp[0].node);
-		(yyvsp[0].node)->sibling_l = (yyvsp[-1].node);
-		(yyval.node) = (yyvsp[0].node);
-	}
-#line 1803 "y.tab.c" /* yacc.c:1646  */
+#line 74 "tigger.y" /* yacc.c:1646  */
+    {(yyval.vstr)=strdup("==");}
+#line 1419 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 375 "minic.y" /* yacc.c:1646  */
-    { (yyval.node) = NULL; }
-#line 1809 "y.tab.c" /* yacc.c:1646  */
+#line 77 "tigger.y" /* yacc.c:1646  */
+    {check_zero_written((yyvsp[-2].vint)); stmts.push_back(new stmt_assign_const((yyvsp[-2].vint), (yyvsp[0].vint)));}
+#line 1425 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 378 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_EXPR_BILOGIC, strdup((yyvsp[-1].name)));
-		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
-		if (((yyvsp[-2].node)->type != TN_EXPR_BILOGIC && (yyvsp[-2].node)->type != TN_EXPR_UNI
-				&& ((yyvsp[-2].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-2].node)->name, "!") != 0))
-			|| ((yyvsp[0].node)->type != TN_EXPR_BILOGIC && (yyvsp[0].node)->type != TN_EXPR_UNI
-				&& ((yyvsp[0].node)->type == TN_EXPR_UNI && strcmp((yyvsp[0].node)->name, "!") != 0)))
-			alloc_ew(WARN_MIXED_EXPR, (yyval.node), NULL, NULL);
-	}
-#line 1824 "y.tab.c" /* yacc.c:1646  */
+#line 78 "tigger.y" /* yacc.c:1646  */
+    {check_zero_written((yyvsp[-4].vint)); check_op2((yyvsp[-1].vstr)); stmts.push_back(new stmt_assign_op2((yyvsp[-4].vint), (yyvsp[-2].vint), (yyvsp[-1].vstr), (yyvsp[0].vint)));}
+#line 1431 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 388 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_EXPR_BILOGIC, strdup((yyvsp[-1].name)));
-		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
-		if ((yyvsp[-2].node)->type == TN_EXPR_BILOGIC
-				|| ((yyvsp[-2].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-2].node)->name, "!") == 0)
-			|| (yyvsp[0].node)->type == TN_EXPR_BILOGIC
-				|| ((yyvsp[0].node)->type == TN_EXPR_UNI && strcmp((yyvsp[0].node)->name, "!") == 0))
-			alloc_ew(WARN_MIXED_EXPR, (yyval.node), NULL, NULL);
-	}
-#line 1839 "y.tab.c" /* yacc.c:1646  */
+#line 79 "tigger.y" /* yacc.c:1646  */
+    {check_zero_written((yyvsp[-4].vint)); check_op2i((yyvsp[-1].vstr)); stmts.push_back(new stmt_assign_op2i((yyvsp[-4].vint), (yyvsp[-2].vint), (yyvsp[-1].vstr), (yyvsp[0].vint)));}
+#line 1437 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 398 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_EXPR_BILOGIC, strdup((yyvsp[-1].name)));
-		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
-		if ((yyvsp[-2].node)->type == TN_EXPR_BILOGIC
-				|| ((yyvsp[-2].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-2].node)->name, "!") == 0)
-			|| (yyvsp[0].node)->type == TN_EXPR_BILOGIC
-				|| ((yyvsp[0].node)->type == TN_EXPR_UNI && strcmp((yyvsp[0].node)->name, "!") == 0))
-			alloc_ew(WARN_MIXED_EXPR, (yyval.node), NULL, NULL);
-	}
-#line 1854 "y.tab.c" /* yacc.c:1646  */
+#line 80 "tigger.y" /* yacc.c:1646  */
+    {check_zero_written((yyvsp[-3].vint)); check_op1((yyvsp[-1].vstr)); stmts.push_back(new stmt_assign_op1((yyvsp[-3].vint), (yyvsp[-1].vstr), (yyvsp[0].vint)));}
+#line 1443 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 408 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_EXPR_BIARITH, strdup((yyvsp[-1].name)));
-		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
-		if ((yyvsp[-2].node)->type == TN_EXPR_BILOGIC
-				|| ((yyvsp[-2].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-2].node)->name, "!") == 0)
-			|| (yyvsp[0].node)->type == TN_EXPR_BILOGIC
-				|| ((yyvsp[0].node)->type == TN_EXPR_UNI && strcmp((yyvsp[0].node)->name, "!") == 0))
-			alloc_ew(WARN_MIXED_EXPR, (yyval.node), NULL, NULL);
-	}
-#line 1869 "y.tab.c" /* yacc.c:1646  */
+#line 81 "tigger.y" /* yacc.c:1646  */
+    {check_zero_written((yyvsp[-2].vint)); stmts.push_back(new stmt_assign_move((yyvsp[-2].vint), (yyvsp[0].vint)));}
+#line 1449 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 418 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_EXPR_BIARITH, strdup((yyvsp[-1].name)));
-		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
-		if ((yyvsp[-2].node)->type == TN_EXPR_BILOGIC
-				|| ((yyvsp[-2].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-2].node)->name, "!") == 0)
-			|| (yyvsp[0].node)->type == TN_EXPR_BILOGIC
-				|| ((yyvsp[0].node)->type == TN_EXPR_UNI && strcmp((yyvsp[0].node)->name, "!") == 0))
-			alloc_ew(WARN_MIXED_EXPR, (yyval.node), NULL, NULL);
-	}
-#line 1884 "y.tab.c" /* yacc.c:1646  */
+#line 82 "tigger.y" /* yacc.c:1646  */
+    {check_zero_written((yyvsp[-5].vint)); stmts.push_back(new stmt_assign_lidx((yyvsp[-5].vint), (yyvsp[-3].vint), (yyvsp[0].vint)));}
+#line 1455 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 428 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_EXPR_ARR, NULL);
-		(yyval.node)->child[0] = (yyvsp[-3].node); (yyvsp[-3].node)->parent = (yyval.node); (yyvsp[-3].node)->child_idx = 0;
-		(yyval.node)->child[1] = (yyvsp[-1].node); (yyvsp[-1].node)->parent = (yyval.node); (yyvsp[-1].node)->child_idx = 1;
-		if ((yyvsp[-1].node)->type == TN_EXPR_BILOGIC
-				|| ((yyvsp[-1].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-1].node)->name, "!") == 0))
-			alloc_ew(WARN_MIXED_EXPR, (yyvsp[-1].node), NULL, NULL);
-		if (find_var(ST_ARR, (yyvsp[-3].node)))
-			print_ew();
-	}
-#line 1899 "y.tab.c" /* yacc.c:1646  */
+#line 83 "tigger.y" /* yacc.c:1646  */
+    {check_zero_written((yyvsp[-5].vint)); stmts.push_back(new stmt_assign_ridx((yyvsp[-5].vint), (yyvsp[-3].vint), (yyvsp[-1].vint)));}
+#line 1461 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 438 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_EXPR_INTEGER, NULL);
-		(yyval.node)->child[0] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 0;
-	}
-#line 1908 "y.tab.c" /* yacc.c:1646  */
+#line 84 "tigger.y" /* yacc.c:1646  */
+    {check_op2((yyvsp[-3].vstr)); stmts.push_back(new stmt_if_goto((yyvsp[-4].vint), (yyvsp[-3].vstr), (yyvsp[-2].vint), (yyvsp[0].vint)));}
+#line 1467 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 442 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_EXPR_IDENTIFIER, NULL);
-		(yyval.node)->child[0] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 0;
-		if (find_var(ST_INT, (yyvsp[0].node)) == 0)
-			print_ew();
-	}
-#line 1919 "y.tab.c" /* yacc.c:1646  */
+#line 85 "tigger.y" /* yacc.c:1646  */
+    {stmts.push_back(new stmt_goto((yyvsp[0].vint)));}
+#line 1473 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 448 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_EXPR_UNI, strdup((yyvsp[-1].name)));
-		(yyval.node)->child[0] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 0;
-		if ((yyvsp[0].node)->type == TN_EXPR_BILOGIC
-			|| ((yyvsp[0].node)->type == TN_EXPR_UNI && strcmp((yyvsp[0].node)->name, "!") == 0))
-			alloc_ew(WARN_MIXED_EXPR, (yyval.node), NULL, NULL);
-	}
-#line 1931 "y.tab.c" /* yacc.c:1646  */
+#line 86 "tigger.y" /* yacc.c:1646  */
+    {add_label((yyvsp[-1].vint));}
+#line 1479 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 455 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_EXPR_UNI, strdup((yyvsp[-1].name)));
-		(yyval.node)->child[0] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 0;
-		if ((yyvsp[0].node)->type != TN_EXPR_BILOGIC && (yyvsp[0].node)->type != TN_EXPR_UNI
-			&& ((yyvsp[0].node)->type == TN_EXPR_UNI && strcmp((yyvsp[0].node)->name, "!") != 0))
-			alloc_ew(WARN_MIXED_EXPR, (yyval.node), NULL, NULL);
-	}
-#line 1943 "y.tab.c" /* yacc.c:1646  */
+#line 87 "tigger.y" /* yacc.c:1646  */
+    {stmts.push_back(new stmt_call((yyvsp[0].vstr)));}
+#line 1485 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 462 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_EXPR_CALL, NULL);
-		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
-		(yyval.node)->child[1] = NULL;
-	}
-#line 1953 "y.tab.c" /* yacc.c:1646  */
+#line 88 "tigger.y" /* yacc.c:1646  */
+    {stmts.push_back(new stmt_store_local((yyvsp[-1].vint), (yyvsp[0].vint)));}
+#line 1491 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 467 "minic.y" /* yacc.c:1646  */
-    {
-		struct TreeNode *tmp_node;
-		(yyval.node) = alloc_treenode(lineno, TN_EXPR_CALL, NULL);
-		(yyval.node)->child[0] = (yyvsp[-3].node); (yyvsp[-3].node)->parent = (yyval.node); (yyvsp[-3].node)->child_idx = 0;
-		tmp_node = (yyvsp[-1].node);
-		while(tmp_node->sibling_l != NULL)
-		{
-			tmp_node->parent = (yyval.node); tmp_node->child_idx = 1;
-			tmp_node = tmp_node->sibling_l;
-		}
-		(yyval.node)->child[1] = tmp_node; tmp_node->parent = (yyval.node); tmp_node->child_idx = 1;
-	}
-#line 1970 "y.tab.c" /* yacc.c:1646  */
+#line 90 "tigger.y" /* yacc.c:1646  */
+    {check_zero_written((yyvsp[0].vint)); stmts.push_back(new stmt_load_local((yyvsp[-1].vint), (yyvsp[0].vint)));}
+#line 1497 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 479 "minic.y" /* yacc.c:1646  */
-    { (yyval.node) = (yyvsp[-1].node); }
-#line 1976 "y.tab.c" /* yacc.c:1646  */
+#line 91 "tigger.y" /* yacc.c:1646  */
+    {check_gvar((yyvsp[-1].vint)); check_zero_written((yyvsp[0].vint)); stmts.push_back(new stmt_load_global(gvar_name[(yyvsp[-1].vint)], (yyvsp[0].vint)));}
+#line 1503 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 482 "minic.y" /* yacc.c:1646  */
-    { (yyval.node) = (yyvsp[0].node); }
-#line 1982 "y.tab.c" /* yacc.c:1646  */
+#line 92 "tigger.y" /* yacc.c:1646  */
+    {check_zero_written((yyvsp[0].vint)); stmts.push_back(new stmt_loadaddr_local((yyvsp[-1].vint), (yyvsp[0].vint)));}
+#line 1509 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 483 "minic.y" /* yacc.c:1646  */
-    {
-		(yyvsp[-2].node)->sibling_r = (yyvsp[0].node);
-		(yyvsp[0].node)->sibling_l = (yyvsp[-2].node);
-		(yyval.node) = (yyvsp[0].node);
-	}
-#line 1992 "y.tab.c" /* yacc.c:1646  */
+#line 93 "tigger.y" /* yacc.c:1646  */
+    {check_gvar((yyvsp[-1].vint)); check_zero_written((yyvsp[0].vint)); stmts.push_back(new stmt_loadaddr_global(gvar_name[(yyvsp[-1].vint)], (yyvsp[0].vint)));}
+#line 1515 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 490 "minic.y" /* yacc.c:1646  */
-    { (yyval.node) = alloc_treenode(lineno, TN_TYPE, strdup((yyvsp[0].name))); }
-#line 1998 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 47:
-#line 493 "minic.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(lineno, TN_INTEGER, NULL);
-		(yyval.node)->val = (yyvsp[0].value);
-	}
-#line 2007 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 48:
-#line 499 "minic.y" /* yacc.c:1646  */
-    { (yyval.node) = alloc_treenode(lineno, TN_IDENTIFIER, strdup((yyvsp[0].name))); }
-#line 2013 "y.tab.c" /* yacc.c:1646  */
+#line 94 "tigger.y" /* yacc.c:1646  */
+    {stmts.push_back(new stmt_return());}
+#line 1521 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 2017 "y.tab.c" /* yacc.c:1646  */
+#line 1525 "/home/lc/Downloads/MiniC-Compiler/Simulators/src_code/src/tigger_simulator/tigger.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2241,84 +1749,11 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 502 "minic.y" /* yacc.c:1906  */
+#line 98 "tigger.y" /* yacc.c:1906  */
 
 
-void yyerror(char* s)
+void yyerror(const char *s)
 {
-	fprintf(stderr, ">> ERROR@L%d: %s\n", lineno, s);
-	exit(-3);
-}
-
-int main(int argc, char** argv)
-{
-	for (int i = 1; i < argc; i++)
-	{
-		if (strcmp(argv[i], "-T") == 0 || strcmp(argv[i], "--tree") == 0)
-			continue;
-		if (strcmp(argv[i], "-S") == 0 || strcmp(argv[i], "--symtab") == 0)
-			continue;
-		if (strcmp(argv[i], "--infile") == 0 || strcmp(argv[i], "--input") == 0
-			|| strcmp(argv[i], "-I") == 0)
-		{
-			if (i + 1 >= argc)
-			{
-				printf("No input file\n");
-				return -1;
-			}
-			yyin = fopen(argv[i+1], "r");
-			if (yyin == NULL)
-			{
-				printf("Cannot open file: %s\nPlease check if it is valid\n",
-					argv[1]);
-				return -1;
-			}
-			i++;
-			continue;
-		}
-		if (strcmp(argv[i], "--outfile") == 0 || strcmp(argv[i], "--output") == 0
-			|| strcmp(argv[i], "-O") == 0)
-		{
-			if (i + 1 >= argc)
-			{
-				printf("No input file\n");
-				return -1;
-			}
-			yyout = fopen(argv[i+1], "w");
-			if (yyout == NULL)
-			{
-				printf("Cannot open file: %s\nPlease check if it is valid\n",
-					argv[2]);
-				return -1;
-			}
-			i++;
-			continue;
-		}
-		printf("Unknown option: %s\n", argv[i]);
-		return -2;
-	}
-	init_tree();
-	init_symtab();
-	init_ew();
-	yyparse();
-	find_wrong_call(root);
-	find_conflict();
-	print_ew();
-	minic2eeyore(root, "");
-	for (int i = 2; i < argc; i++)
-	{
-		if (strcmp(argv[i], "-T") == 0 || strcmp(argv[i], "--tree") == 0)
-		{
-			printf("\nMiniC parse tree of %s\n", argv[1]);
-			print_tree(root, 0);
-		}
-		if (strcmp(argv[i], "-S") == 0 || strcmp(argv[i], "--symtab") == 0)
-		{
-			printf("\nSymbol table of %s\n", argv[1]);
-			print_symtab();
-		}
-	}
-	fclose(yyin);
-	fclose(yyout);
-	return 0;
+    printf("line %d: %s\n", yylineno, s);
+    exit(1);
 }

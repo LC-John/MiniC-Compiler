@@ -206,7 +206,7 @@ int minic2eeyore(struct TreeNode* arg_node, char* arg_prefix)
 			fprintf(yyout, "%sparam %c%d\n", arg_prefix,
 				tmp_sym->eeyore_var_type, tmp_sym->eeyore_var_idx);
 		}
-		fprintf(yyout, "%st%d = call %s\n", arg_prefix, tmp, arg_node->child[0]->name);
+		fprintf(yyout, "%st%d = call f_%s\n", arg_prefix, tmp, arg_node->child[0]->name);
 		free(prefix);
 		return tmp;
 	case TN_TYPE:
