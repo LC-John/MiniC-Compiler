@@ -13,6 +13,8 @@ struct Symbol
 	int idx;
 	int type;
 	char* name;
+	char eeyore_var_type;
+	int eeyore_var_idx;
 	int bornAt;
 	int dieAt;
 	struct TreeNode *node;

@@ -41,6 +41,7 @@ struct ErrorWarning* alloc_ew(int arg_type, struct TreeNode* arg_node,
 	case ERR_WRONG_CALL:	// function calling node is type conflict with the variable symbol
 	case ERR_UNDEFINED_VAR:	// use an undefined variable
 	case ERR_UNDEFINED_FUNC:	// call an undefined function
+	case ERR_WRONG_EXPR:	// wrong expresion format applied
 	case WARN_MIXED_EXPR:	// mix logical and arithmatic expressions together
 	case WARN_NO_RETURN:	// the last statement is not a return
 	case WARN_FUNCDECL_IN_BODY:	// declare functions in the function body
@@ -95,6 +96,9 @@ void print_ew()
 			exit(-3);
 		case ERR_UNDEFINED_FUNC:
 			fprintf(stderr, ">> ERROR@L%d: undefined function %s\n", ew->node->lineno, ew->node->name);
+			exit(-3);
+		case ERR_WRONG_EXPR:
+			fprintf(stderr, ">> ERROR@L%d: wrong expression type in condition\n", ew->node->lineno);
 			exit(-3);
 		case WARN_MIXED_EXPR:
 			fprintf(stderr, ">> WARNING@L%d: mixed expression type\n", ew->node->lineno);

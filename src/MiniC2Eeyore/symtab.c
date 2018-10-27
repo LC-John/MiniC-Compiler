@@ -14,6 +14,8 @@ struct Symbol* alloc_symbol(int arg_line, int arg_type, char* arg_name, struct T
 	else
 		name = strdup(arg_name);
 	sym->name = name;
+	sym->eeyore_var_idx = -1;
+	sym->eeyore_var_type = 'E';
 	switch(sym->type)
 	{
 	case ST_INT:
@@ -105,14 +107,15 @@ void print_symtab()
 	{
 		switch(sym->type)
 		{
-		case ST_INT: printf("%d\t[INT] \t%-12s\tL%d~L%d\n",
-			sym->idx, sym->name, sym->bornAt, sym->dieAt); break;
-		case ST_ARR: printf("%d\t[ARR] \t%-12s\tL%d~L%d\n",
-			sym->idx, sym->name, sym->bornAt, sym->dieAt); break;
+		case ST_INT: printf("%d\t[INT] \t%-12s\tL%d~L%d\t%c%d\n",
+			sym->idx, sym->name, sym->bornAt, sym->dieAt,
+			sym->eeyore_var_type, sym->eeyore_var_idx); break;
+		case ST_ARR: printf("%d\t[ARR] \t%-12s\tL%d~L%d\t%c%d\n",
+			sym->idx, sym->name, sym->bornAt, sym->dieAt,
+			sym->eeyore_var_type, sym->eeyore_var_idx); break;
 		case ST_FUNC: printf("%d\t[FUNC]\t%-12s\tL%d~L%d\n",
 			sym->idx, sym->name, sym->bornAt, sym->dieAt); break;
-		case ST_INIT: printf("%d\t{ERR}  \t%-12s\tL%d~L%d\n",
-			sym->idx, sym->name, sym->bornAt, sym->dieAt); break;
+		case ST_INIT:
 		default: printf("%d\t{ERR}  \t%-12s\tL%d~L%d\n",
 			sym->idx, sym->name, sym->bornAt, sym->dieAt); break;
 		}

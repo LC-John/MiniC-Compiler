@@ -6,11 +6,13 @@
 #include "tree.h"
 #include "symtab.h"
 #include "error.h"
+#include "transform.h"
 
 int yylex(void);
 void yyerror(char*);
 
 extern FILE* yyin;
+extern FILE* yyout;
 extern int lineno;
 struct TreeNode* root;
 %}
@@ -294,9 +296,12 @@ Stmt	: BRC_L StmtList BRC_R {
 		$$->child[1] = $5; $5->parent = $$; $5->child_idx = 1;
 		$$->child[2] = NULL;
 		set_death($2, lineno);
-		if ($3->type != TN_EXPR_BILOGIC && $3->type != TN_EXPR_UNI
-			&& ($3->type == TN_EXPR_UNI && strcmp($3->name, "!") != 0))
-			alloc_ew(WARN_MIXED_EXPR, $3, NULL, NULL);
+		if ($3->type != TN_EXPR_BILOGIC
+			&& !($3->type == TN_EXPR_UNI && strcmp($3->name, "!") == 0))
+		{
+			alloc_ew(ERR_WRONG_EXPR, $3, NULL, NULL);
+			print_ew();
+		}
 	}
 	| IF PRN_L Expr PRN_R Stmt ELSE Stmt {
 		$$ = alloc_treenode(lineno, TN_STMT_IF, NULL);
@@ -305,18 +310,24 @@ Stmt	: BRC_L StmtList BRC_R {
 		$$->child[2] = $7; $7->parent = $$; $7->child_idx = 2;
 		set_death($2, $7->lineno-1);
 		set_death($7->lineno, lineno);
-		if ($3->type != TN_EXPR_BILOGIC && $3->type != TN_EXPR_UNI
-			&& ($3->type == TN_EXPR_UNI && strcmp($3->name, "!") != 0))
-			alloc_ew(WARN_MIXED_EXPR, $3, NULL, NULL);
+		if ($3->type != TN_EXPR_BILOGIC
+			&& !($3->type == TN_EXPR_UNI && strcmp($3->name, "!") == 0))
+		{
+			alloc_ew(ERR_WRONG_EXPR, $3, NULL, NULL);
+			print_ew();
+		}
 	}
 	| WHILE PRN_L Expr PRN_R Stmt {
 		$$ = alloc_treenode(lineno, TN_STMT_WHILE, NULL);
 		$$->child[0] = $3; $3->parent = $$; $3->child_idx = 0;
 		$$->child[1] = $5; $5->parent = $$; $5->child_idx = 1;
 		set_death($2, lineno);
-		if ($3->type != TN_EXPR_BILOGIC && $3->type != TN_EXPR_UNI
-			&& ($3->type == TN_EXPR_UNI && strcmp($3->name, "!") != 0))
-			alloc_ew(WARN_MIXED_EXPR, $3, NULL, NULL);
+		if ($3->type != TN_EXPR_BILOGIC
+			&& !($3->type == TN_EXPR_UNI && strcmp($3->name, "!") == 0))
+		{
+			alloc_ew(ERR_WRONG_EXPR, $3, NULL, NULL);
+			print_ew();
+		}
 	}
 	| Identifier OP_7 Expr EOL {
 		$$ = alloc_treenode(lineno, TN_STMT_VARASSN, NULL);
@@ -498,15 +509,21 @@ void yyerror(char* s)
 
 int main(int argc, char** argv)
 {
-	if (argc < 2)
+	if (argc < 3)
 		return -1;
 	yyin = fopen(argv[1], "r");
+	yyout = fopen(argv[2], "w");
 	if (yyin == NULL)
 	{
 		printf("Cannot open file: %s\nPlease check if it is valid\n", argv[1]);
 		return -1;
 	}
-	for (int i = 2; i < argc; i++)
+	if (yyout == NULL)
+	{
+		printf("Cannot open file: %s\nPlease check if it is valid\n", argv[2]);
+		return -1;
+	}
+	for (int i = 3; i < argc; i++)
 	{
 		if (strcmp(argv[i], "-T") == 0 || strcmp(argv[i], "--tree") == 0)
 			continue;
@@ -522,6 +539,7 @@ int main(int argc, char** argv)
 	find_wrong_call(root);
 	find_conflict();
 	print_ew();
+	minic2eeyore(root, "");
 	for (int i = 2; i < argc; i++)
 	{
 		if (strcmp(argv[i], "-T") == 0 || strcmp(argv[i], "--tree") == 0)
@@ -535,5 +553,7 @@ int main(int argc, char** argv)
 			print_symtab();
 		}
 	}
+	fclose(yyin);
+	fclose(yyout);
 	return 0;
 }

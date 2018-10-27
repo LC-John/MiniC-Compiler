@@ -15,9 +15,9 @@ MiniC => (Type Checking) => Eeyore => Tigger => RISC-V
 
 ## Phase 1. MiniC2Eeyore & Type Checking
 
-In progress...
+Almost finished!
 
-Now, the parse tree is built using Flex & Bison. A symbol table (including all variables and functions) is extracted while building the parse tree.
+The parse tree is built using Flex & Bison. A symbol table (including all variables and functions) is extracted while building the parse tree.
 
 Error/warning checking is performed. The following errors/warning will be detected.
 
@@ -28,13 +28,17 @@ ERROR
 	Wrong assignment	-- Assigning to invalid integer variable, or even not-a-variable
 	Wrong parameter(s)	-- Assigning invalid actual parameters to the function call
 	Wrong function call	-- Call a invalid function
+	Wrong expression	-- Using arithmetic expression in condition
+
 WARNING	
-	Mixed expression	-- Mix the logical and arithmatic expressions
+	Mixed expression	-- Mix the logical and arithmatic expressions together
 	No return		-- The last statement in the function body is not a return
 	Function declarition in function body	-- Declare a function inside another function body, which is allowed, but highly unrecommended!
 ```
 
-Parse tree transformation will be finished soon.
+Transformation is performed on the MiniC parse tree. A depth-first traverse is performed, and the Eeyore code for the sub-parse-tree of each corresponding node is generated in the meantime.
+
+Waiting to be test automatically on the test server...
 
 ## Phase 2. Eeyore2Tigger
 
