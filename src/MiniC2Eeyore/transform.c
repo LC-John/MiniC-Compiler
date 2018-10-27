@@ -44,7 +44,7 @@ int minic2eeyore(struct TreeNode* arg_node, char* arg_prefix)
 		fprintf(yyout, "%sf_%s [%d]\n", arg_prefix, arg_node->child[1]->name, tmp);
 		for (tmp_node = arg_node->child[3]; tmp_node != NULL; tmp_node = tmp_node->sibling_r)
 			minic2eeyore(tmp_node, prefix);
-		fprintf(yyout, "%send f_%s", arg_prefix, arg_node->child[1]->name);
+		fprintf(yyout, "%send f_%s\n", arg_prefix, arg_node->child[1]->name);
 	case TN_FUNCDECL: free(prefix); return -1;
 	case TN_VARDEFN:
 		if (arg_node->child[2] == NULL)

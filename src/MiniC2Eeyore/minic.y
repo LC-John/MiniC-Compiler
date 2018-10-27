@@ -509,27 +509,49 @@ void yyerror(char* s)
 
 int main(int argc, char** argv)
 {
-	if (argc < 3)
-		return -1;
-	yyin = fopen(argv[1], "r");
-	yyout = fopen(argv[2], "w");
-	if (yyin == NULL)
-	{
-		printf("Cannot open file: %s\nPlease check if it is valid\n", argv[1]);
-		return -1;
-	}
-	if (yyout == NULL)
-	{
-		printf("Cannot open file: %s\nPlease check if it is valid\n", argv[2]);
-		return -1;
-	}
-	for (int i = 3; i < argc; i++)
+	for (int i = 1; i < argc; i++)
 	{
 		if (strcmp(argv[i], "-T") == 0 || strcmp(argv[i], "--tree") == 0)
 			continue;
 		if (strcmp(argv[i], "-S") == 0 || strcmp(argv[i], "--symtab") == 0)
 			continue;
-		printf("Unknown option: %s", argv[i]);
+		if (strcmp(argv[i], "--infile") == 0 || strcmp(argv[i], "--input") == 0
+			|| strcmp(argv[i], "-I") == 0)
+		{
+			if (i + 1 >= argc)
+			{
+				printf("No input file\n");
+				return -1;
+			}
+			yyin = fopen(argv[i+1], "r");
+			if (yyin == NULL)
+			{
+				printf("Cannot open file: %s\nPlease check if it is valid\n",
+					argv[1]);
+				return -1;
+			}
+			i++;
+			continue;
+		}
+		if (strcmp(argv[i], "--outfile") == 0 || strcmp(argv[i], "--output") == 0
+			|| strcmp(argv[i], "-O") == 0)
+		{
+			if (i + 1 >= argc)
+			{
+				printf("No input file\n");
+				return -1;
+			}
+			yyout = fopen(argv[i+1], "w");
+			if (yyout == NULL)
+			{
+				printf("Cannot open file: %s\nPlease check if it is valid\n",
+					argv[2]);
+				return -1;
+			}
+			i++;
+			continue;
+		}
+		printf("Unknown option: %s\n", argv[i]);
 		return -2;
 	}
 	init_tree();
