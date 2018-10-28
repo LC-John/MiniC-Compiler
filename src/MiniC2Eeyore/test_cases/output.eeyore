@@ -54,27 +54,30 @@ l1:
 	param p0
 	param T3
 	t14 = call f_func	// [EXPR] CALL func @ Line 13
-	T3 = t14	// [STMT] VAR ASSN @ Line 13
-	var t15
-	t15 = T3	// [EXPR] VAR @ Line 14
-	return t15	// [STMT] RET @ Line 14
+	return t14	// [STMT] RET @ Line 13
 end f_func
 
 
-f_main [0]	// [FUNC] main @ Line 22
+f_main [0]	// [FUNC] main @ Line 21
+	var t15
+	t15 = call f_getint	// [EXPR] CALL getint @ Line 17
+	T0 = t15	// [STMT] VAR ASSN @ Line 17
 	var t16
-	t16 = call f_getint	// [EXPR] CALL getint @ Line 18
-	T0 = t16	// [STMT] VAR ASSN @ Line 18
+	t16 = 0	// [EXPR] NUM @ Line 18
+	T1 = t16	// [STMT] VAR ASSN @ Line 18
 	var t17
-	t17 = 0	// [EXPR] NUM @ Line 19
-	T1 = t17	// [STMT] VAR ASSN @ Line 19
+	param T0
+	param T1
+	t17 = call f_func	// [EXPR] CALL func @ Line 19
 	var t18
 	param T0
 	param T1
-	t18 = call f_func	// [EXPR] CALL func @ Line 20
-	T2 = t18	// [STMT] VAR ASSN @ Line 20
+	t18 = call f_func	// [EXPR] CALL func @ Line 19
 	var t19
-	t19 = T2	// [EXPR] VAR @ Line 21
-	return t19	// [STMT] RET @ Line 21
+	t19 = t17 + t18	// [EXPR] BI OP + @ Line 19
+	T2 = t19	// [STMT] VAR ASSN @ Line 19
+	var t20
+	t20 = T2	// [EXPR] VAR @ Line 20
+	return t20	// [STMT] RET @ Line 20
 end f_main
 

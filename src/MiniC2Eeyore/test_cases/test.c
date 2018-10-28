@@ -10,13 +10,12 @@ int func(int a, int b)
 	int c;
 	c = a + b;
 	a = a - 1;
-	c = func(a, c);
-	return c;
+	return func(a, c);
 }
 
 int main(){
 	a = getint();
 	b = 0;
-	c = func(a, b);
+	c = func(a, b) + func(a, b);
 	return c;
 }

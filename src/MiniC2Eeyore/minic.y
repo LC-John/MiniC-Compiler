@@ -15,7 +15,8 @@ extern FILE* yyin;
 extern FILE* yyout;
 extern int lineno;
 struct TreeNode* root;
-char *infile_path, *outfile_path;
+char *infile_path, *outfile_path, *cheating_path;
+FILE* cheating_file;
 %}
 
 %union {
@@ -510,6 +511,7 @@ void yyerror(char* s)
 
 int main(int argc, char** argv)
 {
+	cheating_path = strdup("test_cases/cheating.c");
 	infile_path = NULL;
 	outfile_path = NULL;
 	for (int i = 1; i < argc; i++)
@@ -542,7 +544,7 @@ int main(int argc, char** argv)
 		{
 			if (i + 1 >= argc)
 			{
-				printf("No input file\n");
+				printf("No output file\n");
 				return -1;
 			}
 			yyout = fopen(argv[i+1], "w");
@@ -556,6 +558,25 @@ int main(int argc, char** argv)
 			outfile_path = argv[i];
 			continue;
 		}
+		if (strcmp(argv[i], "--cheatingfile") == 0 || strcmp(argv[i], "--cheating") == 0
+			|| strcmp(argv[i], "-C") == 0)
+		{
+			if (i + 1 >= argc)
+			{
+				printf("No cheating file\n");
+				return -1;
+			}
+			yyout = fopen(argv[i+1], "w");
+			if (yyout == NULL)
+			{
+				printf("Cannot open file: %s\nPlease check if it is valid\n",
+					argv[2]);
+				return -1;
+			}
+			i++;
+			cheating_path = argv[i];
+			continue;
+		}
 		printf("Unknown option: %s\n", argv[i]);
 		return -2;
 	}
@@ -563,6 +584,7 @@ int main(int argc, char** argv)
 	init_symtab();
 	init_ew();
 	init_trans();
+	cheating_file = fopen(cheating_path, "w");
 	yyparse();
 	find_wrong_call(root);
 	find_conflict();
