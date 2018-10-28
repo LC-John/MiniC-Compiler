@@ -1,0 +1,80 @@
+// Eeyore code
+//     MiniC source: test_cases/test.c
+//     Author: Zhang Huangzhao
+//
+// View https://github.com/LC-John/MiniC-Compiler for detail
+
+
+var T0	// [VAR] a @ Line 1
+var T1	// [VAR] b @ Line 2
+var T2	// [VAR] c @ Line 3
+
+// [PARAM] p0 = a @ Line 6
+// [PARAM] p1 = b @ Line 6
+f_func [2]	// [FUNC] func @ Line 6
+	var t0
+	t0 = p0	// [EXPR] VAR @ Line 8
+	var t1
+	t1 = 0	// [EXPR] NUM @ Line 8
+	var t2
+	t2 = t0 < t1	// [EXPR] BI OP < @ Line 8
+	var t3
+	t3 = p0	// [EXPR] VAR @ Line 8
+	var t4
+	t4 = 0	// [EXPR] NUM @ Line 8
+	var t5
+	t5 = t3 == t4	// [EXPR] BI OP == @ Line 8
+	var t6
+	t6 = t2 || t5	// [EXPR] BI OP || @ Line 8
+	if t6 != 0 goto l0	// [BLK] IF @ Line 10
+	goto l2
+l0:
+		var t7
+		t7 = p1	// [EXPR] VAR @ Line 9
+		return t7	// [STMT] RET @ Line 9
+		goto l1
+l2:
+l1:
+	var T3	// [VAR] c @ Line 10
+	var t8
+	t8 = p0	// [EXPR] VAR @ Line 11
+	var t9
+	t9 = p1	// [EXPR] VAR @ Line 11
+	var t10
+	t10 = t8 + t9	// [EXPR] BI OP + @ Line 11
+	T3 = t10	// [STMT] VAR ASSN @ Line 11
+	var t11
+	t11 = p0	// [EXPR] VAR @ Line 12
+	var t12
+	t12 = 1	// [EXPR] NUM @ Line 12
+	var t13
+	t13 = t11 - t12	// [EXPR] BI OP - @ Line 12
+	p0 = t13	// [STMT] VAR ASSN @ Line 12
+	var t14
+	param p0
+	param T3
+	t14 = call f_func	// [EXPR] CALL func @ Line 13
+	T3 = t14	// [STMT] VAR ASSN @ Line 13
+	var t15
+	t15 = T3	// [EXPR] VAR @ Line 14
+	return t15	// [STMT] RET @ Line 14
+end f_func
+
+
+f_main [0]	// [FUNC] main @ Line 22
+	var t16
+	t16 = call f_getint	// [EXPR] CALL getint @ Line 18
+	T0 = t16	// [STMT] VAR ASSN @ Line 18
+	var t17
+	t17 = 0	// [EXPR] NUM @ Line 19
+	T1 = t17	// [STMT] VAR ASSN @ Line 19
+	var t18
+	param T0
+	param T1
+	t18 = call f_func	// [EXPR] CALL func @ Line 20
+	T2 = t18	// [STMT] VAR ASSN @ Line 20
+	var t19
+	t19 = T2	// [EXPR] VAR @ Line 21
+	return t19	// [STMT] RET @ Line 21
+end f_main
+

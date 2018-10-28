@@ -3,8 +3,20 @@ int b;
 int c;
 int getint();
 
+int func(int a, int b)
+{
+	if (a < 0 || a == 0)
+		return b;
+	int c;
+	c = a + b;
+	a = a - 1;
+	c = func(a, c);
+	return c;
+}
+
 int main(){
 	a = getint();
-	b = -a;
-	return b;
+	b = 0;
+	c = func(a, b);
+	return c;
 }

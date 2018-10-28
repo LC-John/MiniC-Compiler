@@ -6,6 +6,7 @@
 #include "symtab.h"
 
 extern FILE* yyout;
+extern char* infile_path;
 
 void init_trans()
 {
@@ -30,22 +31,34 @@ int minic2eeyore(struct TreeNode* arg_node, char* arg_prefix)
 	switch(arg_node->type)
 	{
 	case TN_ROOT:
+		fprintf(yyout, "// Eeyore code\n");
+		if (infile_path != NULL)
+			fprintf(yyout, "//     MiniC source: %s\n", infile_path);
+		else
+			fprintf(yyout, "//     MiniC source: stdin\n");
+		fprintf(yyout, "//     Author: Zhang Huangzhao\n");
+		fprintf(yyout, "//\n");
+		fprintf(yyout, "// View https://github.com/LC-John/MiniC-Compiler for detail\n\n\n");
 		for (tmp_node = arg_node->child[0]; tmp_node != NULL; tmp_node = tmp_node->sibling_r)
 			minic2eeyore(tmp_node, arg_prefix);
 		minic2eeyore(arg_node->child[1], arg_prefix);
 		free(prefix);
 		return -1;
 	case TN_FUNCDEFN:
+		fprintf(yyout, "\n");
 		p_idx = 0;
 		for (tmp_node = arg_node->child[2], tmp = 0;
 			tmp_node != NULL; tmp_node = tmp_node->sibling_r, tmp++)
+		{
+			fprintf(yyout, "%s// [PARAM] ", arg_prefix);
 			minic2eeyore(tmp_node, prefix);
-		p_idx = 0;
+		}
 		fprintf(yyout, "%sf_%s [%d]", arg_prefix, arg_node->child[1]->name, tmp);
 		fprintf(yyout, "\t// [FUNC] %s @ Line %d\n", arg_node->child[1]->name, arg_node->lineno);
+		p_idx = 0;
 		for (tmp_node = arg_node->child[3]; tmp_node != NULL; tmp_node = tmp_node->sibling_r)
 			minic2eeyore(tmp_node, prefix);
-		fprintf(yyout, "%send f_%s\n", arg_prefix, arg_node->child[1]->name);
+		fprintf(yyout, "%send f_%s\n\n", arg_prefix, arg_node->child[1]->name);
 	case TN_FUNCDECL: free(prefix); return -1;
 	case TN_VARDEFN:
 		if (arg_node->child[2] == NULL)
@@ -68,11 +81,14 @@ int minic2eeyore(struct TreeNode* arg_node, char* arg_prefix)
 		tmp_sym = get_sym(arg_node->lineno, arg_node->child[1]->name);
 		tmp_sym->eeyore_var_idx = p_idx++;
 		tmp_sym->eeyore_var_type = 'p';
+		fprintf(yyout, "%c%d = %s @ Line %d\n", tmp_sym->eeyore_var_type, tmp_sym->eeyore_var_idx,
+			arg_node->child[1]->name, arg_node->lineno);
 		free(prefix);
 		return -1;
 	case TN_STMT_BLOCK:
+		fprintf(yyout, "%s// [BLK] BLOCK @ Line %d\n", arg_prefix, arg_node->lineno);
 		for (tmp_node = arg_node->child[0]; tmp_node != NULL; tmp_node = tmp_node->sibling_r)
-			minic2eeyore(tmp_node, prefix);
+			minic2eeyore(tmp_node, arg_prefix);
 		free(prefix);
 		return -1;
 	case TN_STMT_IF:
@@ -115,8 +131,9 @@ int minic2eeyore(struct TreeNode* arg_node, char* arg_prefix)
 	case TN_STMT_VARASSN:
 		tmp_l = minic2eeyore(arg_node->child[1], arg_prefix);
 		tmp_sym = get_sym(arg_node->child[0]->lineno, arg_node->child[0]->name);
-		fprintf(yyout, "%s%c%d = t%d\n", arg_prefix,
+		fprintf(yyout, "%s%c%d = t%d", arg_prefix,
 			tmp_sym->eeyore_var_type, tmp_sym->eeyore_var_idx, tmp_l);
+		fprintf(yyout, "\t// [STMT] VAR ASSN @ Line %d\n", arg_node->lineno);
 		free(prefix);
 		return -1;
 	case TN_STMT_ARRASSN:
@@ -126,8 +143,9 @@ int minic2eeyore(struct TreeNode* arg_node, char* arg_prefix)
 		fprintf(yyout, "%svar t%d\n", arg_prefix, tmp);
 		fprintf(yyout, "%st%d = t%d * 4\n", arg_prefix, tmp, tmp_l);
 		tmp_sym = get_sym(arg_node->child[0]->lineno, arg_node->child[0]->name);
-		fprintf(yyout, "%s%c%d [t%d] = t%d\n", arg_prefix,
+		fprintf(yyout, "%s%c%d [t%d] = t%d", arg_prefix,
 			tmp_sym->eeyore_var_type, tmp_sym->eeyore_var_idx, tmp, tmp_r);
+		fprintf(yyout, "\t// [STMT] ARR ASSN @ Line %d\n", arg_node->lineno);
 		free(prefix);
 		return -1;
 	case TN_STMT_VARDEFN:
@@ -136,7 +154,8 @@ int minic2eeyore(struct TreeNode* arg_node, char* arg_prefix)
 		return -1;
 	case TN_STMT_RETURN:
 		tmp_l = minic2eeyore(arg_node->child[0], arg_prefix);
-		fprintf(yyout, "%sreturn t%d\n", arg_prefix, tmp_l);
+		fprintf(yyout, "%sreturn t%d", arg_prefix, tmp_l);
+		fprintf(yyout, "\t// [STMT] RET @ Line %d\n", arg_node->lineno);
 		free(prefix);
 		return -1;
 	case TN_EXPR_BIARITH:
@@ -145,7 +164,8 @@ int minic2eeyore(struct TreeNode* arg_node, char* arg_prefix)
 		tmp_r = minic2eeyore(arg_node->child[1], arg_prefix);
 		tmp = t_idx++;
 		fprintf(yyout, "%svar t%d\n", arg_prefix, tmp);
-		fprintf(yyout, "%st%d = t%d %s t%d\n", arg_prefix, tmp, tmp_l, arg_node->name, tmp_r);
+		fprintf(yyout, "%st%d = t%d %s t%d", arg_prefix, tmp, tmp_l, arg_node->name, tmp_r);
+		fprintf(yyout, "\t// [EXPR] BI OP %s @ Line %d\n", arg_node->name, arg_node->lineno);
 		free(prefix);
 		return tmp;
 	case TN_EXPR_ARR:
@@ -156,29 +176,33 @@ int minic2eeyore(struct TreeNode* arg_node, char* arg_prefix)
 		fprintf(yyout, "%st%d = t%d * 4\n", arg_prefix, tmp_r, tmp_l);
 		tmp = t_idx++;
 		fprintf(yyout, "%svar t%d\n", arg_prefix, tmp);
-		fprintf(yyout, "%st%d = %c%d [t%d]\n", arg_prefix, tmp,
+		fprintf(yyout, "%st%d = %c%d [t%d]", arg_prefix, tmp,
 			tmp_sym->eeyore_var_type, tmp_sym->eeyore_var_idx, tmp_r);
+		fprintf(yyout, "\t// [EXPR] ARR @ Line %d\n", arg_node->lineno);
 		free(prefix);
 		return tmp;
 	case TN_EXPR_INTEGER:
 		tmp = t_idx++;
 		fprintf(yyout, "%svar t%d\n", arg_prefix, tmp);
-		fprintf(yyout, "%st%d = %d\n", arg_prefix, tmp, arg_node->child[0]->val);
+		fprintf(yyout, "%st%d = %d", arg_prefix, tmp, arg_node->child[0]->val);
+		fprintf(yyout, "\t// [EXPR] NUM @ Line %d\n", arg_node->lineno);
 		free(prefix);
 		return tmp;
 	case TN_EXPR_IDENTIFIER:
 		tmp_sym = get_sym(arg_node->child[0]->lineno, arg_node->child[0]->name);
 		tmp = t_idx++;
 		fprintf(yyout, "%svar t%d\n", arg_prefix, tmp);
-		fprintf(yyout, "%st%d = %c%d\n", arg_prefix, tmp,
+		fprintf(yyout, "%st%d = %c%d", arg_prefix, tmp,
 			tmp_sym->eeyore_var_type, tmp_sym->eeyore_var_idx);
+		fprintf(yyout, "\t// [EXPR] VAR @ Line %d\n", arg_node->lineno);
 		free(prefix);
 		return tmp;
 	case TN_EXPR_UNI:
 		tmp_r = minic2eeyore(arg_node->child[0], arg_prefix);
 		tmp = t_idx++;
 		fprintf(yyout, "%svar t%d\n", arg_prefix, tmp);
-		fprintf(yyout, "%st%d = %s t%d\n", arg_prefix, tmp, arg_node->name, tmp_r);
+		fprintf(yyout, "%st%d = %s t%d", arg_prefix, tmp, arg_node->name, tmp_r);
+		fprintf(yyout, "\t// [EXPR] UNI OP %s @ Line %d\n", arg_node->name, arg_node->lineno);
 		free(prefix);
 		return tmp;
 	case TN_EXPR_CALL:
@@ -191,7 +215,7 @@ int minic2eeyore(struct TreeNode* arg_node, char* arg_prefix)
 				tmp_sym->eeyore_var_type, tmp_sym->eeyore_var_idx);
 		}
 		fprintf(yyout, "%st%d = call f_%s", arg_prefix, tmp, arg_node->child[0]->name);
-		fprintf(yyout, "\t// [CALL] %s @ Line %d\n", arg_node->child[0]->name, arg_node->lineno);
+		fprintf(yyout, "\t// [EXPR] CALL %s @ Line %d\n", arg_node->child[0]->name, arg_node->lineno);
 		free(prefix);
 		return tmp;
 	case TN_TYPE:

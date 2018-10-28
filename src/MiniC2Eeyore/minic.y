@@ -15,6 +15,7 @@ extern FILE* yyin;
 extern FILE* yyout;
 extern int lineno;
 struct TreeNode* root;
+char *infile_path, *outfile_path;
 %}
 
 %union {
@@ -504,14 +505,13 @@ Identifier	: ID { $$ = alloc_treenode(lineno, TN_IDENTIFIER, strdup($1)); }
 void yyerror(char* s)
 {
 	fprintf(stderr, ">> ERROR@L%d: %s\n", lineno, s);
-	print_ew();
-	print_symtab(stderr);
-	print_tree(root, 0, stderr);
 	exit(-3);
 }
 
 int main(int argc, char** argv)
 {
+	infile_path = NULL;
+	outfile_path = NULL;
 	for (int i = 1; i < argc; i++)
 	{
 		if (strcmp(argv[i], "-T") == 0 || strcmp(argv[i], "--tree") == 0)
@@ -534,6 +534,7 @@ int main(int argc, char** argv)
 				return -1;
 			}
 			i++;
+			infile_path = argv[i];
 			continue;
 		}
 		if (strcmp(argv[i], "--outfile") == 0 || strcmp(argv[i], "--output") == 0
@@ -552,6 +553,7 @@ int main(int argc, char** argv)
 				return -1;
 			}
 			i++;
+			outfile_path = argv[i];
 			continue;
 		}
 		printf("Unknown option: %s\n", argv[i]);
@@ -570,12 +572,18 @@ int main(int argc, char** argv)
 	{
 		if (strcmp(argv[i], "-T") == 0 || strcmp(argv[i], "--tree") == 0)
 		{
-			printf("\nMiniC parse tree of %s\n", argv[1]);
+			if (infile_path != NULL)
+				printf("\nMiniC parse tree of %s\n", infile_path);
+			else
+				printf("\nMiniC parse tree\n");
 			print_tree(root, 0, stdout);
 		}
 		if (strcmp(argv[i], "-S") == 0 || strcmp(argv[i], "--symtab") == 0)
 		{
-			printf("\nSymbol table of %s\n", argv[1]);
+			if (infile_path != NULL)
+				printf("\nSymbol table of %s\n", infile_path);
+			else
+				printf("\nSymbol table\n");
 			print_symtab(stdout);
 		}
 	}
