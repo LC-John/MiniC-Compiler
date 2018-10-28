@@ -504,6 +504,9 @@ Identifier	: ID { $$ = alloc_treenode(lineno, TN_IDENTIFIER, strdup($1)); }
 void yyerror(char* s)
 {
 	fprintf(stderr, ">> ERROR@L%d: %s\n", lineno, s);
+	print_ew();
+	print_symtab();
+	print_tree();
 	exit(-3);
 }
 
