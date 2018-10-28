@@ -1,6 +1,7 @@
 #ifndef __SYMTAB_H__
 #define __SYMTAB_H__
 
+#include <stdio.h>
 #include "tree.h"
 
 #define ST_INIT	0
@@ -33,6 +34,6 @@ void init_symtab();
 struct Symbol* get_sym(int, char*);
 void set_death(int, int);
 void purge_var(int, int);
-void print_symtab();
+void print_symtab(FILE*);
 
 #endif

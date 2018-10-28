@@ -505,8 +505,8 @@ void yyerror(char* s)
 {
 	fprintf(stderr, ">> ERROR@L%d: %s\n", lineno, s);
 	print_ew();
-	print_symtab();
-	print_tree();
+	print_symtab(stderr);
+	print_tree(root, 0, stderr);
 	exit(-3);
 }
 
@@ -571,12 +571,12 @@ int main(int argc, char** argv)
 		if (strcmp(argv[i], "-T") == 0 || strcmp(argv[i], "--tree") == 0)
 		{
 			printf("\nMiniC parse tree of %s\n", argv[1]);
-			print_tree(root, 0);
+			print_tree(root, 0, stdout);
 		}
 		if (strcmp(argv[i], "-S") == 0 || strcmp(argv[i], "--symtab") == 0)
 		{
 			printf("\nSymbol table of %s\n", argv[1]);
-			print_symtab();
+			print_symtab(stdout);
 		}
 	}
 	fclose(yyin);

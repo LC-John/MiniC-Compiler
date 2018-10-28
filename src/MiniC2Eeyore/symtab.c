@@ -100,23 +100,23 @@ void purge_var(int arg_born, int arg_die)
 	}
 }
 
-void print_symtab()
+void print_symtab(FILE* f)
 {
 	struct Symbol* sym = symtab->nxt;
 	while(sym != NULL)
 	{
 		switch(sym->type)
 		{
-		case ST_INT: printf("%d\t[INT] \t%-12s\tL%d~L%d\t%c%d\n",
+		case ST_INT: fprintf(f, "%d\t[INT] \t%-12s\tL%d~L%d\t%c%d\n",
 			sym->idx, sym->name, sym->bornAt, sym->dieAt,
 			sym->eeyore_var_type, sym->eeyore_var_idx); break;
-		case ST_ARR: printf("%d\t[ARR] \t%-12s\tL%d~L%d\t%c%d\n",
+		case ST_ARR: fprintf(f, "%d\t[ARR] \t%-12s\tL%d~L%d\t%c%d\n",
 			sym->idx, sym->name, sym->bornAt, sym->dieAt,
 			sym->eeyore_var_type, sym->eeyore_var_idx); break;
-		case ST_FUNC: printf("%d\t[FUNC]\t%-12s\tL%d~L%d\n",
+		case ST_FUNC: fprintf(f, "%d\t[FUNC]\t%-12s\tL%d~L%d\n",
 			sym->idx, sym->name, sym->bornAt, sym->dieAt); break;
 		case ST_INIT:
-		default: printf("%d\t{ERR}  \t%-12s\tL%d~L%d\n",
+		default: fprintf(f, "%d\t{ERR}  \t%-12s\tL%d~L%d\n",
 			sym->idx, sym->name, sym->bornAt, sym->dieAt); break;
 		}
 		sym = sym->nxt;

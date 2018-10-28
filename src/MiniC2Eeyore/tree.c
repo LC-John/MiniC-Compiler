@@ -53,7 +53,7 @@ void free_treenode(struct TreeNode* arg_node)
 	free(arg_node);
 }
 
-void print_treenode(struct TreeNode* arg_node, char* arg_prefix)
+void print_treenode(struct TreeNode* arg_node, char* arg_prefix, FILE* f)
 {
 	char* prefix;
 	if (arg_prefix == NULL)
@@ -62,45 +62,45 @@ void print_treenode(struct TreeNode* arg_node, char* arg_prefix)
 		prefix = strdup(arg_prefix);
 	switch(arg_node->type)
 	{
-	case TN_ROOT: printf("%s[*]Root(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	case TN_FUNCDEFN: printf("%s[*]FuncDefn(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	case TN_FUNCDECL: printf("%s[*]FuncDecl(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	case TN_VARDEFN: printf("%s[*]VarDefn(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	case TN_VARDECL: printf("%s[*]VarDecl(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	case TN_STMT_BLOCK: printf("%s[*]StmtBlock(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	case TN_STMT_IF: printf("%s[*]StmtIf(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	case TN_STMT_WHILE: printf("%s[*]StmtWhile(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	case TN_STMT_VARASSN: printf("%s[*]StmtVarAssn(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	case TN_STMT_ARRASSN: printf("%s[*]StmtArrAssn(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	case TN_STMT_VARDEFN: printf("%s[*]StmtVarDefn(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	case TN_STMT_RETURN: printf("%s[*]StmtReturn(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	case TN_EXPR_BIARITH: printf("%s[*]ExprBiArith(%s)(%d) at L%d", prefix, arg_node->name, arg_node->idx, arg_node->lineno); break;
-	case TN_EXPR_BILOGIC: printf("%s[*]ExprBiLogic(%s)(%d) at L%d", prefix, arg_node->name, arg_node->idx, arg_node->lineno); break;
-	case TN_EXPR_ARR: printf("%s[*]ExprArr(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	case TN_EXPR_INTEGER: printf("%s[*]ExprInt(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	case TN_EXPR_IDENTIFIER: printf("%s[*]ExprId(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	case TN_EXPR_UNI: printf("%s[*]ExprUni(%s)(%d) at L%d", prefix, arg_node->name, arg_node->idx, arg_node->lineno); break;
-	case TN_EXPR_CALL: printf("%s[*]ExprCall(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	case TN_TYPE: printf("%s[*]Type(%s)(%d) at L%d", prefix, arg_node->name, arg_node->idx, arg_node->lineno); break;
-	case TN_INTEGER: printf("%s[*]Int(%d)(%d) at L%d", prefix, arg_node->val, arg_node->idx, arg_node->lineno); break;
-	case TN_IDENTIFIER: printf("%s[*]Id(%s)(%d) at L%d", prefix, arg_node->name, arg_node->idx, arg_node->lineno); break;
-	case TN_INIT: printf("%s[!]UNKNOWN(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
-	default: printf("%s[!]UNKNOWN(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_ROOT: fprintf(f, "%s[*]Root(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_FUNCDEFN: fprintf(f, "%s[*]FuncDefn(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_FUNCDECL: fprintf(f, "%s[*]FuncDecl(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_VARDEFN: fprintf(f, "%s[*]VarDefn(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_VARDECL: fprintf(f, "%s[*]VarDecl(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_STMT_BLOCK: fprintf(f, "%s[*]StmtBlock(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_STMT_IF: fprintf(f, "%s[*]StmtIf(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_STMT_WHILE: fprintf(f, "%s[*]StmtWhile(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_STMT_VARASSN: fprintf(f, "%s[*]StmtVarAssn(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_STMT_ARRASSN: fprintf(f, "%s[*]StmtArrAssn(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_STMT_VARDEFN: fprintf(f, "%s[*]StmtVarDefn(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_STMT_RETURN: fprintf(f, "%s[*]StmtReturn(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_EXPR_BIARITH: fprintf(f, "%s[*]ExprBiArith(%s)(%d) at L%d", prefix, arg_node->name, arg_node->idx, arg_node->lineno); break;
+	case TN_EXPR_BILOGIC: fprintf(f, "%s[*]ExprBiLogic(%s)(%d) at L%d", prefix, arg_node->name, arg_node->idx, arg_node->lineno); break;
+	case TN_EXPR_ARR: fprintf(f, "%s[*]ExprArr(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_EXPR_INTEGER: fprintf(f, "%s[*]ExprInt(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_EXPR_IDENTIFIER: fprintf(f, "%s[*]ExprId(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_EXPR_UNI: fprintf(f, "%s[*]ExprUni(%s)(%d) at L%d", prefix, arg_node->name, arg_node->idx, arg_node->lineno); break;
+	case TN_EXPR_CALL: fprintf(f, "%s[*]ExprCall(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	case TN_TYPE: fprintf(f, "%s[*]Type(%s)(%d) at L%d", prefix, arg_node->name, arg_node->idx, arg_node->lineno); break;
+	case TN_INTEGER: fprintf(f, "%s[*]Int(%d)(%d) at L%d", prefix, arg_node->val, arg_node->idx, arg_node->lineno); break;
+	case TN_IDENTIFIER: fprintf(f, "%s[*]Id(%s)(%d) at L%d", prefix, arg_node->name, arg_node->idx, arg_node->lineno); break;
+	case TN_INIT: fprintf(f, "%s[!]UNKNOWN(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
+	default: fprintf(f, "%s[!]UNKNOWN(%d) at L%d", prefix, arg_node->idx, arg_node->lineno); break;
 	}
 	if (arg_node->parent == NULL)
-		printf(", P (N)");
+		fprintf(f, ", P (N)");
 	else
-		printf(", P (%d)", arg_node->parent->idx);
+		fprintf(f, ", P (%d)", arg_node->parent->idx);
 	if (arg_node->sibling_l == NULL)
-		printf(" L (N)");
+		fprintf(f, " L (N)");
 	else
-		printf(" L (%d)", arg_node->sibling_l->idx);
+		fprintf(f, " L (%d)", arg_node->sibling_l->idx);
 	if (arg_node->sibling_r == NULL)
-		printf(" R (N)");
+		fprintf(f, " R (N)");
 	else
-		printf(" R (%d)", arg_node->sibling_r->idx);
-	printf(" C = %d", arg_node->n_child);
-	printf(" I = %d\n", arg_node->child_idx);
+		fprintf(f, " R (%d)", arg_node->sibling_r->idx);
+	fprintf(f, " C = %d", arg_node->n_child);
+	fprintf(f, " I = %d\n", arg_node->child_idx);
 }
 
 void init_tree()
@@ -108,7 +108,7 @@ void init_tree()
 	n_treenode = 0;
 }
 
-void print_tree(struct TreeNode *arg_node, int depth)
+void print_tree(struct TreeNode *arg_node, int depth, FILE* f)
 {
 	char* prefix;
 	char prefix_unit[6] = "    ";
@@ -117,7 +117,7 @@ void print_tree(struct TreeNode *arg_node, int depth)
 		return;
 	if (depth == 0)
 	{
-		print_treenode(arg_node, NULL);
+		print_treenode(arg_node, NULL, f);
 		prefix = (char*)malloc(sizeof(char)*4);
 		prefix[0] = '\0';
 	}
@@ -127,20 +127,20 @@ void print_tree(struct TreeNode *arg_node, int depth)
 		memset(prefix, 0, sizeof(char)*depth*4+10);
 		for (int i = 0; i < depth; i++)
 			strcat(prefix, prefix_unit);
-		print_treenode(arg_node, prefix);
+		print_treenode(arg_node, prefix, f);
 	}
 	for (int i = 0; i < arg_node->n_child; i++)
 	{
-		printf("%s  child(s) %d of (%d)\n", prefix, i+1, arg_node->idx);
+		fprintf(f, "%s  child(s) %d of (%d)\n", prefix, i+1, arg_node->idx);
 		tmp_node = arg_node->child[i];
 		if (tmp_node == NULL)
 		{
-			printf("%s    NONE\n", prefix);
+			fprintf(f, "%s    NONE\n", prefix);
 			continue;
 		}
 		while (tmp_node != NULL)
 		{
-			print_tree(tmp_node, depth+1);
+			print_tree(tmp_node, depth+1, f);
 			tmp_node = tmp_node->sibling_r;
 		}
 	}

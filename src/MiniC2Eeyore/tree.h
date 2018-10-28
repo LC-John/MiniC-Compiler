@@ -1,6 +1,8 @@
 #ifndef __TREE_H__
 #define __TREE_H__
 
+#include <stdio.h>
+
 #define TN_MAX_CHILD_NUMBER	5
 
 #define TN_INIT			0
@@ -70,9 +72,9 @@ struct TreeNode
 
 struct TreeNode* alloc_treenode(int, int, char*);
 void free_treenode(struct TreeNode*);
-void print_treenode(struct TreeNode*, char*);
+void print_treenode(struct TreeNode*, char*, FILE*);
 
 void init_tree();
-void print_tree(struct TreeNode*, int);
+void print_tree(struct TreeNode*, int, FILE*);
 
 #endif
