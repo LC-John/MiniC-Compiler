@@ -5,9 +5,11 @@
 
 This repo is a series of labs from the Compiler Lab course, EECS, PKU, which aims for a compiler to compile miniC (a subset of C language) source code to RISC-V (majorly RV64I) executable.
 
+Repo site: https://github.com/LC-John/MiniC-Compiler
+
 ![pooh](images/pooh.jpg)
 
-The work flow is shown below.
+The three-phase work flow is shown below.
 
 ```
 MiniC => Eeyore => Tigger => RISC-V
@@ -35,20 +37,21 @@ The parse tree is built using Flex & Bison. A symbol table (including all variab
 
 An example of the parse tree and the Symbol table is shown below. It is generated from "example.c" by running the command "./eeyore -I example.c -T -S".
 
-```
+```C
 // example.c
 
 int a;
 int b;
 
 int main(){
-	a=10;
-	b=20;
+	a = 10;
+	b = 20;
 	int c;
 	c = a + b;
 	return c;
 }
-
+```
+```
 // symbol table of example.c
 
 0	[INT] 	a           	L1~L-1	T0
@@ -148,7 +151,7 @@ Transformation is performed on the MiniC parse tree. A depth-first traverse is p
 
 ```
 // Eeyore code
-//     MiniC source: test_cases/06_add.c
+//     MiniC source: example.c
 //     Author: Zhang Huangzhao
 //
 // View https://github.com/LC-John/MiniC-Compiler for detail
