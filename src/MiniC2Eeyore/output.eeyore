@@ -1,67 +1,16 @@
 var T0	// [VAR] a @ Line 1
 var T1	// [VAR] b @ Line 2
 var T2	// [VAR] c @ Line 3
-f_func [2]	// [FUNC] func @ Line 6
+f_main [0]	// [FUNC] main @ Line 10
 	var t0
-	t0 = p0
+	t0 = call f_getint	// [CALL] getint @ Line 7
+	T0 = t0
 	var t1
-	t1 = 0
+	t1 = T0
 	var t2
-	t2 = t0 < t1
+	t2 = - t1
+	T1 = t2
 	var t3
-	t3 = p0
-	var t4
-	t4 = 0
-	var t5
-	t5 = t3 == t4
-	var t6
-	t6 = t2 || t5
-	if t6 != 0 goto l0	// [BLK] IF @ Line 10
-	goto l2
-l0:
-		var t7
-		t7 = p1
-		return t7
-		goto l1
-l2:
-l1:
-	var t8
-	t8 = p1
-	var t9
-	t9 = p0
-	var t10
-	t10 = t8 + t9
-	p1 = t10
-	var t11
-	t11 = p0
-	var t12
-	t12 = 1
-	var t13
-	t13 = t11 - t12
-	p0 = t13
-	var T3	// [VAR] ret @ Line 12
-	var t14
-	param p0
-	param p1
-	t14 = call f_func	// [CALL] func @ Line 13
-	T3 = t14
-	var t15
-	t15 = T3
-	return t15
-end f_func
-f_main [0]	// [FUNC] main @ Line 22
-	var t16
-	t16 = call f_getint	// [CALL] getint @ Line 18
-	T0 = t16
-	var t17
-	t17 = 0
-	T1 = t17
-	var t18
-	param T0
-	param T1
-	t18 = call f_func	// [CALL] func @ Line 20
-	T2 = t18
-	var t19
-	t19 = T2
-	return t19
+	t3 = T1
+	return t3
 end f_main

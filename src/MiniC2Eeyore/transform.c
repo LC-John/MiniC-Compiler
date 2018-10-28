@@ -175,7 +175,7 @@ int minic2eeyore(struct TreeNode* arg_node, char* arg_prefix)
 		free(prefix);
 		return tmp;
 	case TN_EXPR_UNI:
-		tmp_r = minic2eeyore(arg_node->child[1], arg_prefix);
+		tmp_r = minic2eeyore(arg_node->child[0], arg_prefix);
 		tmp = t_idx++;
 		fprintf(yyout, "%svar t%d\n", arg_prefix, tmp);
 		fprintf(yyout, "%st%d = %s t%d\n", arg_prefix, tmp, arg_node->name, tmp_r);
