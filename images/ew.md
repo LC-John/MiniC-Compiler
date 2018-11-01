@@ -20,46 +20,46 @@ WARNING
 
 Conflict variables
 
-![conflict_variables](/errors/conflict_variables.png)
+![conflict_variables](./errors/conflict_variables.png)
 
 Notice that variables in different scopes with the same name are allowed.
 
-![duplicate_variables_in_different_scope](/errors/duplicate_variables_in_different_scope.png)
+![duplicate_variables_in_different_scope](./errors/duplicate_variables_in_different_scope.png)
 
 Conflict function(s)
 
-![conflict_functions](/errors/conflict_functions.png)
+![conflict_functions](./errors/conflict_functions.png)
 
 Wrong assignment
 
-![wrong_assignment](/errors/wrong_assignment.png)
+![wrong_assignment](./errors/wrong_assignment.png)
 
 Wrong parameter(s)
 
-![wrong_actual_parameters](/errors/wrong_actual_parameters.png)
+![wrong_actual_parameters](./errors/wrong_actual_parameters.png)
 
 Wrong expression
 
-![wrong_expression](/errors/wrong_condition.png)
+![wrong_expression](./errors/wrong_condition.png)
 
 Undefined variable
 
-![undefined_variable](/errors/undefined_variable.png)
+![undefined_variable](./errors/undefined_variable.png)
 
 Undefined function
 
-![undefined_function](/errors/undefined_function.png)
+![undefined_function](./errors/undefined_function.png)
 
 ## Warnings
 
 Mixed expressions
 
-![mixed_expressions](/warnings/mixed_expressions.png)
+![mixed_expressions](./warnings/mixed_expressions.png)
 
 No return
 
-![no_return](/warnings/no_return.png)
+![no_return](./warnings/no_return.png)
 
 Function declaration in function body
 
-![function_declaration_in_function_body](/warnings/declaration_function_inside_function_body.png)
+![function_declaration_in_function_body](./warnings/declaration_function_inside_function_body.png)
