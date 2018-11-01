@@ -7,4 +7,4 @@ eeyore:	minic.lex minic.y tree.h tree.c symtab.h symtab.c error.h error.c transf
 	gcc tree.o symtab.o error.o transform.o y.tab.o lex.yy.o -o $@ -lm
 
 clean:
-	rm -rf eeyore *.o lex.yy.* y.tab.* *.gch
+	rm -rf eeyore *.o lex.yy.* y.tab.* *.gch null.minic

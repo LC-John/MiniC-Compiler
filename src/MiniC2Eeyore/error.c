@@ -205,5 +205,5 @@ void find_wrong_call(struct TreeNode* arg_node)
 		print_ew();
 	find_wrong_call(arg_node->sibling_r);
 	for (int i = 0; i < arg_node->n_child; i++)
-		find_wrong_call(arg_node->sibling_r);
+		find_wrong_call(arg_node->child[i]);
 }

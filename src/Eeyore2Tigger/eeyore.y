@@ -3,10 +3,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include "tree.h"
-#include "symtab.h"
-#include "error.h"
-#include "transform.h"
 
 int yylex(void);
 void yyerror(char*);
@@ -20,8 +16,8 @@ FILE* cheating_file;
 %}
 
 %union {
-	int value;
-	char* name;
+	int val;
+	char* str;
 	struct TreeNode* node;
 };
 
@@ -511,7 +507,7 @@ void yyerror(char* s)
 
 int main(int argc, char** argv)
 {
-	cheating_file = fopen("null.minic", "w");
+	cheating_file = stderr;
 	infile_path = NULL;
 	outfile_path = NULL;
 	for (int i = 1; i < argc; i++)
@@ -566,7 +562,6 @@ int main(int argc, char** argv)
 				printf("No cheating file\n");
 				return -1;
 			}
-			fclose(cheating_file);
 			cheating_file = fopen(argv[i+1], "w");
 			if (cheating_file == NULL)
 			{
