@@ -46,17 +46,16 @@ An example of the parse tree and the Symbol table is shown below. It is generate
 
 ```C
 // example.c
-
-int a;
-int b;
-
-int main(){
-	a = 10;
-	b = 20;
-	int c;
-	c = a + b;
-	return c;
-}
+1  int a;
+2  int b;
+3  
+4  int main(){
+5  	a = 10;
+6  	b = 20;
+7  	int c;
+8  	c = a + b;
+9  	return c;
+10  }
 ```
 ```
 // symbol table of example.c

@@ -18,7 +18,6 @@ FILE* cheating_file;
 %union {
 	int val;
 	char* str;
-	struct TreeNode* node;
 };
 
 %token <name> MAIN IF ELSE WHILE RETURN
@@ -510,6 +509,7 @@ int main(int argc, char** argv)
 	cheating_file = stderr;
 	infile_path = NULL;
 	outfile_path = NULL;
+	lineno = 1;
 	for (int i = 1; i < argc; i++)
 	{
 		if (strcmp(argv[i], "-T") == 0 || strcmp(argv[i], "--tree") == 0)
