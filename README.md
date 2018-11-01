@@ -136,7 +136,7 @@ An example of the parse tree and the Symbol table is shown below. It is generate
 
 ```
 
-Error/warning checking is performed based on the parse tree and the symbol table. The following errors/warnings will be checked. See the errors and warnings [here](/images/ew.md).
+Error/warning checking is performed based on the parse tree and the symbol table. The following errors/warnings will be checked. See the examples of errors and warnings by [CLICKING ME](/images/ew.md).
 
 ```
 ERROR
