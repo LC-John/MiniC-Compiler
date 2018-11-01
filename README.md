@@ -137,7 +137,7 @@ int main(){
 
 ```
 
-Error/warning checking is performed based on the parse tree and the symbol table. The following errors/warnings will be checked.
+Error/warning checking is performed based on the parse tree and the symbol table. The following errors/warnings will be checked. See the errors and warnings [here](/images/ew.md).
 
 ```
 ERROR
