@@ -1,0 +1,39 @@
+// Eeyore code
+//     MiniC source: test_cases/16_equal.c
+//     Author: Zhang Huangzhao
+//
+// View https://github.com/LC-John/MiniC-Compiler for detail
+
+
+var T0	// [VAR] a @ Line 1
+var T1	// [VAR] b @ Line 2
+
+f_main [0]	// [FUNC] main @ Line 13
+	var t0
+	t0 = call f_getint	// [EXPR] CALL getint @ Line 5
+	T0 = t0	// [STMT] VAR ASSN @ Line 5
+	var t1
+	t1 = call f_getint	// [EXPR] CALL getint @ Line 6
+	T1 = t1	// [STMT] VAR ASSN @ Line 6
+	var t2
+	t2 = T0	// [EXPR] VAR @ Line 7
+	var t3
+	t3 = T1	// [EXPR] VAR @ Line 7
+	var t4
+	t4 = t2 == t3	// [EXPR] BI OP == @ Line 7
+	if t4 != 0 goto l0	// [BLK] IF @ Line 12
+	goto l2
+l0:
+		// [BLK] BLOCK @ Line 9
+		var t5
+		t5 = 1	// [EXPR] NUM @ Line 8
+		return t5	// [STMT] RET @ Line 8
+		goto l1
+l2:
+		// [BLK] BLOCK @ Line 12
+		var t6
+		t6 = 0	// [EXPR] NUM @ Line 11
+		return t6	// [STMT] RET @ Line 11
+l1:
+end f_main
+

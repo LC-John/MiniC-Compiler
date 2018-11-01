@@ -1,0 +1,14 @@
+// Eeyore code
+//     MiniC source: test_cases/01_main.c
+//     Author: Zhang Huangzhao
+//
+// View https://github.com/LC-John/MiniC-Compiler for detail
+
+
+
+f_main [0]	// [FUNC] main @ Line 3
+	var t0
+	t0 = 0	// [EXPR] NUM @ Line 2
+	return t0	// [STMT] RET @ Line 2
+end f_main
+

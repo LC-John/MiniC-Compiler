@@ -11,8 +11,8 @@ FILE* cheating_file;
 
 %%
 
-[ \t]+
-[\n]	{ lineno++; }
+[ \t]+		{ ; }
+[\n]	{ lineno++; yylval.str = strdup(yytext); return EOL; }
 
 "var"		{ yylval.str = strdup(yytext); return VAR; }
 "end"		{ yylval.str = strdup(yytext); return END; }
@@ -22,28 +22,27 @@ FILE* cheating_file;
 "call"		{ yylval.str = strdup(yytext); return CALL; }
 "return"	{ yylval.str = strdup(yytext); return RETURN; }
 
-[t][0-9]+			{ yylval.val = atoi(yytext+1); return ID_TEMP; }
-[p][0-9]+			{ yylval.val = atoi(yytext+1); return ID_PARAM; }
-[T][0-9]+			{ yylval.val = atoi(yytext+1); return ID_NATIVE; }
-[0-9]+				{ yylval.val = atoi(yytext); return NUM; }
-[a-zA-Z_]([a-zA-Z0-9_])*	{ yylval.str = strdup(yytext); return ID_OTHER; }
+[t][0-9]+		{ yylval.val = atoi(yytext+1); return ID_TMP; }
+[p][0-9]+		{ yylval.val = atoi(yytext+1); return ID_PARAM; }
+[T][0-9]+		{ yylval.val = atoi(yytext+1); return ID_NATIVE; }
+[l][0-9]+		{ yylval.val = atoi(yytext+1); return ID_LABEL; }
+[f][_][0-9a-zA-Z]+	{ yylval.str = strdup(yytext); return ID_FUNC; }
+[0-9]+			{ yylval.val = atoi(yytext); return NUM; }
 
 "="	{ yylval.str = strdup(yytext); return ASSIGN; }
-"&&"	{ yylval.str = strdup(yytext); return OP_BI; }
-"||"	{ yylval.str = strdup(yytext); return OP_BI; }
-"=="	{ yylval.str = strdup(yytext); return OP_BI; }
-"!="	{ yylval.str = strdup(yytext); return OP_BI; }
-"<"	{ yylval.str = strdup(yytext); return OP_BI; }
-">"	{ yylval.str = strdup(yytext); return OP_BI; }
-"+"	{ yylval.str = strdup(yytext); return OP_BI; }
-"-"	{ yylval.str = strdup(yytext); return OP_BI; }
-"*"	{ yylval.str = strdup(yytext); return OP_BI; }
-"/"	{ yylval.str = strdup(yytext); return OP_BI; }
-"%"	{ yylval.str = strdup(yytext); return OP_BI; }
+"&&"	{ yylval.str = strdup(yytext); return OP_BI_LOGIC; }
+"||"	{ yylval.str = strdup(yytext); return OP_BI_LOGIC; }
+"=="	{ yylval.str = strdup(yytext); return OP_BI_LOGIC; }
+"!="	{ yylval.str = strdup(yytext); return OP_BI_LOGIC; }
+"<"	{ yylval.str = strdup(yytext); return OP_BI_LOGIC; }
+">"	{ yylval.str = strdup(yytext); return OP_BI_LOGIC; }
+"+"	{ yylval.str = strdup(yytext); return OP_BI_LOGIC; }
+"-"	{ yylval.str = strdup(yytext); return OP_BI_ARITH; }
+"*"	{ yylval.str = strdup(yytext); return OP_BI_ARITH; }
+"/"	{ yylval.str = strdup(yytext); return OP_BI_ARITH; }
+"%"	{ yylval.str = strdup(yytext); return OP_BI_ARITH; }
 "!"	{ yylval.str = strdup(yytext); return OP_UNI; }
 
-"("	{ yylval.val = lineno; return PRN_L; }
-")"	{ yylval.val = lineno; return PRN_R; }
 "["	{ yylval.val = lineno; return ARR_L; }
 "]"	{ yylval.val = lineno; return ARR_R; }
 ":"	{ yylval.val = lineno; return COLON; }

@@ -1,0 +1,35 @@
+// Eeyore code
+//     MiniC source: test_cases/11_if_else.c
+//     Author: Zhang Huangzhao
+//
+// View https://github.com/LC-John/MiniC-Compiler for detail
+
+
+var T0	// [VAR] a @ Line 1
+
+f_main [0]	// [FUNC] main @ Line 10
+	var t0
+	t0 = 10	// [EXPR] NUM @ Line 3
+	T0 = t0	// [STMT] VAR ASSN @ Line 3
+	var t1
+	t1 = T0	// [EXPR] VAR @ Line 4
+	var t2
+	t2 = 0	// [EXPR] NUM @ Line 4
+	var t3
+	t3 = t1 > t2	// [EXPR] BI OP > @ Line 4
+	if t3 != 0 goto l0	// [BLK] IF @ Line 9
+	goto l2
+l0:
+		// [BLK] BLOCK @ Line 6
+		var t4
+		t4 = 1	// [EXPR] NUM @ Line 5
+		return t4	// [STMT] RET @ Line 5
+		goto l1
+l2:
+		// [BLK] BLOCK @ Line 9
+		var t5
+		t5 = 0	// [EXPR] NUM @ Line 8
+		return t5	// [STMT] RET @ Line 8
+l1:
+end f_main
+

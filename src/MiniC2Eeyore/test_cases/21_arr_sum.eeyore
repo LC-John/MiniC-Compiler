@@ -1,0 +1,89 @@
+// Eeyore code
+//     MiniC source: test_cases/21_arr_sum.c
+//     Author: Zhang Huangzhao
+//
+// View https://github.com/LC-John/MiniC-Compiler for detail
+
+
+var 20 T0	// [VAR] a @ Line 2
+
+f_main [0]	// [FUNC] main @ Line 18
+	var t0
+	t0 = 0	// [EXPR] NUM @ Line 4
+	var t1
+	t1 = call f_getint	// [EXPR] CALL getint @ Line 4
+	var t2
+	t2 = t0 * 4
+	T0 [t2] = t1	// [STMT] ARR ASSN @ Line 4
+	var t3
+	t3 = 1	// [EXPR] NUM @ Line 5
+	var t4
+	t4 = call f_getint	// [EXPR] CALL getint @ Line 5
+	var t5
+	t5 = t3 * 4
+	T0 [t5] = t4	// [STMT] ARR ASSN @ Line 5
+	var t6
+	t6 = 2	// [EXPR] NUM @ Line 6
+	var t7
+	t7 = call f_getint	// [EXPR] CALL getint @ Line 6
+	var t8
+	t8 = t6 * 4
+	T0 [t8] = t7	// [STMT] ARR ASSN @ Line 6
+	var t9
+	t9 = 3	// [EXPR] NUM @ Line 7
+	var t10
+	t10 = call f_getint	// [EXPR] CALL getint @ Line 7
+	var t11
+	t11 = t9 * 4
+	T0 [t11] = t10	// [STMT] ARR ASSN @ Line 7
+	var t12
+	t12 = 4	// [EXPR] NUM @ Line 8
+	var t13
+	t13 = call f_getint	// [EXPR] CALL getint @ Line 8
+	var t14
+	t14 = t12 * 4
+	T0 [t14] = t13	// [STMT] ARR ASSN @ Line 8
+	var T1	// [VAR] cnt @ Line 9
+	var t15
+	t15 = 4	// [EXPR] NUM @ Line 10
+	T1 = t15	// [STMT] VAR ASSN @ Line 10
+	var T2	// [VAR] sum @ Line 11
+	var t16
+	t16 = 0	// [EXPR] NUM @ Line 12
+	T2 = t16	// [STMT] VAR ASSN @ Line 12
+l0:
+	var t17
+	t17 = T1	// [EXPR] VAR @ Line 13
+	var t18
+	t18 = 1	// [EXPR] NUM @ Line 13
+	var t19
+	t19 = t17 > t18	// [EXPR] BI OP > @ Line 13
+	if t19 != 0 goto l1	// [BLK] WHILE @ Line 16
+	goto l2
+l1:
+		// [BLK] BLOCK @ Line 16
+		var t20
+		t20 = T2	// [EXPR] VAR @ Line 14
+		var t21
+		t21 = T1	// [EXPR] VAR @ Line 14
+		var t22
+		t22 = t21 * 4
+		var t23
+		t23 = T0 [t22]	// [EXPR] ARR @ Line 14
+		var t24
+		t24 = t20 + t23	// [EXPR] BI OP + @ Line 14
+		T2 = t24	// [STMT] VAR ASSN @ Line 14
+		var t25
+		t25 = T1	// [EXPR] VAR @ Line 15
+		var t26
+		t26 = 1	// [EXPR] NUM @ Line 15
+		var t27
+		t27 = t25 - t26	// [EXPR] BI OP - @ Line 15
+		T1 = t27	// [STMT] VAR ASSN @ Line 15
+		goto l0
+l2:
+	var t28
+	t28 = T2	// [EXPR] VAR @ Line 17
+	return t28	// [STMT] RET @ Line 17
+end f_main
+

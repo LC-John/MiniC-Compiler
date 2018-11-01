@@ -1,0 +1,30 @@
+// Eeyore code
+//     MiniC source: test_cases/06_add.c
+//     Author: Zhang Huangzhao
+//
+// View https://github.com/LC-John/MiniC-Compiler for detail
+
+
+var T0	// [VAR] a @ Line 1
+var T1	// [VAR] b @ Line 2
+
+f_main [0]	// [FUNC] main @ Line 10
+	var t0
+	t0 = 10	// [EXPR] NUM @ Line 5
+	T0 = t0	// [STMT] VAR ASSN @ Line 5
+	var t1
+	t1 = 20	// [EXPR] NUM @ Line 6
+	T1 = t1	// [STMT] VAR ASSN @ Line 6
+	var T2	// [VAR] c @ Line 7
+	var t2
+	t2 = T0	// [EXPR] VAR @ Line 8
+	var t3
+	t3 = T1	// [EXPR] VAR @ Line 8
+	var t4
+	t4 = t2 + t3	// [EXPR] BI OP + @ Line 8
+	T2 = t4	// [STMT] VAR ASSN @ Line 8
+	var t5
+	t5 = T2	// [EXPR] VAR @ Line 9
+	return t5	// [STMT] RET @ Line 9
+end f_main
+
