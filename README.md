@@ -141,17 +141,18 @@ Error/warning checking is performed based on the parse tree and the symbol table
 
 ```
 ERROR
-	Conflict variables	-- Variables have the same name in the same scope
-	Conflict function(s)	-- Functions or functions and variable have the same name even in different scope
-	Wrong assignment	-- Assigning to invalid integer variable, or even not-a-variable
-	Wrong parameter(s)	-- Assigning invalid actual parameters to the function call
-	Wrong function call	-- Call a invalid function
-	Wrong expression	-- Using arithmetic expression in condition
+  Conflict variables  -- Variables have the same name in the same scope
+  Conflict function(s)  -- Functions or functions and variable have the same name even in different scope
+  Wrong assignment  -- Assigning to invalid integer variable, or even not-a-variable
+  Wrong parameter(s)  -- Assigning invalid actual parameters to the function call
+  Wrong expression  -- Using arithmetic expression in condition
+  Undefined variable  -- Using an undefined variable
+  Undefined function  -- Using an undefined function (the function may be declared)
 
-WARNING	
-	Mixed expression	-- Mix the logical and arithmatic expressions together
-	No return		-- The last statement in the function body is not a return
-	Function declarition in function body	-- Declare a function inside another function body, which is allowed, but highly unrecommended!
+WARNING 
+  Mixed expression  -- Mix the logical and arithmatic expressions together
+  No return   -- The last statement in the function body is not a return
+  Function declarition in function body -- Declare a function inside another function body, which is allowed, but highly unrecommended!
 ```
 
 Transformation is performed on the MiniC parse tree. A depth-first traverse is performed, and the Eeyore code for the sub-parse-tree of each corresponding node is generated in the meantime. The Eeyore code generated from "example.c" is shown as below.
