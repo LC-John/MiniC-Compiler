@@ -1,6 +1,5 @@
 # MiniC-Compiler
 
-
 [![Build Status](https://travis-ci.org/LC-John/MiniC-Compiler.svg?branch=master)](https://travis-ci.org/LC-John/MiniC-Compiler)
 
 This repo is a series of labs from the Compiler Lab course, EECS, PKU, which aims for a compiler to compile miniC (a subset of C language) source code to RISC-V (majorly RV64I) executable.
@@ -13,6 +12,14 @@ The three-phase work flow is shown below.
 
 ```
 MiniC => Eeyore => Tigger => RISC-V
+```
+
+## Requirement
+
+```
+gcc/g++		version == 7.3.0
+Flex/Lex	version == 2.6.0
+Bison/Yacc(GNU)	version == 3.0.4
 ```
 
 ## Phase 1. MiniC2Eeyore & Type Checking
