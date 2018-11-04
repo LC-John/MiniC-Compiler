@@ -123,11 +123,11 @@ end f_main
 
 ```
 
-It now has passed the MiniC Checker automatic testing.
+It has passed the MiniC Checker automatic testing.
 
 ![pass_eeyore](images/pass_eeyore.png)
 
-Note that the cheating file is used to extract test minic source file from the MiniC Checker, which means it is useless for usual usage. Please ignore it, or redirect it to some temporary file and delete it after compilation. The cheating file option may be deleted in a later time.
+PHASE 1 (MiniC2Eeyore & type checking) COMPLETE!
 
 ## Phase 2. Eeyore2Tigger
 
