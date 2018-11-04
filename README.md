@@ -64,7 +64,6 @@ The symbol table looks like below. [CLICK HERE](/images/parse_tree_example.md) t
 
 ```
 // symbol table of example.c
-
 0	[INT] 	a           	L1~L-1	T0
 1	[INT] 	b           	L2~L-1	T1
 2	[INT] 	c           	L7~L10	T2

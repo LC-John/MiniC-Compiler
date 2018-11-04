@@ -16,6 +16,16 @@
 10  }
 ```
 
+## Symbol Table Produced
+
+```
+// symbol table of example.c
+0	[INT] 	a           	L1~L-1	T0
+1	[INT] 	b           	L2~L-1	T1
+2	[INT] 	c           	L7~L10	T2
+3	[FUNC]	main        	L4~L-1
+```
+
 ## Parse Tree Produced
 
 ```
