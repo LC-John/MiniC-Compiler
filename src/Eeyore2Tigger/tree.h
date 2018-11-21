@@ -42,6 +42,7 @@
 struct TreeNode
 {
 	int idx;
+	int lineno;
 	int type;
 	char* str;
 	int val;

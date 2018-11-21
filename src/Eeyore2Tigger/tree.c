@@ -66,16 +66,16 @@ void print_tree(struct TreeNode* arg_node, int arg_depth, FILE* arg_file)
 		strcat(prefix, "  ");
 	switch(arg_node->type)
 	{
-	case TN_ROOT:	fprintf(arg_file, "%sRoot\n", prefix); break;
-	case TN_FUNC:	fprintf(arg_file, "%sFunc, %s(%d)\n", prefix, arg_node->str, arg_node->val); break;
+	case TN_ROOT:	fprintf(arg_file, "%sRoot@L%d\n", prefix, arg_node->lineno); break;
+	case TN_FUNC:	fprintf(arg_file, "%sFunc@L%d, %s(%d)\n", prefix, arg_node->lineno, arg_node->str, arg_node->val); break;
 	case TN_VAR:
 		if (arg_node->val < 0)
-			fprintf(arg_file, "%sVar, %s\n", prefix, arg_node->str);
+			fprintf(arg_file, "%sVar@L%d, %s\n", prefix, arg_node->lineno, arg_node->str);
 		else
-			fprintf(arg_file, "%sVar, %s[%d]\n", prefix, arg_node->str, arg_node->val);
+			fprintf(arg_file, "%sVar@L%d, %s[%d]\n", prefix, arg_node->lineno, arg_node->str, arg_node->val);
 		break;
 	case TN_EXPR_BI_LOGIC:
-		fprintf(arg_file, "%sBiLogicOp, to %s, ", prefix, arg_node->str);
+		fprintf(arg_file, "%sBiLogicOp@L%d, to %s, ", prefix, arg_node->lineno, arg_node->str);
 		switch (arg_node->val)
 		{
 		case OP_AND:	fprintf(arg_file, "AND\n"); break;
@@ -88,7 +88,7 @@ void print_tree(struct TreeNode* arg_node, int arg_depth, FILE* arg_file)
 		}
 		break;
 	case TN_EXPR_BI_ARITH:
-		fprintf(arg_file, "%sBiArithOp, to %s, ", prefix, arg_node->str);
+		fprintf(arg_file, "%sBiArithOp@L%d, to %s, ", prefix, arg_node->lineno, arg_node->str);
 		switch (arg_node->val)
 		{
 		case OP_ADD:	fprintf(arg_file, "ADD\n"); break;
@@ -100,7 +100,7 @@ void print_tree(struct TreeNode* arg_node, int arg_depth, FILE* arg_file)
 		}
 		break;
 	case TN_EXPR_UNI_LOGIC:
-		fprintf(arg_file, "%sUniLogicOp, to %s, ", prefix, arg_node->str);
+		fprintf(arg_file, "%sUniLogicOp@L%d, to %s, ", prefix, arg_node->lineno, arg_node->str);
 		switch (arg_node->val)
 		{
 		case OP_NOT:	fprintf(arg_file, "NOT\n"); break;
@@ -108,7 +108,7 @@ void print_tree(struct TreeNode* arg_node, int arg_depth, FILE* arg_file)
 		}
 		break;
 	case TN_EXPR_UNI_ARITH:
-		fprintf(arg_file, "%sUniArithOp, to %s, ", prefix, arg_node->str);
+		fprintf(arg_file, "%sUniArithOp@L%d, to %s, ", prefix, arg_node->lineno, arg_node->str);
 		switch (arg_node->val)
 		{
 		case OP_POS:	fprintf(arg_file, "POS\n"); break;
@@ -118,12 +118,12 @@ void print_tree(struct TreeNode* arg_node, int arg_depth, FILE* arg_file)
 		break;
 	case TN_EXPR_ASSN:
 		if (arg_node->val < 0)
-			fprintf(arg_file, "%sAssnOp, to %s\n", prefix, arg_node->str);
+			fprintf(arg_file, "%sAssnOp@L%d, to %s\n", prefix, arg_node->lineno, arg_node->str);
 		else
-			fprintf(arg_file, "%sAssnOp, to %s[%d]\n", prefix, arg_node->str, arg_node->val);
+			fprintf(arg_file, "%sAssnOp@L%d, to %s[%d]\n", prefix, arg_node->lineno, arg_node->str, arg_node->val);
 		break;
 	case TN_EXPR_IF_GOTO:
-		fprintf(arg_file, "%sIfGoto, to %s, ", prefix, arg_node->str);
+		fprintf(arg_file, "%sIfGoto@L%d, to %s, ", prefix, arg_node->lineno, arg_node->str);
 		switch (arg_node->val)
 		{
 		case OP_AND:	fprintf(arg_file, "AND\n"); break;
@@ -135,14 +135,14 @@ void print_tree(struct TreeNode* arg_node, int arg_depth, FILE* arg_file)
 		default:	fprintf(arg_file, "<UNK>\n"); break;
 		}
 		break;
-	case TN_EXPR_GOTO:	fprintf(arg_file, "%sGoto, to %s\n", prefix, arg_node->str); break;
-	case TN_EXPR_LABEL:	fprintf(arg_file, "Label, %s\n", arg_node->str); break;
-	case TN_EXPR_PARAM:	fprintf(arg_file, "%sParam\n", prefix); break;
-	case TN_EXPR_CALL:	fprintf(arg_file, "%sFuncCall, to %s\n", prefix, arg_node->str); break;
-	case TN_EXPR_RETURN:	fprintf(arg_file, "%sReturn\n", prefix); break;
-	case TN_NUM:	fprintf(arg_file, "%sNumber, %d\n", prefix, arg_node->val); break;
-	case TN_ID:	fprintf(arg_file, "%sID, %s\n", prefix, arg_node->str); break;
-	default:	fprintf(arg_file, "%s<UNK>\n", prefix); break;
+	case TN_EXPR_GOTO:	fprintf(arg_file, "%sGoto@L%d, to %s\n", prefix, arg_node->lineno, arg_node->str); break;
+	case TN_EXPR_LABEL:	fprintf(arg_file, "Label@L%d, %s\n", arg_node->lineno, arg_node->str); break;
+	case TN_EXPR_PARAM:	fprintf(arg_file, "%sParam@L%d\n", prefix, arg_node->lineno); break;
+	case TN_EXPR_CALL:	fprintf(arg_file, "%sFuncCall@L%d, to %s\n", prefix, arg_node->lineno, arg_node->str); break;
+	case TN_EXPR_RETURN:	fprintf(arg_file, "%sReturn@L%d\n", prefix, arg_node->lineno); break;
+	case TN_NUM:	fprintf(arg_file, "%sNumber@L%d, %d\n", prefix, arg_node->lineno, arg_node->val); break;
+	case TN_ID:	fprintf(arg_file, "%sID@L%d, %s\n", prefix, arg_node->lineno, arg_node->str); break;
+	default:	fprintf(arg_file, "%s<UNK>@L%d\n", prefix, arg_node->lineno); break;
 	}
 	if (arg_node->type == TN_EXPR_ASSN)
 		for (int i = 1; i < arg_node->n_child; i++)

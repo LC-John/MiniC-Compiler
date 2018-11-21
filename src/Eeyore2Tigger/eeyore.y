@@ -4,6 +4,7 @@
 #include <math.h>
 #include <string.h>
 #include "tree.h"
+#include "bb.h"
 
 int yylex(void);
 void yyerror(char*);
@@ -36,11 +37,17 @@ struct TreeNode* root;
 %%
 
 Goal	: FuncVarDefnList {
+		struct TreeNode* last_node = $1;
 		$$ = alloc_treenode(TN_ROOT, NULL, -1);
 		root = $$;
 		$$->child[0] = $1;
-		for (struct TreeNode* tmp_node = $1; tmp_node != NULL; tmp_node = tmp_node->nxt)
+		for (struct TreeNode* tmp_node = $1; tmp_node != NULL;
+			last_node = tmp_node, tmp_node = tmp_node->nxt)
 			tmp_node->parent = $$;
+		if (last_node != NULL)
+			$$->lineno = last_node->lineno;
+		else
+			$$->lineno = lineno - 1;
 	}
 	;
 
@@ -62,6 +69,7 @@ FuncVarDefnList	: 		{ $$ = NULL; }
 
 FuncDefn	: Id ARR_L Integer ARR_R EOL ExprList END Id {
 		$$ = alloc_treenode(TN_FUNC, $1->str, $3->val);
+		$$->lineno = $8->lineno;
 		free_treenode($1);
 		free_treenode($3);
 		$$->child[0] = $6;
@@ -88,18 +96,20 @@ ExprList	:	{ $$ = NULL; }
 
 Expr	: Id ASSIGN RVal OP_BI_LOGIC RVal {
 		$$ = alloc_treenode(TN_EXPR_BI_LOGIC, $1->str, $4);
+		$$->lineno = $1->lineno;
 		free_treenode($1);
 		$$->child[0] = $3;
 		$3->parent = $$;
-		$$->child[0] = $5;
+		$$->child[1] = $5;
 		$5->parent = $$;
 	}
 	| Id ASSIGN RVal OP_BI_ARITH RVal {
 		$$ = alloc_treenode(TN_EXPR_BI_ARITH, $1->str, $4);
+		$$->lineno = $1->lineno;
 		free_treenode($1);
 		$$->child[0] = $3;
 		$3->parent = $$;
-		$$->child[0] = $5;
+		$$->child[1] = $5;
 		$5->parent = $$;
 	}
 	| Id ASSIGN OP_BI_ARITH RVal {
@@ -107,20 +117,23 @@ Expr	: Id ASSIGN RVal OP_BI_LOGIC RVal {
 		{
 		case OP_ADD: $$ = alloc_treenode(TN_EXPR_UNI_ARITH, $1->str, OP_POS); break;
 		case OP_SUB: $$ = alloc_treenode(TN_EXPR_UNI_ARITH, $1->str, OP_NEG); break;
-		default: yyerror("wrong syntax.");
+		default: yyerror("wrong syntax."); break;
 		}
+		$$->lineno = $1->lineno;
 		free_treenode($1);
 		$$->child[0] = $4;
 		$4->parent = $$;
 	}
 	| Id ASSIGN OP_UNI RVal {
 		$$ = alloc_treenode(TN_EXPR_UNI_LOGIC, $1->str, $3);
+		$$->lineno = $1->lineno;
 		free_treenode($1);
 		$$->child[0] = $4;
 		$4->parent = $$;
 	}
 	| Id ASSIGN RVal {
 		$$ = alloc_treenode(TN_EXPR_ASSN, $1->str, -1);
+		$$->lineno = $1->lineno;
 		free_treenode($1);
 		$$->child[0] = NULL;
 		$$->child[1] = $3;
@@ -129,6 +142,7 @@ Expr	: Id ASSIGN RVal OP_BI_LOGIC RVal {
 	}
 	| Id ARR_L RVal ARR_R ASSIGN RVal {
 		$$ = alloc_treenode(TN_EXPR_ASSN, $1->str, -1);
+		$$->lineno = $1->lineno;
 		free_treenode($1);
 		$$->child[0] = $3;
 		$3->parent = $$;
@@ -138,6 +152,7 @@ Expr	: Id ASSIGN RVal OP_BI_LOGIC RVal {
 	}
 	| Id ASSIGN Id ARR_L RVal ARR_R {
 		$$ = alloc_treenode(TN_EXPR_ASSN, $1->str, -1);
+		$$->lineno = $1->lineno;
 		free_treenode($1);
 		$$->child[0] = NULL;
 		$$->child[1] = $3;
@@ -147,6 +162,7 @@ Expr	: Id ASSIGN RVal OP_BI_LOGIC RVal {
 	}
 	| IF RVal OP_BI_LOGIC RVal GOTO Id {
 		$$ = alloc_treenode(TN_EXPR_IF_GOTO, $6->str, $3);
+		$$->lineno = $2->lineno;
 		free_treenode($6);
 		$$->child[0] = $2;
 		$2->parent = $$;
@@ -155,25 +171,30 @@ Expr	: Id ASSIGN RVal OP_BI_LOGIC RVal {
 	}
 	| GOTO Id {
 		$$ = alloc_treenode(TN_EXPR_GOTO, $2->str, -1);
+		$$->lineno = $2->lineno;
 		free_treenode($2);
 	}
 	| Id COLON {
 		$$ = alloc_treenode(TN_EXPR_LABEL, $1->str, -1);
+		$$->lineno = $1->lineno;
 		free_treenode($1);
 	}
 	| PARAM RVal {
 		$$ = alloc_treenode(TN_EXPR_PARAM, NULL, -1);
+		$$->lineno = $2->lineno;
 		$$->child[0] = $2;
 		$2->parent = $$;
 	}
 	| Id ASSIGN CALL Id {
 		$$ = alloc_treenode(TN_EXPR_CALL, $1->str, -1);
+		$$->lineno = $1->lineno;
 		free_treenode($1);
 		$$->child[0] = $4;
 		$4->parent = $$;
 	}
 	| RETURN RVal {
 		$$ = alloc_treenode(TN_EXPR_RETURN, NULL, -1);
+		$$->lineno = $2->lineno;
 		$$->child[0] = $2;
 		$2->parent = $$;
 	}
@@ -185,23 +206,25 @@ RVal	: Id		{ $$ = $1; }
 
 VarDefn	: VAR Id {
 		$$ = alloc_treenode(TN_VAR, $2->str, -1);
+		$$->lineno = $2->lineno;
 		free_treenode($2);
 	}
 	| VAR Integer Id {
 		$$ = alloc_treenode(TN_VAR, $3->str, $2->val);
+		$$->lineno = $2->lineno;
 		free_treenode($2);
 		free_treenode($3);
 	}
 	;
 
-Integer	: NUM		{ $$ = alloc_treenode(TN_NUM, NULL, $1); }
+Integer	: NUM		{ $$ = alloc_treenode(TN_NUM, NULL, $1); $$->lineno = lineno; }
 	;
 
-Id	: ID_TMP	{ $$ = alloc_treenode(TN_ID, $1, -1); }
-	| ID_PARAM	{ $$ = alloc_treenode(TN_ID, $1, -1); }
-	| ID_NATIVE	{ $$ = alloc_treenode(TN_ID, $1, -1); }
-	| ID_FUNC	{ $$ = alloc_treenode(TN_ID, $1, -1); }
-	| ID_LABEL	{ $$ = alloc_treenode(TN_ID, $1, -1); }
+Id	: ID_TMP	{ $$ = alloc_treenode(TN_ID, $1, -1); $$->lineno = lineno; }
+	| ID_PARAM	{ $$ = alloc_treenode(TN_ID, $1, -1); $$->lineno = lineno; }
+	| ID_NATIVE	{ $$ = alloc_treenode(TN_ID, $1, -1); $$->lineno = lineno; }
+	| ID_FUNC	{ $$ = alloc_treenode(TN_ID, $1, -1); $$->lineno = lineno; }
+	| ID_LABEL	{ $$ = alloc_treenode(TN_ID, $1, -1); $$->lineno = lineno; }
 	;
 
 %%
@@ -263,6 +286,23 @@ int main(int argc, char** argv)
 	init_tree();
 	yyparse();
 	print_tree(root, 1, stdout);
+	fprintf(stdout, "\n\n");
+	for (struct TreeNode* node = root->child[0]; node != NULL; node = node->nxt)
+	{
+		struct TreeNode** split = (struct TreeNode**)malloc(sizeof(struct TreeNode*));
+		struct BasicBlock* bb;
+		if (node->type != TN_FUNC)
+			continue;
+		*split = node->child[0];
+		fprintf(stdout, "FUNCTION %s[%d]\n\n", node->str, node->val);
+		do
+		{
+			bb = alloc_bb(*split, split);
+			print_bb(bb, stdout);
+			fprintf(stdout, "\n");
+			free_bb(bb);
+		} while (*split != NULL);
+	}
 
 	if (yyin != stdin)
 		fclose(yyin);

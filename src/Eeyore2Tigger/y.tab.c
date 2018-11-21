@@ -69,6 +69,7 @@
 #include <math.h>
 #include <string.h>
 #include "tree.h"
+#include "bb.h"
 
 int yylex(void);
 void yyerror(char*);
@@ -80,7 +81,7 @@ extern char* yytext;
 
 struct TreeNode* root;
 
-#line 84 "y.tab.c" /* yacc.c:339  */
+#line 85 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -166,13 +167,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 19 "eeyore.y" /* yacc.c:355  */
+#line 20 "eeyore.y" /* yacc.c:355  */
 
 	int val;
 	char* str;
 	struct TreeNode* node;
 
-#line 176 "y.tab.c" /* yacc.c:355  */
+#line 177 "y.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -189,7 +190,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 193 "y.tab.c" /* yacc.c:358  */
+#line 194 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -488,10 +489,10 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    38,    38,    47,    48,    49,    55,    63,    73,    74,
-      75,    81,    89,    97,   105,   116,   122,   130,   139,   148,
-     156,   160,   164,   169,   175,   182,   183,   186,   190,   197,
-     200,   201,   202,   203,   204
+       0,    39,    39,    54,    55,    56,    62,    70,    81,    82,
+      83,    89,    97,   106,   115,   127,   134,   143,   153,   163,
+     172,   177,   182,   188,   195,   203,   204,   207,   212,   220,
+     223,   224,   225,   226,   227
 };
 #endif
 
@@ -1307,144 +1308,143 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 38 "eeyore.y" /* yacc.c:1646  */
+#line 39 "eeyore.y" /* yacc.c:1646  */
     {
+		struct TreeNode* last_node = (yyvsp[0].node);
 		(yyval.node) = alloc_treenode(TN_ROOT, NULL, -1);
 		root = (yyval.node);
 		(yyval.node)->child[0] = (yyvsp[0].node);
-		for (struct TreeNode* tmp_node = (yyvsp[0].node); tmp_node != NULL; tmp_node = tmp_node->nxt)
+		for (struct TreeNode* tmp_node = (yyvsp[0].node); tmp_node != NULL;
+			last_node = tmp_node, tmp_node = tmp_node->nxt)
 			tmp_node->parent = (yyval.node);
+		if (last_node != NULL)
+			(yyval.node)->lineno = last_node->lineno;
+		else
+			(yyval.node)->lineno = lineno - 1;
 	}
-#line 1319 "y.tab.c" /* yacc.c:1646  */
+#line 1326 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 47 "eeyore.y" /* yacc.c:1646  */
+#line 54 "eeyore.y" /* yacc.c:1646  */
     { (yyval.node) = NULL; }
-#line 1325 "y.tab.c" /* yacc.c:1646  */
+#line 1332 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 48 "eeyore.y" /* yacc.c:1646  */
+#line 55 "eeyore.y" /* yacc.c:1646  */
     { (yyval.node) = (yyvsp[0].node); }
-#line 1331 "y.tab.c" /* yacc.c:1646  */
+#line 1338 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 49 "eeyore.y" /* yacc.c:1646  */
+#line 56 "eeyore.y" /* yacc.c:1646  */
     {
 		(yyval.node) = (yyvsp[-2].node);
 		(yyvsp[-2].node)->nxt = (yyvsp[0].node);
 		if ((yyvsp[0].node) != NULL)
 			(yyvsp[0].node)->prv = (yyvsp[-2].node);
 	}
-#line 1342 "y.tab.c" /* yacc.c:1646  */
+#line 1349 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 55 "eeyore.y" /* yacc.c:1646  */
+#line 62 "eeyore.y" /* yacc.c:1646  */
     {
 		(yyval.node) = (yyvsp[-2].node);
 		(yyvsp[-2].node)->nxt = (yyvsp[0].node);
 		if ((yyvsp[0].node) != NULL)
 			(yyvsp[0].node)->prv = (yyvsp[-2].node);
 	}
-#line 1353 "y.tab.c" /* yacc.c:1646  */
+#line 1360 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 63 "eeyore.y" /* yacc.c:1646  */
+#line 70 "eeyore.y" /* yacc.c:1646  */
     {
 		(yyval.node) = alloc_treenode(TN_FUNC, (yyvsp[-7].node)->str, (yyvsp[-5].node)->val);
+		(yyval.node)->lineno = (yyvsp[0].node)->lineno;
 		free_treenode((yyvsp[-7].node));
 		free_treenode((yyvsp[-5].node));
 		(yyval.node)->child[0] = (yyvsp[-2].node);
 		for (struct TreeNode* tmp_node = (yyvsp[-2].node); tmp_node != NULL; tmp_node = tmp_node->nxt)
 			tmp_node->parent = (yyval.node);
 	}
-#line 1366 "y.tab.c" /* yacc.c:1646  */
+#line 1374 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 73 "eeyore.y" /* yacc.c:1646  */
+#line 81 "eeyore.y" /* yacc.c:1646  */
     { (yyval.node) = NULL; }
-#line 1372 "y.tab.c" /* yacc.c:1646  */
+#line 1380 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 74 "eeyore.y" /* yacc.c:1646  */
+#line 82 "eeyore.y" /* yacc.c:1646  */
     { (yyval.node) = (yyvsp[0].node); }
-#line 1378 "y.tab.c" /* yacc.c:1646  */
+#line 1386 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 75 "eeyore.y" /* yacc.c:1646  */
+#line 83 "eeyore.y" /* yacc.c:1646  */
     {
 		(yyval.node) = (yyvsp[-2].node);
 		(yyvsp[-2].node)->nxt = (yyvsp[0].node);
 		if ((yyvsp[0].node) != NULL)
 			(yyvsp[0].node)->prv = (yyvsp[-2].node);
 	}
-#line 1389 "y.tab.c" /* yacc.c:1646  */
+#line 1397 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 81 "eeyore.y" /* yacc.c:1646  */
+#line 89 "eeyore.y" /* yacc.c:1646  */
     {
 		(yyval.node) = (yyvsp[-2].node);
 		(yyvsp[-2].node)->nxt = (yyvsp[0].node);
 		if ((yyvsp[0].node) != NULL)
 			(yyvsp[0].node)->prv = (yyvsp[-2].node);
 	}
-#line 1400 "y.tab.c" /* yacc.c:1646  */
+#line 1408 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 89 "eeyore.y" /* yacc.c:1646  */
+#line 97 "eeyore.y" /* yacc.c:1646  */
     {
 		(yyval.node) = alloc_treenode(TN_EXPR_BI_LOGIC, (yyvsp[-4].node)->str, (yyvsp[-1].val));
+		(yyval.node)->lineno = (yyvsp[-4].node)->lineno;
 		free_treenode((yyvsp[-4].node));
 		(yyval.node)->child[0] = (yyvsp[-2].node);
 		(yyvsp[-2].node)->parent = (yyval.node);
-		(yyval.node)->child[0] = (yyvsp[0].node);
+		(yyval.node)->child[1] = (yyvsp[0].node);
 		(yyvsp[0].node)->parent = (yyval.node);
 	}
-#line 1413 "y.tab.c" /* yacc.c:1646  */
+#line 1422 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 97 "eeyore.y" /* yacc.c:1646  */
+#line 106 "eeyore.y" /* yacc.c:1646  */
     {
 		(yyval.node) = alloc_treenode(TN_EXPR_BI_ARITH, (yyvsp[-4].node)->str, (yyvsp[-1].val));
+		(yyval.node)->lineno = (yyvsp[-4].node)->lineno;
 		free_treenode((yyvsp[-4].node));
 		(yyval.node)->child[0] = (yyvsp[-2].node);
 		(yyvsp[-2].node)->parent = (yyval.node);
-		(yyval.node)->child[0] = (yyvsp[0].node);
+		(yyval.node)->child[1] = (yyvsp[0].node);
 		(yyvsp[0].node)->parent = (yyval.node);
 	}
-#line 1426 "y.tab.c" /* yacc.c:1646  */
+#line 1436 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 105 "eeyore.y" /* yacc.c:1646  */
+#line 115 "eeyore.y" /* yacc.c:1646  */
     {
 		switch ((yyvsp[-1].val))
 		{
 		case OP_ADD: (yyval.node) = alloc_treenode(TN_EXPR_UNI_ARITH, (yyvsp[-3].node)->str, OP_POS); break;
 		case OP_SUB: (yyval.node) = alloc_treenode(TN_EXPR_UNI_ARITH, (yyvsp[-3].node)->str, OP_NEG); break;
-		default: yyerror("wrong syntax.");
+		default: yyerror("wrong syntax."); break;
 		}
-		free_treenode((yyvsp[-3].node));
-		(yyval.node)->child[0] = (yyvsp[0].node);
-		(yyvsp[0].node)->parent = (yyval.node);
-	}
-#line 1442 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 15:
-#line 116 "eeyore.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(TN_EXPR_UNI_LOGIC, (yyvsp[-3].node)->str, (yyvsp[-1].val));
+		(yyval.node)->lineno = (yyvsp[-3].node)->lineno;
 		free_treenode((yyvsp[-3].node));
 		(yyval.node)->child[0] = (yyvsp[0].node);
 		(yyvsp[0].node)->parent = (yyval.node);
@@ -1452,23 +1452,37 @@ yyreduce:
 #line 1453 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 15:
+#line 127 "eeyore.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(TN_EXPR_UNI_LOGIC, (yyvsp[-3].node)->str, (yyvsp[-1].val));
+		(yyval.node)->lineno = (yyvsp[-3].node)->lineno;
+		free_treenode((yyvsp[-3].node));
+		(yyval.node)->child[0] = (yyvsp[0].node);
+		(yyvsp[0].node)->parent = (yyval.node);
+	}
+#line 1465 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 16:
-#line 122 "eeyore.y" /* yacc.c:1646  */
+#line 134 "eeyore.y" /* yacc.c:1646  */
     {
 		(yyval.node) = alloc_treenode(TN_EXPR_ASSN, (yyvsp[-2].node)->str, -1);
+		(yyval.node)->lineno = (yyvsp[-2].node)->lineno;
 		free_treenode((yyvsp[-2].node));
 		(yyval.node)->child[0] = NULL;
 		(yyval.node)->child[1] = (yyvsp[0].node);
 		(yyvsp[0].node)->parent = (yyval.node);
 		(yyval.node)->child[2] = NULL;
 	}
-#line 1466 "y.tab.c" /* yacc.c:1646  */
+#line 1479 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 130 "eeyore.y" /* yacc.c:1646  */
+#line 143 "eeyore.y" /* yacc.c:1646  */
     {
 		(yyval.node) = alloc_treenode(TN_EXPR_ASSN, (yyvsp[-5].node)->str, -1);
+		(yyval.node)->lineno = (yyvsp[-5].node)->lineno;
 		free_treenode((yyvsp[-5].node));
 		(yyval.node)->child[0] = (yyvsp[-3].node);
 		(yyvsp[-3].node)->parent = (yyval.node);
@@ -1476,13 +1490,14 @@ yyreduce:
 		(yyvsp[0].node)->parent = (yyval.node);
 		(yyval.node)->child[2] = NULL;
 	}
-#line 1480 "y.tab.c" /* yacc.c:1646  */
+#line 1494 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 139 "eeyore.y" /* yacc.c:1646  */
+#line 153 "eeyore.y" /* yacc.c:1646  */
     {
 		(yyval.node) = alloc_treenode(TN_EXPR_ASSN, (yyvsp[-5].node)->str, -1);
+		(yyval.node)->lineno = (yyvsp[-5].node)->lineno;
 		free_treenode((yyvsp[-5].node));
 		(yyval.node)->child[0] = NULL;
 		(yyval.node)->child[1] = (yyvsp[-3].node);
@@ -1490,140 +1505,148 @@ yyreduce:
 		(yyval.node)->child[2] = (yyvsp[-1].node);
 		(yyvsp[-1].node)->parent = (yyval.node);
 	}
-#line 1494 "y.tab.c" /* yacc.c:1646  */
+#line 1509 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 148 "eeyore.y" /* yacc.c:1646  */
+#line 163 "eeyore.y" /* yacc.c:1646  */
     {
 		(yyval.node) = alloc_treenode(TN_EXPR_IF_GOTO, (yyvsp[0].node)->str, (yyvsp[-3].val));
+		(yyval.node)->lineno = (yyvsp[-4].node)->lineno;
 		free_treenode((yyvsp[0].node));
 		(yyval.node)->child[0] = (yyvsp[-4].node);
 		(yyvsp[-4].node)->parent = (yyval.node);
 		(yyval.node)->child[1] = (yyvsp[-2].node);
 		(yyvsp[-2].node)->parent = (yyval.node);
 	}
-#line 1507 "y.tab.c" /* yacc.c:1646  */
+#line 1523 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 156 "eeyore.y" /* yacc.c:1646  */
+#line 172 "eeyore.y" /* yacc.c:1646  */
     {
 		(yyval.node) = alloc_treenode(TN_EXPR_GOTO, (yyvsp[0].node)->str, -1);
+		(yyval.node)->lineno = (yyvsp[0].node)->lineno;
 		free_treenode((yyvsp[0].node));
 	}
-#line 1516 "y.tab.c" /* yacc.c:1646  */
+#line 1533 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 160 "eeyore.y" /* yacc.c:1646  */
+#line 177 "eeyore.y" /* yacc.c:1646  */
     {
 		(yyval.node) = alloc_treenode(TN_EXPR_LABEL, (yyvsp[-1].node)->str, -1);
+		(yyval.node)->lineno = (yyvsp[-1].node)->lineno;
 		free_treenode((yyvsp[-1].node));
 	}
-#line 1525 "y.tab.c" /* yacc.c:1646  */
+#line 1543 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 164 "eeyore.y" /* yacc.c:1646  */
+#line 182 "eeyore.y" /* yacc.c:1646  */
     {
 		(yyval.node) = alloc_treenode(TN_EXPR_PARAM, NULL, -1);
+		(yyval.node)->lineno = (yyvsp[0].node)->lineno;
 		(yyval.node)->child[0] = (yyvsp[0].node);
 		(yyvsp[0].node)->parent = (yyval.node);
 	}
-#line 1535 "y.tab.c" /* yacc.c:1646  */
+#line 1554 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 169 "eeyore.y" /* yacc.c:1646  */
+#line 188 "eeyore.y" /* yacc.c:1646  */
     {
 		(yyval.node) = alloc_treenode(TN_EXPR_CALL, (yyvsp[-3].node)->str, -1);
+		(yyval.node)->lineno = (yyvsp[-3].node)->lineno;
 		free_treenode((yyvsp[-3].node));
 		(yyval.node)->child[0] = (yyvsp[0].node);
 		(yyvsp[0].node)->parent = (yyval.node);
 	}
-#line 1546 "y.tab.c" /* yacc.c:1646  */
+#line 1566 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 175 "eeyore.y" /* yacc.c:1646  */
+#line 195 "eeyore.y" /* yacc.c:1646  */
     {
 		(yyval.node) = alloc_treenode(TN_EXPR_RETURN, NULL, -1);
+		(yyval.node)->lineno = (yyvsp[0].node)->lineno;
 		(yyval.node)->child[0] = (yyvsp[0].node);
 		(yyvsp[0].node)->parent = (yyval.node);
-	}
-#line 1556 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 25:
-#line 182 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = (yyvsp[0].node); }
-#line 1562 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 26:
-#line 183 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = (yyvsp[0].node); }
-#line 1568 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 27:
-#line 186 "eeyore.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(TN_VAR, (yyvsp[0].node)->str, -1);
-		free_treenode((yyvsp[0].node));
 	}
 #line 1577 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 28:
-#line 190 "eeyore.y" /* yacc.c:1646  */
+  case 25:
+#line 203 "eeyore.y" /* yacc.c:1646  */
+    { (yyval.node) = (yyvsp[0].node); }
+#line 1583 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 26:
+#line 204 "eeyore.y" /* yacc.c:1646  */
+    { (yyval.node) = (yyvsp[0].node); }
+#line 1589 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 27:
+#line 207 "eeyore.y" /* yacc.c:1646  */
     {
-		(yyval.node) = alloc_treenode(TN_VAR, (yyvsp[0].node)->str, (yyvsp[-1].node)->val);
-		free_treenode((yyvsp[-1].node));
+		(yyval.node) = alloc_treenode(TN_VAR, (yyvsp[0].node)->str, -1);
+		(yyval.node)->lineno = (yyvsp[0].node)->lineno;
 		free_treenode((yyvsp[0].node));
 	}
-#line 1587 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 29:
-#line 197 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = alloc_treenode(TN_NUM, NULL, (yyvsp[0].val)); }
-#line 1593 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 30:
-#line 200 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = alloc_treenode(TN_ID, (yyvsp[0].str), -1); }
 #line 1599 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 28:
+#line 212 "eeyore.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(TN_VAR, (yyvsp[0].node)->str, (yyvsp[-1].node)->val);
+		(yyval.node)->lineno = (yyvsp[-1].node)->lineno;
+		free_treenode((yyvsp[-1].node));
+		free_treenode((yyvsp[0].node));
+	}
+#line 1610 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 29:
+#line 220 "eeyore.y" /* yacc.c:1646  */
+    { (yyval.node) = alloc_treenode(TN_NUM, NULL, (yyvsp[0].val)); (yyval.node)->lineno = lineno; }
+#line 1616 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 30:
+#line 223 "eeyore.y" /* yacc.c:1646  */
+    { (yyval.node) = alloc_treenode(TN_ID, (yyvsp[0].str), -1); (yyval.node)->lineno = lineno; }
+#line 1622 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 31:
-#line 201 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = alloc_treenode(TN_ID, (yyvsp[0].str), -1); }
-#line 1605 "y.tab.c" /* yacc.c:1646  */
+#line 224 "eeyore.y" /* yacc.c:1646  */
+    { (yyval.node) = alloc_treenode(TN_ID, (yyvsp[0].str), -1); (yyval.node)->lineno = lineno; }
+#line 1628 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 202 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = alloc_treenode(TN_ID, (yyvsp[0].str), -1); }
-#line 1611 "y.tab.c" /* yacc.c:1646  */
+#line 225 "eeyore.y" /* yacc.c:1646  */
+    { (yyval.node) = alloc_treenode(TN_ID, (yyvsp[0].str), -1); (yyval.node)->lineno = lineno; }
+#line 1634 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 203 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = alloc_treenode(TN_ID, (yyvsp[0].str), -1); }
-#line 1617 "y.tab.c" /* yacc.c:1646  */
+#line 226 "eeyore.y" /* yacc.c:1646  */
+    { (yyval.node) = alloc_treenode(TN_ID, (yyvsp[0].str), -1); (yyval.node)->lineno = lineno; }
+#line 1640 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 204 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = alloc_treenode(TN_ID, (yyvsp[0].str), -1); }
-#line 1623 "y.tab.c" /* yacc.c:1646  */
+#line 227 "eeyore.y" /* yacc.c:1646  */
+    { (yyval.node) = alloc_treenode(TN_ID, (yyvsp[0].str), -1); (yyval.node)->lineno = lineno; }
+#line 1646 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1627 "y.tab.c" /* yacc.c:1646  */
+#line 1650 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1851,7 +1874,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 207 "eeyore.y" /* yacc.c:1906  */
+#line 230 "eeyore.y" /* yacc.c:1906  */
 
 
 void yyerror(char* s)
@@ -1911,6 +1934,23 @@ int main(int argc, char** argv)
 	init_tree();
 	yyparse();
 	print_tree(root, 1, stdout);
+	fprintf(stdout, "\n\n");
+	for (struct TreeNode* node = root->child[0]; node != NULL; node = node->nxt)
+	{
+		struct TreeNode** split = (struct TreeNode**)malloc(sizeof(struct TreeNode*));
+		struct BasicBlock* bb;
+		if (node->type != TN_FUNC)
+			continue;
+		*split = node->child[0];
+		fprintf(stdout, "FUNCTION %s[%d]\n\n", node->str, node->val);
+		do
+		{
+			bb = alloc_bb(*split, split);
+			print_bb(bb, stdout);
+			fprintf(stdout, "\n");
+			free_bb(bb);
+		} while (*split != NULL);
+	}
 
 	if (yyin != stdin)
 		fclose(yyin);
