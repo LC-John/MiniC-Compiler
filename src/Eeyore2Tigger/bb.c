@@ -3,11 +3,18 @@
 #include <stdio.h>
 #include <string.h>
 
+void init_bb()
+{
+	n_bb = 0;
+}
+
 struct BasicBlock* alloc_bb(struct TreeNode* begin_node, struct TreeNode** end_node)
 {
 	struct TreeNode* tmp_node;
 	struct BasicBlock* bb = (struct BasicBlock*)malloc(sizeof(struct BasicBlock));
+	bb->idx = n_bb++;
 	bb->n_stmt = 0;
+	bb->str = NULL;
 	for (tmp_node = begin_node; tmp_node != NULL; tmp_node = tmp_node->nxt)
 	{
 		if (tmp_node->type == TN_VAR)
@@ -27,6 +34,9 @@ struct BasicBlock* alloc_bb(struct TreeNode* begin_node, struct TreeNode** end_n
 		bb->live[i] = NULL;
 	bb->begin = begin_node;
 	bb->end = *end_node;
+	bb->nxt[0] = NULL;
+	bb->nxt[1] = NULL;
+	bb->prv = NULL;
 	return bb;
 }
 
@@ -45,11 +55,234 @@ void free_bb(struct BasicBlock* arg_bb)
 	free(arg_bb);
 }
 
+struct ListNode** tree2bbs(struct TreeNode* root, int* arg_n_func)
+{
+	int n_func = 0, idx = 0;
+	struct ListNode** funcs;
+	struct TreeNode* make_the_compiler_happy;
+	for (struct TreeNode* node = root->child[0]; node != NULL; node = node->nxt)
+	{
+		if (node->type != TN_FUNC)
+			continue;
+		n_func++;
+	}
+	*arg_n_func = n_func;
+	funcs = (struct ListNode**)malloc(sizeof(struct ListNode*)*n_func);
+	for (int i = 0; i < n_func; i++)
+	{
+		funcs[i] = (struct ListNode*)malloc(sizeof(struct ListNode));
+		funcs[i]->obj = alloc_bb(NULL, &make_the_compiler_happy);
+		funcs[i]->prv = NULL;
+	}
+	for (struct TreeNode* node = root->child[0]; node != NULL; node = node->nxt)
+	{
+		struct TreeNode** split = (struct TreeNode**)malloc(sizeof(struct TreeNode*));
+		struct ListNode* bb_container;
+		struct ListNode* last_bb_container;
+		struct ListNode *bb_entry, *bb_exit;
+		if (node->type != TN_FUNC)
+			continue;
+		last_bb_container = funcs[idx++];
+		*split = node->child[0];
+		((struct BasicBlock*)(last_bb_container->obj))->str = strdup(node->str);
+		do
+		{
+			bb_container = (struct ListNode*)malloc(sizeof(struct ListNode));
+			bb_container->obj = alloc_bb(*split, split);
+			last_bb_container->nxt = bb_container;
+			bb_container->prv = last_bb_container;
+			last_bb_container = bb_container;
+		} while (*split != NULL);
+		bb_exit = (struct ListNode*)malloc(sizeof(struct ListNode));
+		bb_exit->obj = alloc_bb(NULL, &make_the_compiler_happy);
+		((struct BasicBlock*)(bb_exit->obj))->str = strdup("RETURN");
+		last_bb_container->nxt = bb_exit;
+		bb_exit->prv = last_bb_container;
+		bb_exit->nxt = NULL;
+	}
+	for (int i = 0; i < n_func; i++)
+	{
+		struct ListNode* bb_container = funcs[i];
+		struct ListNode* bb_container_nxt = funcs[i]->nxt;
+		struct BasicBlock* bb = (struct BasicBlock*)(bb_container->obj);
+		struct BasicBlock* bb_nxt = (struct BasicBlock*)(bb_container_nxt->obj);
+		struct ListNode* end_bb_container = funcs[i];
+		struct BasicBlock* end_bb;
+		while(end_bb_container->nxt != NULL)
+			end_bb_container = end_bb_container->nxt;
+		end_bb = (struct BasicBlock*)(end_bb_container->obj);
+		bb->nxt[0] = (struct BasicBlock*)(bb_container->nxt->obj);
+		if (bb_nxt->prv == NULL)
+		{
+			bb_nxt->prv = (struct ListNode*)malloc(sizeof(struct ListNode));
+			bb_nxt->prv->obj = bb;
+			bb_nxt->prv->nxt = bb_nxt->prv->prv = NULL;
+		}
+		else
+		{
+			struct ListNode* tmp_lnode = (struct ListNode*)malloc(sizeof(struct ListNode));
+			tmp_lnode->obj = bb; tmp_lnode->prv = NULL;
+			bb_nxt->prv->prv = tmp_lnode;
+			tmp_lnode->nxt = bb_nxt->prv;
+			bb_nxt->prv = tmp_lnode;
+		}
+		bb_container = bb_container->nxt;
+		while(bb_container->nxt != NULL)
+		{
+			struct TreeNode* tmp_end = NULL;
+			bb = (struct BasicBlock*)(bb_container->obj);
+			bb_nxt = NULL;
+			// RETURN, link to exit BB
+			for (struct TreeNode* tnode = bb->begin; tnode != bb->end; tnode = tnode->nxt)
+				if (tnode->type == TN_EXPR_RETURN)
+					tmp_end = tnode->nxt;
+				else if (tmp_end != NULL)
+					bb->n_stmt--;
+			if (tmp_end != NULL)
+			{
+				bb->end = tmp_end;
+				bb_nxt = end_bb;
+				if (bb_nxt != NULL)
+					bb->nxt[0] = bb_nxt;
+				if (bb_nxt != NULL &&bb_nxt->prv == NULL)
+				{
+					bb_nxt->prv = (struct ListNode*)malloc(sizeof(struct ListNode));
+					bb_nxt->prv->obj = bb;
+					bb_nxt->prv->nxt = bb_nxt->prv->prv = NULL;
+				}
+				else if (bb_nxt != NULL)
+				{
+					struct ListNode* tmp_lnode = (struct ListNode*)malloc(sizeof(struct ListNode));
+					tmp_lnode->obj = bb; tmp_lnode->prv = NULL;
+					bb_nxt->prv->prv = tmp_lnode;
+					tmp_lnode->nxt = bb_nxt->prv;
+					bb_nxt->prv = tmp_lnode;
+				}
+			}
+			tmp_end = bb->begin;
+			while (tmp_end->nxt != bb->end)
+				tmp_end = tmp_end->nxt;
+			// (IF) GOTO, link to target BB
+			if (tmp_end->type == TN_EXPR_GOTO || tmp_end->type == TN_EXPR_IF_GOTO)
+			{
+				bb_nxt = NULL;
+				for (bb_container_nxt = funcs[i]->nxt; bb_container_nxt != NULL && bb_container_nxt->nxt != NULL; bb_container_nxt = bb_container_nxt->nxt)
+				{
+					struct TreeNode* tmp_tnode = ((struct BasicBlock*)(bb_container_nxt->obj))->begin;
+					if (tmp_tnode->type == TN_EXPR_LABEL && strcmp(tmp_tnode->str, tmp_end->str) == 0)
+					{
+						bb_nxt = ((struct BasicBlock*)(bb_container_nxt->obj));
+						break;
+					}
+				}
+				if (bb_nxt == NULL)
+				{
+					fprintf(stderr, "Cannot find label %s", tmp_end->str);
+					for (int i = 0; i < n_func; i++)
+					{
+						struct ListNode* lnode = funcs[i];
+						while(lnode != NULL)
+						{
+							print_bb(lnode->obj, stdout);
+							fprintf(stdout, "\n");
+							lnode = lnode->nxt;
+						}
+						fprintf(stdout, "\n");
+					}
+					exit(-1);
+				}
+				bb->nxt[0] = bb_nxt;
+				if (bb_nxt->prv == NULL)
+				{
+					bb_nxt->prv = (struct ListNode*)malloc(sizeof(struct ListNode));
+					bb_nxt->prv->obj = bb;
+					bb_nxt->prv->nxt = bb_nxt->prv->prv = NULL;
+				}
+				else
+				{
+					struct ListNode* tmp_lnode = (struct ListNode*)malloc(sizeof(struct ListNode));
+					tmp_lnode->obj = bb; tmp_lnode->prv = NULL;
+					bb_nxt->prv->prv = tmp_lnode;
+					tmp_lnode->nxt = bb_nxt->prv;
+					bb_nxt->prv = tmp_lnode;
+				}
+			}
+			// IF GOTO, link to next BB
+			if (tmp_end->type == TN_EXPR_IF_GOTO)
+			{
+				bb_container_nxt = bb_container->nxt;
+				bb_nxt = (struct BasicBlock*)(bb_container_nxt->obj);
+				bb->nxt[1] = bb_nxt;
+				if (bb_nxt != NULL &&bb_nxt->prv == NULL)
+				{
+					bb_nxt->prv = (struct ListNode*)malloc(sizeof(struct ListNode));
+					bb_nxt->prv->obj = bb;
+					bb_nxt->prv->nxt = bb_nxt->prv->prv = NULL;
+				}
+				else if (bb_nxt != NULL)
+				{
+					struct ListNode* tmp_lnode = (struct ListNode*)malloc(sizeof(struct ListNode));
+					tmp_lnode->obj = bb; tmp_lnode->prv = NULL;
+					bb_nxt->prv->prv = tmp_lnode;
+					tmp_lnode->nxt = bb_nxt->prv;
+					bb_nxt->prv = tmp_lnode;
+				}
+			}
+			// Link others to next BB
+			if (bb->nxt[0] == NULL)
+			{
+				bb_container_nxt = bb_container->nxt;
+				bb_nxt = (struct BasicBlock*)(bb_container_nxt->obj);
+				bb->nxt[0] = bb_nxt;
+				if (bb_nxt != NULL &&bb_nxt->prv == NULL)
+				{
+					bb_nxt->prv = (struct ListNode*)malloc(sizeof(struct ListNode));
+					bb_nxt->prv->obj = bb;
+					bb_nxt->prv->nxt = bb_nxt->prv->prv = NULL;
+				}
+				else if (bb_nxt != NULL)
+				{
+					struct ListNode* tmp_lnode = (struct ListNode*)malloc(sizeof(struct ListNode));
+					tmp_lnode->obj = bb; tmp_lnode->prv = NULL;
+					bb_nxt->prv->prv = tmp_lnode;
+					tmp_lnode->nxt = bb_nxt->prv;
+					bb_nxt->prv = tmp_lnode;
+				}
+			}
+			bb_container = bb_container->nxt;
+		}
+	}
+	return funcs;
+}
+
 void print_bb(struct BasicBlock* arg_bb, FILE* arg_file)
 {
 	struct TreeNode* node = arg_bb->begin;
+	struct ListNode* from;
 	struct ListNode* live_val;
-	fprintf(arg_file, "stmt num = %d\n", arg_bb->n_stmt);
+	if (arg_bb->str == NULL)
+		fprintf(arg_file, "BB %d\t", arg_bb->idx);
+	else
+		fprintf(arg_file, "BB %d (%s)\t", arg_bb->idx, arg_bb->str);
+	fprintf(arg_file, "stmt# = %d\t", arg_bb->n_stmt);
+	if (arg_bb->nxt[0] != NULL)
+	{
+		fprintf(arg_file, "to BB %d", arg_bb->nxt[0]->idx);
+		if (arg_bb->nxt[1] != NULL)
+			fprintf(arg_file, ", %d", arg_bb->nxt[1]->idx);
+		fprintf(arg_file, "\t");
+	}
+	if (arg_bb->prv != NULL)
+	{
+		fprintf(arg_file, "from BB %d", ((struct BasicBlock*)(arg_bb->prv->obj))->idx);
+		from = arg_bb->prv->nxt;
+		while (from != NULL)
+		{
+			fprintf(arg_file, ", %d", ((struct BasicBlock*)(from->obj))->idx);
+			from = from->nxt;
+		}
+	}
+	fprintf(arg_file, "\n");
 	for (int i = 0; i < arg_bb->n_stmt && node != arg_bb->end; i++, node = node->nxt)
 	{
 		switch(node->type)
@@ -148,8 +381,8 @@ void print_bb(struct BasicBlock* arg_bb, FILE* arg_file)
 			}
 			switch (node->child[1]->type)
 			{
-			case TN_NUM:		fprintf(arg_file, "%d ", node->child[0]->val); break;
-			case TN_ID:		fprintf(arg_file, "%s ", node->child[0]->str); break;
+			case TN_NUM:		fprintf(arg_file, "%d ", node->child[1]->val); break;
+			case TN_ID:		fprintf(arg_file, "%s ", node->child[1]->str); break;
 			default:	fprintf(arg_file, "<UNK> "); break;
 			}
 			fprintf(arg_file, ") goto %s ", node->str);

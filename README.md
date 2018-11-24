@@ -131,7 +131,11 @@ PHASE 1 (MiniC2Eeyore & type checking) COMPLETE!
 
 ## Phase 2. Eeyore2Tigger
 
-To be continued...
+Eeyore parsing complete.
+
+Eeyore data-flow graph built.
+
+TODO: variable life cycle, register assignment, tigger code generation
 
 ## Phase 3. Tigger2RISC-V
 

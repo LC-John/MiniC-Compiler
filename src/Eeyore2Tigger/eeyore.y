@@ -15,6 +15,8 @@ extern int lineno;
 extern char* yytext;
 
 struct TreeNode* root;
+int n_funcs;
+struct ListNode** funcs;
 %}
 
 %union {
@@ -284,24 +286,23 @@ int main(int argc, char** argv)
 	}
 
 	init_tree();
+	init_bb();
+
 	yyparse();
-	print_tree(root, 1, stdout);
-	fprintf(stdout, "\n\n");
-	for (struct TreeNode* node = root->child[0]; node != NULL; node = node->nxt)
+
+	//print_tree(root, 1, stdout);
+	n_funcs = 0;
+	funcs = tree2bbs(root, &n_funcs);
+	for (int i = 0; i < n_funcs; i++)
 	{
-		struct TreeNode** split = (struct TreeNode**)malloc(sizeof(struct TreeNode*));
-		struct BasicBlock* bb;
-		if (node->type != TN_FUNC)
-			continue;
-		*split = node->child[0];
-		fprintf(stdout, "FUNCTION %s[%d]\n\n", node->str, node->val);
-		do
+		struct ListNode* lnode = funcs[i];
+		while(lnode != NULL)
 		{
-			bb = alloc_bb(*split, split);
-			print_bb(bb, stdout);
+			print_bb(lnode->obj, stdout);
 			fprintf(stdout, "\n");
-			free_bb(bb);
-		} while (*split != NULL);
+			lnode = lnode->nxt;
+		}
+		fprintf(stdout, "\n");
 	}
 
 	if (yyin != stdin)
