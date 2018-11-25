@@ -135,7 +135,9 @@ Eeyore parsing complete.
 
 Eeyore data-flow graph built.
 
-TODO: variable life cycle, register assignment, tigger code generation
+Variable activaty analysis complete.
+
+TODO: register assignment, tigger code generation
 
 ## Phase 3. Tigger2RISC-V
 

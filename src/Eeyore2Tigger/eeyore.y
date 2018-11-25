@@ -289,10 +289,16 @@ int main(int argc, char** argv)
 	init_bb();
 
 	yyparse();
-
 	//print_tree(root, 1, stdout);
+
 	n_funcs = 0;
 	funcs = tree2bbs(root, &n_funcs);
+
+	int convergence;
+	do
+	{
+		convergence = var_life_between_bbs(funcs[0]);
+	} while (convergence != 0);
 	for (int i = 0; i < n_funcs; i++)
 	{
 		struct ListNode* lnode = funcs[i];
