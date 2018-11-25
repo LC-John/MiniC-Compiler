@@ -13,7 +13,6 @@ struct BasicBlock* alloc_bb(struct TreeNode* begin_node, struct TreeNode** end_n
 	struct TreeNode* tmp_node;
 	struct BasicBlock* bb = (struct BasicBlock*)malloc(sizeof(struct BasicBlock));
 	bb->idx = n_bb++;
-	bb->flag = 0;
 	bb->n_stmt = 0;
 	bb->str = NULL;
 	for (tmp_node = begin_node; tmp_node != NULL; tmp_node = tmp_node->nxt)
@@ -373,46 +372,58 @@ int var_life_within_bb(struct BasicBlock* arg_bb_container, struct ListNode* arg
 int var_life_between_bbs(struct ListNode* arg_bb_container)
 {
 	int ret = 0;
+	int **flag_matrix, begin_idx;
 	struct BasicBlock* bb;
 	struct ListNode* bb_container;
+	bb = (struct BasicBlock*)(arg_bb_container->obj);
+	begin_idx = bb->idx;
 	while (arg_bb_container->nxt != NULL)
 	{
 		bb = (struct BasicBlock*)(arg_bb_container->obj);
-		bb->flag = 0;
 		arg_bb_container = arg_bb_container->nxt;
 	}
 	bb = (struct BasicBlock*)(arg_bb_container->obj);
 	bb_container = bb->prv;
+	flag_matrix = (int**)malloc(sizeof(int*)*(bb->idx+10));
+	for (int i = 0; i < bb->idx+10; i++)
+	{
+		flag_matrix[i] = (int*)malloc(sizeof(int)*(bb->idx+10));
+		memset(flag_matrix[i], 0, sizeof(int)*(bb->idx+10));
+	}
 	while (bb_container != NULL)
 	{
 		struct BasicBlock* tmp = (struct BasicBlock*)(bb_container->obj);
-		if (tmp->flag > 0)
+		if (flag_matrix[tmp->idx][bb->idx] > 0)
 		{
 			bb_container = bb_container->nxt;
 			continue;
 		}
-		ret += var_life_bb2bb(tmp, bb);
+		ret += var_life_bb2bb(tmp, bb, flag_matrix);
 		bb_container = bb_container->nxt;
 	}
+	for (int i = 0; i < bb->idx+10; i++)
+		free(flag_matrix[i]);
+	free(flag_matrix);
 	return ret;
 }
 
-int var_life_bb2bb(struct BasicBlock* bb1, struct BasicBlock* bb2)
+int var_life_bb2bb(struct BasicBlock* bb1, struct BasicBlock* bb2, int** flag_matrix)
 {
+	//printf ("%d\t%d\n", bb1->idx, bb2->idx);
 	if (bb1 == NULL || bb2 == NULL)
 		return 0;
 	int ret = var_life_within_bb(bb1, bb2->live[0]);
-	bb1->flag = 1;
 	struct ListNode* bb3_container = bb1->prv;
+	flag_matrix[bb1->idx][bb2->idx] = 1;
 	while (bb3_container != NULL)
 	{
 		struct BasicBlock* tmp = (struct BasicBlock*)(bb3_container->obj);
-		if (tmp->flag > 0)
+		if (flag_matrix[tmp->idx][bb1->idx] > 0)
 		{
 			bb3_container = bb3_container->nxt;
 			continue;
 		}
-		ret += var_life_bb2bb(tmp, bb1);
+		ret += var_life_bb2bb(tmp, bb1, flag_matrix);
 		bb3_container = bb3_container->nxt;
 	}
 	return ret;

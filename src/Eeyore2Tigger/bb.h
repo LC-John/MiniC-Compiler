@@ -7,7 +7,6 @@
 
 struct BasicBlock
 {
-	int flag;
 	int idx;
 	int n_stmt;
 	char* str;
@@ -29,7 +28,7 @@ struct ListNode** tree2bbs(struct TreeNode* root, int*);	// (ParseTreeRoot, Func
 
 int var_life_within_bb(struct BasicBlock*, struct ListNode*);	// (BB, ListNodeContainer4LiveVarsTillThisBBEnd)
 int var_life_between_bbs(struct ListNode*);	// (ListNodeContainer4EntryBB)
-int var_life_bb2bb(struct BasicBlock*, struct BasicBlock*);	// (BB1, BB2) BB is in BB2->prv
+int var_life_bb2bb(struct BasicBlock*, struct BasicBlock*, int**);	// (BB1, BB2, PathMatrix) BB1 is in BB2->prv
 
 void print_bb(struct BasicBlock*, FILE*); 	// (BasicBlock2BPrinted, OutputFile)
 

@@ -298,6 +298,7 @@ int main(int argc, char** argv)
 	do
 	{
 		convergence = var_life_between_bbs(funcs[0]);
+		printf("%d\n", convergence);
 	} while (convergence != 0);
 	for (int i = 0; i < n_funcs; i++)
 	{
