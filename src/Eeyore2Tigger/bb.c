@@ -17,8 +17,6 @@ struct BasicBlock* alloc_bb(struct TreeNode* begin_node, struct TreeNode** end_n
 	bb->str = NULL;
 	for (tmp_node = begin_node; tmp_node != NULL; tmp_node = tmp_node->nxt)
 	{
-		if (tmp_node->type == TN_VAR)
-			continue;
 		if (tmp_node->type == TN_EXPR_LABEL && tmp_node != begin_node)
 			break;
 		bb->n_stmt++;
@@ -52,6 +50,7 @@ void free_bb(struct BasicBlock* arg_bb)
 			free(tbd);
 		}
 	}
+	free(arg_bb->live);
 	free(arg_bb);
 }
 
@@ -268,17 +267,15 @@ int var_life_within_bb(struct BasicBlock* arg_bb_container, struct ListNode* arg
 	bb->live[bb->n_stmt] = merge_str_lists(bb->live[bb->n_stmt], arg_live);
 	for (int i = bb->n_stmt-1; i >= 0; i--, stmt = stmt->prv)
 	{
-		if (stmt->type == TN_VAR)
-		{
-			i++;
-			continue;
-		}
 		struct ListNode* old = copy_str_list(bb->live[i]);
-		int continue_flag = 0;
 		bb->live[i] = merge_str_lists(bb->live[i], bb->live[i+1]);
 		switch (stmt->type)
 		{
-		case TN_VAR: i++; continue_flag = 1; break;
+		case TN_VAR:
+			tmp = find_str_list(bb->live[i], stmt->str);
+			if (tmp != NULL)
+				bb->live[i] = delete_node_from_list(tmp, bb->live[i]);
+			break;
 		case TN_EXPR_BI_LOGIC:
 		case TN_EXPR_BI_ARITH:
 		case TN_EXPR_IF_GOTO:	// stmt->str for IF_GOTO is the label, which will never appear in the live var lists
@@ -351,8 +348,6 @@ int var_life_within_bb(struct BasicBlock* arg_bb_container, struct ListNode* arg
 		case TN_EXPR_LABEL:
 		default:	break;
 		}
-		if (continue_flag != 0)
-			continue;
 		if (cmp_str_lists(old, bb->live[i]) != 0)
 		{
 			ret++;
@@ -461,7 +456,12 @@ void print_bb(struct BasicBlock* arg_bb, FILE* arg_file)
 	{
 		switch(node->type)
 		{
-		case TN_VAR: i--; continue;
+		case TN_VAR:
+			fprintf(arg_file, "%d\t", i+1);
+			fprintf(arg_file, "var %s ", node->str);
+			if (node->val > 0)
+				fprintf(arg_file, "[%d] ", node->val);
+			break;
 		case TN_EXPR_BI_LOGIC:
 		case TN_EXPR_BI_ARITH:
 			fprintf(arg_file, "%d\t", i+1);
