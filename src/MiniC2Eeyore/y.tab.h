@@ -45,64 +45,68 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    EOL = 258,
-    VAR = 259,
-    END = 260,
-    IF = 261,
-    GOTO = 262,
-    PARAM = 263,
-    CALL = 264,
-    RETURN = 265,
-    NUM = 266,
-    ID_TMP = 267,
-    ID_PARAM = 268,
-    ID_NATIVE = 269,
-    ID_LABEL = 270,
-    ID_FUNC = 271,
-    ASSIGN = 272,
-    OP_BI_LOGIC = 273,
-    OP_BI_ARITH = 274,
-    OP_UNI = 275,
-    ARR_L = 276,
-    ARR_R = 277,
-    COLON = 278
+    MAIN = 258,
+    IF = 259,
+    ELSE = 260,
+    WHILE = 261,
+    RETURN = 262,
+    PRN_R = 263,
+    ARR_L = 264,
+    ARR_R = 265,
+    BRC_R = 266,
+    COMMA = 267,
+    EOL = 268,
+    PRN_L = 269,
+    BRC_L = 270,
+    NUM = 271,
+    ID = 272,
+    TYPE = 273,
+    OP_7 = 274,
+    OP_6 = 275,
+    OP_5 = 276,
+    OP_4 = 277,
+    OP_3 = 278,
+    OP_2 = 279,
+    OP_1 = 280
   };
 #endif
 /* Tokens.  */
-#define EOL 258
-#define VAR 259
-#define END 260
-#define IF 261
-#define GOTO 262
-#define PARAM 263
-#define CALL 264
-#define RETURN 265
-#define NUM 266
-#define ID_TMP 267
-#define ID_PARAM 268
-#define ID_NATIVE 269
-#define ID_LABEL 270
-#define ID_FUNC 271
-#define ASSIGN 272
-#define OP_BI_LOGIC 273
-#define OP_BI_ARITH 274
-#define OP_UNI 275
-#define ARR_L 276
-#define ARR_R 277
-#define COLON 278
+#define MAIN 258
+#define IF 259
+#define ELSE 260
+#define WHILE 261
+#define RETURN 262
+#define PRN_R 263
+#define ARR_L 264
+#define ARR_R 265
+#define BRC_R 266
+#define COMMA 267
+#define EOL 268
+#define PRN_L 269
+#define BRC_L 270
+#define NUM 271
+#define ID 272
+#define TYPE 273
+#define OP_7 274
+#define OP_6 275
+#define OP_5 276
+#define OP_4 277
+#define OP_3 278
+#define OP_2 279
+#define OP_1 280
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 25 "eeyore.y" /* yacc.c:1909  */
+#line 22 "minic.y" /* yacc.c:1909  */
 
-	int val;
-	char* str;
+	int value;
+	char* name;
 	struct TreeNode* node;
 
-#line 106 "y.tab.h" /* yacc.c:1909  */
+#line 110 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

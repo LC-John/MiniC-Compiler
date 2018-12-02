@@ -5,6 +5,7 @@
 #include <string.h>
 #include "tree.h"
 #include "bb.h"
+#include "regalloc.h"
 
 int yylex(void);
 void yyerror(char*);
@@ -17,6 +18,8 @@ extern char* yytext;
 struct TreeNode* root;
 int n_funcs;
 struct ListNode** funcs;
+int **reg_alloced;
+int *stack_size;
 %}
 
 %union {
@@ -287,6 +290,7 @@ int main(int argc, char** argv)
 
 	init_tree();
 	init_bb();
+	init_reg();
 
 	yyparse();
 	//print_tree(root, 1, stdout);
@@ -298,8 +302,33 @@ int main(int argc, char** argv)
 	do
 	{
 		convergence = var_life_between_bbs(funcs[0]);
-		printf("%d\n", convergence);
+		// printf("%d\n", convergence);
 	} while (convergence != 0);
+	
+	for (int i = 0; i < n_funcs; i++)
+	{
+		struct ListNode* lnode = funcs[i];
+		while(lnode != NULL)
+		{
+			get_die_within_bb(lnode->obj);
+			lnode = lnode->nxt;
+		}
+	}
+	reg_alloced = (int**)malloc(sizeof(int*)*n_funcs);
+	stack_size = (int*)malloc(sizeof(int)*n_funcs);
+	for (int i = 0; i < n_funcs; i++)
+	{
+		struct ListNode* lnode = funcs[i];
+		reg_alloced[i] = (int*)malloc(sizeof(int) * REG_N);
+		memset(reg_alloced[i], 0, sizeof(int)*REG_N);
+		stack_size[i] = 1;
+		while (lnode != NULL)
+		{
+			stack_size[i] = reg_alloc(lnode->obj, stack_size[i], reg_alloced[i]);
+			lnode = lnode->nxt;
+		}
+	}
+
 	for (int i = 0; i < n_funcs; i++)
 	{
 		struct ListNode* lnode = funcs[i];

@@ -27,9 +27,9 @@ struct BasicBlock* alloc_bb(struct TreeNode* begin_node, struct TreeNode** end_n
 		}
 	}
 	*end_node = tmp_node;
-	bb->live = (struct ListNode**)malloc(sizeof(struct ListNode*) * (bb->n_stmt+1));
+	bb->live_chain = (struct ListNode**)malloc(sizeof(struct ListNode*) * (bb->n_stmt+1));
 	for (int i = 0; i <= bb->n_stmt; i++)
-		bb->live[i] = NULL;
+		bb->live_chain[i] = NULL;
 	bb->begin = begin_node;
 	bb->end = *end_node;
 	bb->nxt[0] = NULL;
@@ -40,9 +40,11 @@ struct BasicBlock* alloc_bb(struct TreeNode* begin_node, struct TreeNode** end_n
 
 void free_bb(struct BasicBlock* arg_bb)
 {
+	if (arg_bb->str != NULL)
+		free(arg_bb->str);
 	for (int i = 0; i < arg_bb->n_stmt; i++)
 	{
-		struct ListNode *tmp = arg_bb->live[i], *tbd = arg_bb->live[i];
+		struct ListNode *tmp = arg_bb->live_chain[i], *tbd = arg_bb->live_chain[i];
 		while(tmp != NULL)
 		{
 			tbd = tmp;
@@ -50,7 +52,25 @@ void free_bb(struct BasicBlock* arg_bb)
 			free(tbd);
 		}
 	}
+	for (int i = 0; i < arg_bb->n_stmt; i++)
+	{
+		for (int j = 0; j < arg_bb->n_live[i]; j++)
+			if (arg_bb->live[i][j] != NULL)
+				free(arg_bb->live[i][j]);
+		for (int j = 0; j < REG_N; j++)
+			if (arg_bb->reg2id[i][j] != NULL)
+				free(arg_bb->reg2id[i][j]);
+		free(arg_bb->live[i]);
+		free(arg_bb->die[i]);
+		free(arg_bb->id2reg[i]);
+		free(arg_bb->reg2id[i]);
+	}
+	free(arg_bb->live_chain);
+	free(arg_bb->n_live);
 	free(arg_bb->live);
+	free(arg_bb->die);
+	free(arg_bb->id2reg);
+	free(arg_bb->reg2id);
 	free(arg_bb);
 }
 
@@ -158,8 +178,8 @@ struct ListNode** tree2bbs(struct TreeNode* root, int* arg_n_func)
 					bb_nxt->prv = tmp_lnode;
 				}
 			}
-			if (bb->live == NULL)
-				bb->live = (struct ListNode**)malloc(sizeof(struct ListNode*)*(bb->n_stmt+1));
+			if (bb->live_chain == NULL)
+				bb->live_chain = (struct ListNode**)malloc(sizeof(struct ListNode*)*(bb->n_stmt+1));
 			tmp_end = bb->begin;
 			while (tmp_end->nxt != bb->end)
 				tmp_end = tmp_end->nxt;
@@ -256,99 +276,99 @@ struct ListNode** tree2bbs(struct TreeNode* root, int* arg_n_func)
 	return funcs;
 }
 
-int var_life_within_bb(struct BasicBlock* arg_bb_container, struct ListNode* arg_live)
+int var_life_within_bb(struct BasicBlock* arg_bb_container, struct ListNode* arg_live_chain)
 {
 	int ret = 0;
 	struct BasicBlock* bb = arg_bb_container;
 	struct TreeNode* stmt = bb->begin;
-	struct ListNode *live = arg_live, *tmp;
+	struct ListNode *live_chain = arg_live_chain, *tmp;
 	while(stmt != NULL && stmt->nxt != bb->end)
 		stmt = stmt->nxt;
-	bb->live[bb->n_stmt] = merge_str_lists(bb->live[bb->n_stmt], arg_live);
+	bb->live_chain[bb->n_stmt] = merge_str_lists(bb->live_chain[bb->n_stmt], arg_live_chain);
 	for (int i = bb->n_stmt-1; i >= 0; i--, stmt = stmt->prv)
 	{
-		struct ListNode* old = copy_str_list(bb->live[i]);
-		bb->live[i] = merge_str_lists(bb->live[i], bb->live[i+1]);
+		struct ListNode* old = copy_str_list(bb->live_chain[i]);
+		bb->live_chain[i] = merge_str_lists(bb->live_chain[i], bb->live_chain[i+1]);
 		switch (stmt->type)
 		{
 		case TN_VAR:
-			tmp = find_str_list(bb->live[i], stmt->str);
+			tmp = find_str_list(bb->live_chain[i], stmt->str);
 			if (tmp != NULL)
-				bb->live[i] = delete_node_from_list(tmp, bb->live[i]);
+				bb->live_chain[i] = delete_node_from_list(tmp, bb->live_chain[i]);
 			break;
 		case TN_EXPR_BI_LOGIC:
 		case TN_EXPR_BI_ARITH:
-		case TN_EXPR_IF_GOTO:	// stmt->str for IF_GOTO is the label, which will never appear in the live var lists
-			tmp = find_str_list(bb->live[i], stmt->str);
+		case TN_EXPR_IF_GOTO:	// stmt->str for IF_GOTO is the label, which will never appear in the live_chain var lists
+			tmp = find_str_list(bb->live_chain[i], stmt->str);
 			if (tmp != NULL)
-				bb->live[i] = delete_node_from_list(tmp, bb->live[i]);
+				bb->live_chain[i] = delete_node_from_list(tmp, bb->live_chain[i]);
 			if (stmt->child[0]->type == TN_ID)
 			{
-				tmp = find_str_list(bb->live[i], stmt->child[0]->str);
+				tmp = find_str_list(bb->live_chain[i], stmt->child[0]->str);
 				if (tmp == NULL)
-					bb->live[i] = insert_str_node_into_list(bb->live[i], stmt->child[0]->str);
+					bb->live_chain[i] = insert_str_node_into_list(bb->live_chain[i], stmt->child[0]->str);
 			}
 			if (stmt->child[1]->type == TN_ID)
 			{
-				tmp = find_str_list(bb->live[i], stmt->child[1]->str);
+				tmp = find_str_list(bb->live_chain[i], stmt->child[1]->str);
 				if (tmp == NULL)
-					bb->live[i] = insert_str_node_into_list(bb->live[i], stmt->child[1]->str);
+					bb->live_chain[i] = insert_str_node_into_list(bb->live_chain[i], stmt->child[1]->str);
 			}
 			break;
 		case TN_EXPR_UNI_LOGIC:
 		case TN_EXPR_UNI_ARITH:
-			tmp = find_str_list(bb->live[i], stmt->str);
+			tmp = find_str_list(bb->live_chain[i], stmt->str);
 			if (tmp != NULL)
-				bb->live[i] = delete_node_from_list(tmp, bb->live[i]);
+				bb->live_chain[i] = delete_node_from_list(tmp, bb->live_chain[i]);
 			if (stmt->child[0]->type == TN_ID)
 			{
-				tmp = find_str_list(bb->live[i], stmt->child[0]->str);
+				tmp = find_str_list(bb->live_chain[i], stmt->child[0]->str);
 				if (tmp == NULL)
-					bb->live[i] = insert_str_node_into_list(bb->live[i], stmt->child[0]->str);
+					bb->live_chain[i] = insert_str_node_into_list(bb->live_chain[i], stmt->child[0]->str);
 			}
 			break;
 		case TN_EXPR_ASSN:
-			tmp = find_str_list(bb->live[i], stmt->str);
+			tmp = find_str_list(bb->live_chain[i], stmt->str);
 			if (tmp != NULL)
-				bb->live[i] = delete_node_from_list(tmp, bb->live[i]);
+				bb->live_chain[i] = delete_node_from_list(tmp, bb->live_chain[i]);
 			if (stmt->child[1] != NULL && stmt->child[1]->type == TN_ID)
 			{
-				tmp = find_str_list(bb->live[i], stmt->child[1]->str);
+				tmp = find_str_list(bb->live_chain[i], stmt->child[1]->str);
 				if (tmp == NULL)
-					bb->live[i] = insert_str_node_into_list(bb->live[i], stmt->child[1]->str);
+					bb->live_chain[i] = insert_str_node_into_list(bb->live_chain[i], stmt->child[1]->str);
 			}
 			if (stmt->child[0] != NULL && stmt->child[0]->type == TN_ID)
 			{
-				tmp = find_str_list(bb->live[i], stmt->child[0]->str);
+				tmp = find_str_list(bb->live_chain[i], stmt->child[0]->str);
 				if (tmp == NULL)
-					bb->live[i] = insert_str_node_into_list(bb->live[i], stmt->child[0]->str);
+					bb->live_chain[i] = insert_str_node_into_list(bb->live_chain[i], stmt->child[0]->str);
 			}
 			if (stmt->child[2] != NULL && stmt->child[2]->type == TN_ID)
 			{
-				tmp = find_str_list(bb->live[i], stmt->child[2]->str);
+				tmp = find_str_list(bb->live_chain[i], stmt->child[2]->str);
 				if (tmp == NULL)
-					bb->live[i] = insert_str_node_into_list(bb->live[i], stmt->child[2]->str);
+					bb->live_chain[i] = insert_str_node_into_list(bb->live_chain[i], stmt->child[2]->str);
 			}
 			break;
 		case TN_EXPR_CALL:
-			tmp = find_str_list(bb->live[i], stmt->str);
+			tmp = find_str_list(bb->live_chain[i], stmt->str);
 			if (tmp != NULL)
-				bb->live[i] = delete_node_from_list(tmp, bb->live[i]);
+				bb->live_chain[i] = delete_node_from_list(tmp, bb->live_chain[i]);
 			break;
 		case TN_EXPR_PARAM:
 		case TN_EXPR_RETURN:
 			if (stmt->child[0]->type == TN_ID)
 			{
-				tmp = find_str_list(bb->live[i], stmt->child[0]->str);
+				tmp = find_str_list(bb->live_chain[i], stmt->child[0]->str);
 				if (tmp == NULL)
-					bb->live[i] = insert_str_node_into_list(bb->live[i], stmt->child[0]->str);
+					bb->live_chain[i] = insert_str_node_into_list(bb->live_chain[i], stmt->child[0]->str);
 			}
 			break;
 		case TN_EXPR_GOTO:
 		case TN_EXPR_LABEL:
 		default:	break;
 		}
-		if (cmp_str_lists(old, bb->live[i]) != 0)
+		if (cmp_str_lists(old, bb->live_chain[i]) != 0)
 		{
 			ret++;
 		}
@@ -407,7 +427,7 @@ int var_life_bb2bb(struct BasicBlock* bb1, struct BasicBlock* bb2, int** flag_ma
 	//printf ("%d\t%d\n", bb1->idx, bb2->idx);
 	if (bb1 == NULL || bb2 == NULL)
 		return 0;
-	int ret = var_life_within_bb(bb1, bb2->live[0]);
+	int ret = var_life_within_bb(bb1, bb2->live_chain[0]);
 	struct ListNode* bb3_container = bb1->prv;
 	flag_matrix[bb1->idx][bb2->idx] = 1;
 	while (bb3_container != NULL)
@@ -424,11 +444,47 @@ int var_life_bb2bb(struct BasicBlock* bb1, struct BasicBlock* bb2, int** flag_ma
 	return ret;
 }
 
+void get_die_within_bb(struct BasicBlock* arg_bb)
+{
+	arg_bb->die = (int**)malloc(sizeof(int*) * (arg_bb->n_stmt+1));
+	arg_bb->live = (char***)malloc(sizeof(char**) * (arg_bb->n_stmt+1));
+	arg_bb->n_live = (int*)malloc(sizeof(int) * (arg_bb->n_stmt+1));
+	for (int i = arg_bb->n_stmt; i >= 0; i--)
+	{
+		struct ListNode* live_node = arg_bb->live_chain[i];
+		int idx;
+		arg_bb->n_live[i] = 0;
+		while(live_node != NULL)
+		{
+			arg_bb->n_live[i]++;
+			live_node = live_node->nxt;
+		}
+		arg_bb->die[i] = (int*)malloc(sizeof(int)*arg_bb->n_live[i]);
+		arg_bb->live[i] = (char**)malloc(sizeof(char*)*arg_bb->n_live[i]);
+		for(idx = 0, live_node = arg_bb->live_chain[i]; live_node != NULL && idx < arg_bb->n_live[i]; live_node = live_node->nxt, idx++)
+		{
+			arg_bb->live[i][idx] = strdup((char*)(live_node->obj));
+			if (i == arg_bb->n_stmt)
+				arg_bb->die[i][idx] = LV_LIVE_TILL_END;
+			else
+			{
+				int tmp = i;
+				for (int j = 0; j < arg_bb->n_live[i+1]; j++)
+					if (strcmp(arg_bb->live[i][idx], arg_bb->live[i+1][j]) == 0)
+					{
+						tmp = arg_bb->die[i+1][j];
+						continue;
+					}
+				arg_bb->die[i][idx] = tmp;
+			}
+		}
+	}
+}
+
 void print_bb(struct BasicBlock* arg_bb, FILE* arg_file)
 {
 	struct TreeNode* node = arg_bb->begin;
 	struct ListNode* from;
-	struct ListNode* live_val;
 	if (arg_bb->str == NULL)
 		fprintf(arg_file, "BB %d\t", arg_bb->idx);
 	else
@@ -440,15 +496,15 @@ void print_bb(struct BasicBlock* arg_bb, FILE* arg_file)
 		if (arg_bb->nxt[1] != NULL)
 			fprintf(arg_file, ", %d", arg_bb->nxt[1]->idx);
 		fprintf(arg_file, "\t");
-	}
-	if (arg_bb->prv != NULL)
-	{
-		fprintf(arg_file, "from BB %d", ((struct BasicBlock*)(arg_bb->prv->obj))->idx);
-		from = arg_bb->prv->nxt;
-		while (from != NULL)
+		if (arg_bb->prv != NULL)
 		{
-			fprintf(arg_file, ", %d", ((struct BasicBlock*)(from->obj))->idx);
-			from = from->nxt;
+			fprintf(arg_file, "from BB %d", ((struct BasicBlock*)(arg_bb->prv->obj))->idx);
+			from = arg_bb->prv->nxt;
+			while (from != NULL)
+			{
+				fprintf(arg_file, ", %d", ((struct BasicBlock*)(from->obj))->idx);
+				from = from->nxt;
+			}
 		}
 	}
 	fprintf(arg_file, "\n");
@@ -457,14 +513,14 @@ void print_bb(struct BasicBlock* arg_bb, FILE* arg_file)
 		switch(node->type)
 		{
 		case TN_VAR:
-			fprintf(arg_file, "%d\t", i+1);
+			fprintf(arg_file, "%d\t", i);
 			fprintf(arg_file, "var %s ", node->str);
 			if (node->val > 0)
 				fprintf(arg_file, "[%d] ", node->val);
 			break;
 		case TN_EXPR_BI_LOGIC:
 		case TN_EXPR_BI_ARITH:
-			fprintf(arg_file, "%d\t", i+1);
+			fprintf(arg_file, "%d\t", i);
 			fprintf(arg_file, "%s = ", node->str);
 			switch (node->child[0]->type)
 			{
@@ -496,7 +552,7 @@ void print_bb(struct BasicBlock* arg_bb, FILE* arg_file)
 			break;
 		case TN_EXPR_UNI_LOGIC:
 		case TN_EXPR_UNI_ARITH:
-			fprintf(arg_file, "%d\t", i+1);
+			fprintf(arg_file, "%d\t", i);
 			fprintf(arg_file, "%s = ", node->str);
 			switch (node->val)
 			{
@@ -513,7 +569,7 @@ void print_bb(struct BasicBlock* arg_bb, FILE* arg_file)
 			}
 			break;
 		case TN_EXPR_ASSN:
-			fprintf(arg_file, "%d\t", i+1);
+			fprintf(arg_file, "%d\t", i);
 			fprintf(arg_file, "%s", node->str);
 			if (node->child[0] != NULL)
 				switch (node->child[0]->type)
@@ -539,7 +595,7 @@ void print_bb(struct BasicBlock* arg_bb, FILE* arg_file)
 			fprintf(arg_file, " ");
 			break;
 		case TN_EXPR_IF_GOTO:
-			fprintf(arg_file, "%d\t", i+1);
+			fprintf(arg_file, "%d\t", i);
 			fprintf(arg_file, "if (");
 			switch (node->child[0]->type)
 			{
@@ -566,13 +622,13 @@ void print_bb(struct BasicBlock* arg_bb, FILE* arg_file)
 			fprintf(arg_file, ") goto %s ", node->str);
 			break;
 		case TN_EXPR_GOTO:	
-			fprintf(arg_file, "%d\t", i+1);
+			fprintf(arg_file, "%d\t", i);
 			fprintf(arg_file, "goto %s ", node->str); break;
 		case TN_EXPR_LABEL:	
-			fprintf(arg_file, "%d\t", i+1);
+			fprintf(arg_file, "%d\t", i);
 			fprintf(arg_file, "label %s ", node->str); break;
 		case TN_EXPR_PARAM:
-			fprintf(arg_file, "%d\t", i+1);
+			fprintf(arg_file, "%d\t", i);
 			fprintf(arg_file, "param ");
 			switch (node->child[0]->type)
 			{
@@ -582,10 +638,10 @@ void print_bb(struct BasicBlock* arg_bb, FILE* arg_file)
 			}
 			break;
 		case TN_EXPR_CALL:	
-			fprintf(arg_file, "%d\t", i+1);
+			fprintf(arg_file, "%d\t", i);
 			fprintf(arg_file, "%s = call %s ", node->str, node->child[0]->str); break;
 		case TN_EXPR_RETURN:
-			fprintf(arg_file, "%d\t", i+1);
+			fprintf(arg_file, "%d\t", i);
 			fprintf(arg_file, "return ");
 			switch (node->child[0]->type)
 			{
@@ -595,29 +651,39 @@ void print_bb(struct BasicBlock* arg_bb, FILE* arg_file)
 			}
 			break;
 		default:	
-			fprintf(arg_file, "%d\t", i+1);
+			fprintf(arg_file, "%d\t", i);
 			fprintf(arg_file, "{UNK STMT} "); break;
 		}
-		if (arg_bb->live == NULL)
+		if (arg_bb->live_chain == NULL)
 		{
 			fprintf(arg_file, "\t//{}\n");
 			continue;
 		}
-		live_val = arg_bb->live[i];
-		fprintf(arg_file, "\t//{");
-		while(live_val != NULL)
+		fprintf(arg_file, "\t// {");
+		for (int k = 0; k < arg_bb->n_live[i]; k++)
 		{
-			fprintf(arg_file, " %s ", (char*)(live_val->obj));
-			live_val = live_val->nxt;
+			if (arg_bb->id2reg[i][k] < 0)
+				fprintf(arg_file, " %s(UNK) ", arg_bb->live[i][k]);
+			else if (arg_bb->id2reg[i][k] < REG_N)
+				fprintf(arg_file, " %s(REG%s) ", arg_bb->live[i][k], registers[arg_bb->id2reg[i][k]]);
+			else if (arg_bb->id2reg[i][k] == REG_GLOBAL)
+				fprintf(arg_file, " %s(GLB) ", arg_bb->live[i][k]);
+			else
+				fprintf(arg_file, " %s(ST%d) ", arg_bb->live[i][k], arg_bb->id2reg[i][k]-REG_STACK);
 		}
 		fprintf(arg_file, "}\n");
 	}
-	live_val = arg_bb->live[arg_bb->n_stmt];
-	fprintf(arg_file, "\t//{");
-	while(live_val != NULL)
+	fprintf(arg_file, "\t// {");
+	for (int k = 0; k < arg_bb->n_live[arg_bb->n_stmt]; k++)
 	{
-		fprintf(arg_file, " %s ", (char*)(live_val->obj));
-		live_val = live_val->nxt;
+		if (arg_bb->id2reg[arg_bb->n_stmt][k] < 0)
+			fprintf(arg_file, " %s(UNK) ", arg_bb->live[arg_bb->n_stmt][k]);
+		else if (arg_bb->id2reg[arg_bb->n_stmt][k] < REG_N)
+			fprintf(arg_file, " %s(REG%s) ", arg_bb->live[arg_bb->n_stmt][k], registers[arg_bb->id2reg[arg_bb->n_stmt][k]]);
+		else if (arg_bb->id2reg[arg_bb->n_stmt][k] == REG_GLOBAL)
+			fprintf(arg_file, " %s(GLB) ", arg_bb->live[arg_bb->n_stmt][k]);
+		else
+			fprintf(arg_file, " %s(ST%d) ", arg_bb->live[arg_bb->n_stmt][k], arg_bb->id2reg[arg_bb->n_stmt][k]-REG_STACK);
 	}
 	fprintf(arg_file, "}\n");
 }

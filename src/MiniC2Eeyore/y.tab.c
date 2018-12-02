@@ -62,15 +62,16 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 1 "eeyore.y" /* yacc.c:339  */
+#line 1 "minic.y" /* yacc.c:339  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 #include "tree.h"
-#include "bb.h"
-#include "regalloc.h"
+#include "symtab.h"
+#include "error.h"
+#include "transform.h"
 
 int yylex(void);
 void yyerror(char*);
@@ -78,15 +79,11 @@ void yyerror(char*);
 extern FILE* yyin;
 extern FILE* yyout;
 extern int lineno;
-extern char* yytext;
-
 struct TreeNode* root;
-int n_funcs;
-struct ListNode** funcs;
-int **reg_alloced;
-int *stack_size;
+char *infile_path, *outfile_path;
+FILE* cheating_file;
 
-#line 90 "y.tab.c" /* yacc.c:339  */
+#line 87 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -121,64 +118,68 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    EOL = 258,
-    VAR = 259,
-    END = 260,
-    IF = 261,
-    GOTO = 262,
-    PARAM = 263,
-    CALL = 264,
-    RETURN = 265,
-    NUM = 266,
-    ID_TMP = 267,
-    ID_PARAM = 268,
-    ID_NATIVE = 269,
-    ID_LABEL = 270,
-    ID_FUNC = 271,
-    ASSIGN = 272,
-    OP_BI_LOGIC = 273,
-    OP_BI_ARITH = 274,
-    OP_UNI = 275,
-    ARR_L = 276,
-    ARR_R = 277,
-    COLON = 278
+    MAIN = 258,
+    IF = 259,
+    ELSE = 260,
+    WHILE = 261,
+    RETURN = 262,
+    PRN_R = 263,
+    ARR_L = 264,
+    ARR_R = 265,
+    BRC_R = 266,
+    COMMA = 267,
+    EOL = 268,
+    PRN_L = 269,
+    BRC_L = 270,
+    NUM = 271,
+    ID = 272,
+    TYPE = 273,
+    OP_7 = 274,
+    OP_6 = 275,
+    OP_5 = 276,
+    OP_4 = 277,
+    OP_3 = 278,
+    OP_2 = 279,
+    OP_1 = 280
   };
 #endif
 /* Tokens.  */
-#define EOL 258
-#define VAR 259
-#define END 260
-#define IF 261
-#define GOTO 262
-#define PARAM 263
-#define CALL 264
-#define RETURN 265
-#define NUM 266
-#define ID_TMP 267
-#define ID_PARAM 268
-#define ID_NATIVE 269
-#define ID_LABEL 270
-#define ID_FUNC 271
-#define ASSIGN 272
-#define OP_BI_LOGIC 273
-#define OP_BI_ARITH 274
-#define OP_UNI 275
-#define ARR_L 276
-#define ARR_R 277
-#define COLON 278
+#define MAIN 258
+#define IF 259
+#define ELSE 260
+#define WHILE 261
+#define RETURN 262
+#define PRN_R 263
+#define ARR_L 264
+#define ARR_R 265
+#define BRC_R 266
+#define COMMA 267
+#define EOL 268
+#define PRN_L 269
+#define BRC_L 270
+#define NUM 271
+#define ID 272
+#define TYPE 273
+#define OP_7 274
+#define OP_6 275
+#define OP_5 276
+#define OP_4 277
+#define OP_3 278
+#define OP_2 279
+#define OP_1 280
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 25 "eeyore.y" /* yacc.c:355  */
+#line 22 "minic.y" /* yacc.c:355  */
 
-	int val;
-	char* str;
+	int value;
+	char* name;
 	struct TreeNode* node;
 
-#line 182 "y.tab.c" /* yacc.c:355  */
+#line 183 "y.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -195,7 +196,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 199 "y.tab.c" /* yacc.c:358  */
+#line 200 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -435,23 +436,23 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  17
+#define YYFINAL  3
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   96
+#define YYLAST   207
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  24
+#define YYNTOKENS  26
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  10
+#define YYNNTS  17
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  34
+#define YYNRULES  48
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  75
+#define YYNSTATES  113
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   278
+#define YYMAXUTOK   280
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -487,17 +488,19 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21,    22,    23
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_uint16 yyrline[] =
 {
-       0,    44,    44,    59,    60,    61,    67,    75,    86,    87,
-      88,    94,   102,   111,   120,   132,   139,   148,   158,   168,
-     177,   182,   187,   193,   200,   208,   209,   212,   217,   225,
-     228,   229,   230,   231,   232
+       0,    47,    47,    67,    73,    79,    85,    88,   120,   150,
+     188,   197,   222,   223,   230,   236,   243,   246,   253,   262,
+     269,   278,   295,   308,   322,   334,   344,   358,   362,   371,
+     377,   380,   390,   400,   410,   420,   430,   440,   444,   450,
+     457,   464,   469,   481,   484,   485,   492,   495,   501
 };
 #endif
 
@@ -506,11 +509,12 @@ static const yytype_uint8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "EOL", "VAR", "END", "IF", "GOTO",
-  "PARAM", "CALL", "RETURN", "NUM", "ID_TMP", "ID_PARAM", "ID_NATIVE",
-  "ID_LABEL", "ID_FUNC", "ASSIGN", "OP_BI_LOGIC", "OP_BI_ARITH", "OP_UNI",
-  "ARR_L", "ARR_R", "COLON", "$accept", "Goal", "FuncVarDefnList",
-  "FuncDefn", "ExprList", "Expr", "RVal", "VarDefn", "Integer", "Id", YY_NULLPTR
+  "$end", "error", "$undefined", "MAIN", "IF", "ELSE", "WHILE", "RETURN",
+  "PRN_R", "ARR_L", "ARR_R", "BRC_R", "COMMA", "EOL", "PRN_L", "BRC_L",
+  "NUM", "ID", "TYPE", "OP_7", "OP_6", "OP_5", "OP_4", "OP_3", "OP_2",
+  "OP_1", "$accept", "Goal", "BeforeMain", "MainFunc", "FuncDefn",
+  "FuncDecl", "ParamDeclList", "FuncDeclStmtList", "VarDefn", "VarDecl",
+  "Stmt", "StmtList", "Expr", "ParamList", "Type", "Integer", "Identifier", YY_NULLPTR
 };
 #endif
 
@@ -521,14 +525,14 @@ static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278
+     275,   276,   277,   278,   279,   280
 };
 # endif
 
-#define YYPACT_NINF -25
+#define YYPACT_NINF -52
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-25)))
+  (!!((Yystate) == (-52)))
 
 #define YYTABLE_NINF -1
 
@@ -537,16 +541,20 @@ static const yytype_uint16 yytoknum[] =
 
   /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
      STATE-NUM.  */
-static const yytype_int8 yypact[] =
+static const yytype_int16 yypact[] =
 {
-      62,    62,    57,   -25,   -25,   -25,   -25,   -25,     4,   -25,
-      11,    21,   -13,   -25,   -25,    79,   -25,   -25,    62,    62,
-      22,   -25,   -25,   -25,    14,    34,    48,    48,    57,    79,
-      57,    57,    33,    39,    45,   -12,   -25,    41,   -25,   -25,
-     -25,   -25,   -25,    79,    48,    48,    70,    57,   -25,    57,
-     -25,   -25,   -25,    79,    57,    57,    -6,    36,    58,    80,
-     -25,   -25,   -25,    57,    57,    57,    71,    79,   -25,   -25,
-      74,    57,   -25,   -25,   -25
+     -52,     5,    -6,   -52,   -52,   -52,   -52,   -52,   -52,     4,
+       9,   -52,    -3,     1,    15,   -52,    -5,    31,   -52,    49,
+      43,    65,   -52,    50,   -52,    79,   -52,   -52,    57,    -6,
+      86,    87,   -52,   102,   -52,   -52,   -52,    15,    98,   104,
+     182,   -52,   -52,   -52,   -52,   -52,    50,    17,   -52,   117,
+      90,   182,   182,   182,   182,   182,   163,   -52,    46,   132,
+      40,   182,   182,   -52,   -52,    -4,    61,    66,    77,   -52,
+     -52,   182,   182,   182,   182,   182,   182,    30,   -52,   -52,
+      50,    21,   131,   168,   152,   152,   -52,   141,   107,    55,
+      77,   -52,   151,   -52,    95,   -52,   101,   109,   103,    97,
+     -52,   120,   -52,   -52,   -52,    50,   113,   182,   152,   -52,
+     180,   -52,   -52
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -554,26 +562,32 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       3,     3,     0,    30,    31,    32,    34,    33,     0,     2,
-       0,     0,     0,     4,    29,     0,    27,     1,     3,     3,
-       0,    28,     6,     5,     0,     0,     8,     8,     0,     0,
-       0,     0,     0,     0,     0,     0,     9,     0,    26,    25,
-      20,    22,    24,     0,     8,     8,     0,     0,    21,     0,
-       7,    11,    10,     0,     0,     0,    16,    25,     0,     0,
-      23,    14,    15,     0,     0,     0,     0,     0,    12,    13,
-       0,     0,    19,    18,    17
+       6,     0,     0,     1,    46,     2,     4,     5,     3,     0,
+       0,    48,     0,     0,     0,    17,     0,     0,    47,     0,
+       0,     0,    12,     0,    16,     0,    10,    16,     0,     0,
+      19,     0,    18,     0,    11,    16,    13,     0,     0,     0,
+       0,     7,    30,    15,    27,    14,     0,     0,     8,     0,
+       0,     0,     0,     0,     0,     0,     0,    37,    38,     0,
+       0,     0,     0,     9,    20,     0,     0,     0,    39,    40,
+      28,     0,     0,     0,     0,     0,     0,     0,    21,    29,
+       0,     0,     0,     0,     0,     0,    43,    31,    32,    33,
+      34,    35,     0,    41,     0,    44,     0,     0,     0,     0,
+      25,    22,    24,    36,    42,     0,     0,     0,     0,    45,
+       0,    23,    26
 };
 
   /* YYPGOTO[NTERM-NUM].  */
-static const yytype_int8 yypgoto[] =
+static const yytype_int16 yypgoto[] =
 {
-     -25,   -25,     2,   -25,     5,   -25,   -24,   -10,     8,     0
+     -52,   -52,   -52,   -52,   -52,   125,    52,     0,   135,   111,
+     -51,   -52,   -10,   -52,    -1,   -12,    -9
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     8,     9,    10,    32,    33,    37,    11,    38,    39
+      -1,     1,     2,     5,     6,    43,    21,    31,    44,    22,
+      45,    59,    56,    94,    80,    57,    58
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -581,62 +595,90 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      12,    12,    16,    13,    17,    46,    41,    42,    20,    47,
-      15,    48,    63,    64,    18,    21,    34,    34,    12,    12,
-      22,    23,    56,    58,    19,    59,    35,    35,    24,    40,
-      61,    62,    36,    14,    34,    34,    25,    26,    43,    68,
-      69,    70,    44,    50,    35,    35,    57,    74,    45,    51,
-      52,    27,     2,    60,    28,    29,    30,    65,    31,    49,
-       3,     4,     5,     6,     7,     1,     2,    72,    14,     3,
-       4,     5,     6,     7,     3,     4,     5,     6,     7,    53,
-      66,    14,     3,     4,     5,     6,     7,    67,    71,    54,
-      55,     3,     4,     5,     6,     7,    73
+      12,     9,    19,    20,    84,     3,    14,    10,    79,    17,
+      15,    16,     4,     4,    30,    23,    71,    72,    73,    74,
+      75,    11,    47,    13,    47,    50,    61,    33,    23,    97,
+      46,    18,    46,   101,   102,    49,    62,    60,    93,     4,
+      47,    65,    66,    67,    68,    69,    24,    11,    46,    14,
+      47,    82,    83,    15,    81,    76,    26,   111,    27,    25,
+      77,    87,    88,    89,    90,    91,    92,    11,    95,    85,
+      34,    96,    35,    28,    86,    47,    47,    29,    74,    75,
+      23,    71,    72,    73,    74,    75,    71,    72,    73,    74,
+      75,    38,    32,    39,    40,    37,   109,   110,    41,    47,
+      64,    75,    42,   104,    11,     4,    38,   105,    39,    40,
+      14,   106,    51,    48,    15,    29,   107,    42,    52,    11,
+       4,    38,    26,    39,    40,   108,    34,     7,    63,    73,
+      74,    75,    42,    98,    11,     4,    38,     8,    39,    40,
+      36,    99,     0,    78,     0,     0,     0,    42,     0,    11,
+       4,    71,    72,    73,    74,    75,    38,     0,    39,    40,
+       0,   103,    72,    73,    74,    75,     0,    42,     0,    11,
+       4,    71,    72,    73,    74,    75,    70,     0,     0,     0,
+       0,   100,     0,    71,    72,    73,    74,    75,    71,    72,
+      73,    74,    75,   112,     0,     0,    53,     0,    18,    11,
+      71,    72,    73,    74,    75,    54,     0,    55
 };
 
-static const yytype_uint8 yycheck[] =
+static const yytype_int8 yycheck[] =
 {
-       0,     1,     2,     1,     0,    17,    30,    31,    21,    21,
-       2,    23,    18,    19,     3,    15,    26,    27,    18,    19,
-      18,    19,    46,    47,     3,    49,    26,    27,    20,    29,
-      54,    55,    27,    11,    44,    45,    22,     3,     5,    63,
-      64,    65,     3,    43,    44,    45,    46,    71,     3,    44,
-      45,     3,     4,    53,     6,     7,     8,    21,    10,    18,
-      12,    13,    14,    15,    16,     3,     4,    67,    11,    12,
-      13,    14,    15,    16,    12,    13,    14,    15,    16,     9,
-      22,    11,    12,    13,    14,    15,    16,     7,    17,    19,
-      20,    12,    13,    14,    15,    16,    22
+       9,     2,    14,     8,     8,     0,     9,     3,    59,     8,
+      13,    14,    18,    18,    23,    16,    20,    21,    22,    23,
+      24,    17,    31,    14,    33,    37,     9,    27,    29,     8,
+      31,    16,    33,    84,    85,    35,    19,    46,     8,    18,
+      49,    51,    52,    53,    54,    55,    15,    17,    49,     9,
+      59,    61,    62,    13,    14,     9,    13,   108,    15,    10,
+      14,    71,    72,    73,    74,    75,    76,    17,    77,     8,
+      13,    80,    15,     8,     8,    84,    85,    12,    23,    24,
+      81,    20,    21,    22,    23,    24,    20,    21,    22,    23,
+      24,     4,    13,     6,     7,     9,   105,   107,    11,   108,
+      10,    24,    15,     8,    17,    18,     4,    12,     6,     7,
+       9,     8,    14,    11,    13,    12,    19,    15,    14,    17,
+      18,     4,    13,     6,     7,     5,    13,     2,    11,    22,
+      23,    24,    15,    81,    17,    18,     4,     2,     6,     7,
+      29,    10,    -1,    11,    -1,    -1,    -1,    15,    -1,    17,
+      18,    20,    21,    22,    23,    24,     4,    -1,     6,     7,
+      -1,    10,    21,    22,    23,    24,    -1,    15,    -1,    17,
+      18,    20,    21,    22,    23,    24,    13,    -1,    -1,    -1,
+      -1,    13,    -1,    20,    21,    22,    23,    24,    20,    21,
+      22,    23,    24,    13,    -1,    -1,    14,    -1,    16,    17,
+      20,    21,    22,    23,    24,    23,    -1,    25
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,     4,    12,    13,    14,    15,    16,    25,    26,
-      27,    31,    33,    26,    11,    32,    33,     0,     3,     3,
-      21,    33,    26,    26,    32,    22,     3,     3,     6,     7,
-       8,    10,    28,    29,    31,    33,    28,    30,    32,    33,
-      33,    30,    30,     5,     3,     3,    17,    21,    23,    18,
-      33,    28,    28,     9,    19,    20,    30,    33,    30,    30,
-      33,    30,    30,    18,    19,    21,    22,     7,    30,    30,
-      30,    17,    33,    22,    30
+       0,    27,    28,     0,    18,    29,    30,    31,    34,    40,
+       3,    17,    42,    14,     9,    13,    14,     8,    16,    41,
+       8,    32,    35,    40,    15,    10,    13,    15,     8,    12,
+      42,    33,    13,    33,    13,    15,    35,     9,     4,     6,
+       7,    11,    15,    31,    34,    36,    40,    42,    11,    33,
+      41,    14,    14,    14,    23,    25,    38,    41,    42,    37,
+      42,     9,    19,    11,    10,    38,    38,    38,    38,    38,
+      13,    20,    21,    22,    23,    24,     9,    14,    11,    36,
+      40,    14,    38,    38,     8,     8,     8,    38,    38,    38,
+      38,    38,    38,     8,    39,    42,    42,     8,    32,    10,
+      13,    36,    36,    10,     8,    12,     8,    19,     5,    42,
+      38,    36,    13
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    24,    25,    26,    26,    26,    26,    27,    28,    28,
-      28,    28,    29,    29,    29,    29,    29,    29,    29,    29,
-      29,    29,    29,    29,    29,    30,    30,    31,    31,    32,
-      33,    33,    33,    33,    33
+       0,    26,    27,    28,    28,    28,    28,    29,    30,    30,
+      31,    31,    32,    32,    33,    33,    33,    34,    34,    35,
+      35,    36,    36,    36,    36,    36,    36,    36,    36,    37,
+      37,    38,    38,    38,    38,    38,    38,    38,    38,    38,
+      38,    38,    38,    38,    39,    39,    40,    41,    42
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     0,     2,     3,     3,     8,     0,     2,
-       3,     3,     5,     5,     4,     4,     3,     6,     6,     6,
-       2,     2,     2,     4,     2,     1,     1,     2,     3,     1,
-       1,     1,     1,     1,     1
+       0,     2,     2,     2,     2,     2,     0,     7,     7,     8,
+       5,     6,     1,     3,     2,     2,     0,     3,     6,     2,
+       5,     3,     5,     7,     5,     4,     7,     1,     3,     2,
+       0,     3,     3,     3,     3,     3,     4,     1,     1,     2,
+       2,     3,     4,     3,     1,     3,     1,     1,     1
 };
 
 
@@ -1313,345 +1355,667 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 44 "eeyore.y" /* yacc.c:1646  */
+#line 47 "minic.y" /* yacc.c:1646  */
     {
-		struct TreeNode* last_node = (yyvsp[0].node);
-		(yyval.node) = alloc_treenode(TN_ROOT, NULL, -1);
-		root = (yyval.node);
-		(yyval.node)->child[0] = (yyvsp[0].node);
-		for (struct TreeNode* tmp_node = (yyvsp[0].node); tmp_node != NULL;
-			last_node = tmp_node, tmp_node = tmp_node->nxt)
+		struct TreeNode* tmp_node;
+		(yyval.node) = alloc_treenode(lineno, TN_ROOT, NULL);
+		tmp_node = (yyvsp[-1].node);
+		while(tmp_node != NULL && tmp_node->sibling_l != NULL)
+		{
+			tmp_node->parent = (yyval.node); tmp_node->child_idx = 0;
+			tmp_node = tmp_node->sibling_l;
+		}
+		(yyval.node)->child[0] = tmp_node;
+		if (tmp_node != NULL)
+		{
 			tmp_node->parent = (yyval.node);
-		if (last_node != NULL)
-			(yyval.node)->lineno = last_node->lineno;
-		else
-			(yyval.node)->lineno = lineno - 1;
+			tmp_node->child_idx = 0;
+		}
+		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
+		root = (yyval.node);
 	}
-#line 1331 "y.tab.c" /* yacc.c:1646  */
+#line 1378 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 59 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = NULL; }
-#line 1337 "y.tab.c" /* yacc.c:1646  */
+#line 67 "minic.y" /* yacc.c:1646  */
+    {
+		if ((yyvsp[-1].node) != NULL)
+			(yyvsp[-1].node)->sibling_r = (yyvsp[0].node);
+		(yyvsp[0].node)->sibling_l = (yyvsp[-1].node);
+		(yyval.node) = (yyvsp[0].node);
+	}
+#line 1389 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 60 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = (yyvsp[0].node); }
-#line 1343 "y.tab.c" /* yacc.c:1646  */
+#line 73 "minic.y" /* yacc.c:1646  */
+    {
+		if ((yyvsp[-1].node) != NULL)
+			(yyvsp[-1].node)->sibling_r = (yyvsp[0].node);
+		(yyvsp[0].node)->sibling_l = (yyvsp[-1].node);
+		(yyval.node) = (yyvsp[0].node);
+	}
+#line 1400 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 61 "eeyore.y" /* yacc.c:1646  */
+#line 79 "minic.y" /* yacc.c:1646  */
     {
-		(yyval.node) = (yyvsp[-2].node);
-		(yyvsp[-2].node)->nxt = (yyvsp[0].node);
-		if ((yyvsp[0].node) != NULL)
-			(yyvsp[0].node)->prv = (yyvsp[-2].node);
+		if ((yyvsp[-1].node) != NULL)
+			(yyvsp[-1].node)->sibling_r = (yyvsp[0].node);
+		(yyvsp[0].node)->sibling_l = (yyvsp[-1].node);
+		(yyval.node) = (yyvsp[0].node);
 	}
-#line 1354 "y.tab.c" /* yacc.c:1646  */
+#line 1411 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 67 "eeyore.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = (yyvsp[-2].node);
-		(yyvsp[-2].node)->nxt = (yyvsp[0].node);
-		if ((yyvsp[0].node) != NULL)
-			(yyvsp[0].node)->prv = (yyvsp[-2].node);
-	}
-#line 1365 "y.tab.c" /* yacc.c:1646  */
+#line 85 "minic.y" /* yacc.c:1646  */
+    { (yyval.node) = NULL; }
+#line 1417 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 75 "eeyore.y" /* yacc.c:1646  */
+#line 88 "minic.y" /* yacc.c:1646  */
     {
-		(yyval.node) = alloc_treenode(TN_FUNC, (yyvsp[-7].node)->str, (yyvsp[-5].node)->val);
-		(yyval.node)->lineno = (yyvsp[0].node)->lineno;
-		free_treenode((yyvsp[-7].node));
-		free_treenode((yyvsp[-5].node));
-		(yyval.node)->child[0] = (yyvsp[-2].node);
-		for (struct TreeNode* tmp_node = (yyvsp[-2].node); tmp_node != NULL; tmp_node = tmp_node->nxt)
+		struct TreeNode* tmp_node = alloc_treenode((yyvsp[-6].node)->lineno, TN_IDENTIFIER, strdup("main"));
+		(yyval.node) = alloc_treenode(lineno, TN_FUNCDEFN, NULL);
+		(yyval.node)->child[0] = (yyvsp[-6].node); (yyvsp[-6].node)->parent = (yyval.node); (yyvsp[-6].node)->child_idx = 0;
+		(yyval.node)->child[1] = tmp_node; tmp_node->parent = (yyval.node); tmp_node->child_idx = 1;
+		(yyval.node)->child[2] = NULL;
+		tmp_node = (yyvsp[-1].node);
+		while(tmp_node != NULL && tmp_node->sibling_l != NULL)
+		{
+			tmp_node->parent = (yyval.node); tmp_node->child_idx = 3;
+			tmp_node = tmp_node->sibling_l;
+		}
+		(yyval.node)->child[3] = tmp_node;
+		if (tmp_node != NULL)
+		{
 			tmp_node->parent = (yyval.node);
+			tmp_node->child_idx = 3;
+		}
+		set_death((yyvsp[-4].value), lineno);
+		alloc_symbol((yyvsp[-6].node)->lineno, ST_FUNC, "main", (yyval.node));
+		if ((yyvsp[-1].node) == NULL)
+			alloc_ew(WARN_NO_RETURN, (yyval.node), NULL, NULL);
+		else
+		{
+			for (tmp_node = (yyvsp[-1].node); tmp_node->sibling_r != NULL;
+				tmp_node = tmp_node->sibling_r);
+			if (tmp_node->type != TN_STMT_RETURN)
+				alloc_ew(WARN_NO_RETURN, (yyval.node), NULL, NULL);
+		}
 	}
-#line 1379 "y.tab.c" /* yacc.c:1646  */
+#line 1452 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 86 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = NULL; }
-#line 1385 "y.tab.c" /* yacc.c:1646  */
+#line 120 "minic.y" /* yacc.c:1646  */
+    {
+		struct TreeNode* tmp_node;
+		(yyval.node) = alloc_treenode((yyvsp[-6].node)->lineno, TN_FUNCDEFN, NULL);
+		(yyval.node)->child[0] = (yyvsp[-6].node); (yyvsp[-6].node)->parent = (yyval.node); (yyvsp[-6].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[-5].node); (yyvsp[-5].node)->parent = (yyval.node); (yyvsp[-5].node)->child_idx = 1;
+		(yyval.node)->child[2] = NULL;
+		tmp_node = (yyvsp[-1].node);
+		while(tmp_node != NULL && tmp_node->sibling_l != NULL)
+		{
+			tmp_node->parent = (yyval.node); tmp_node->child_idx = 3;
+			tmp_node = tmp_node->sibling_l;
+		}
+		(yyval.node)->child[3] = tmp_node;
+		if (tmp_node != NULL)
+		{
+			tmp_node->parent = (yyval.node);
+			tmp_node->child_idx = 3;
+		}
+		set_death((yyvsp[-4].value), lineno);
+		alloc_symbol((yyvsp[-6].node)->lineno, ST_FUNC, (yyvsp[-5].node)->name, (yyval.node));
+		if ((yyvsp[-1].node) == NULL)
+			alloc_ew(WARN_NO_RETURN, (yyval.node), NULL, NULL);
+		else
+		{
+			for (tmp_node = (yyvsp[-1].node); tmp_node->sibling_r != NULL;
+				tmp_node = tmp_node->sibling_r);
+			if (tmp_node->type != TN_STMT_RETURN)
+				alloc_ew(WARN_NO_RETURN, (yyval.node), NULL, NULL);
+		}
+	}
+#line 1487 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 87 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = (yyvsp[0].node); }
-#line 1391 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 10:
-#line 88 "eeyore.y" /* yacc.c:1646  */
+#line 150 "minic.y" /* yacc.c:1646  */
     {
-		(yyval.node) = (yyvsp[-2].node);
-		(yyvsp[-2].node)->nxt = (yyvsp[0].node);
-		if ((yyvsp[0].node) != NULL)
-			(yyvsp[0].node)->prv = (yyvsp[-2].node);
-	}
-#line 1402 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 11:
-#line 94 "eeyore.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = (yyvsp[-2].node);
-		(yyvsp[-2].node)->nxt = (yyvsp[0].node);
-		if ((yyvsp[0].node) != NULL)
-			(yyvsp[0].node)->prv = (yyvsp[-2].node);
-	}
-#line 1413 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 12:
-#line 102 "eeyore.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(TN_EXPR_BI_LOGIC, (yyvsp[-4].node)->str, (yyvsp[-1].val));
-		(yyval.node)->lineno = (yyvsp[-4].node)->lineno;
-		free_treenode((yyvsp[-4].node));
-		(yyval.node)->child[0] = (yyvsp[-2].node);
-		(yyvsp[-2].node)->parent = (yyval.node);
-		(yyval.node)->child[1] = (yyvsp[0].node);
-		(yyvsp[0].node)->parent = (yyval.node);
-	}
-#line 1427 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 13:
-#line 111 "eeyore.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(TN_EXPR_BI_ARITH, (yyvsp[-4].node)->str, (yyvsp[-1].val));
-		(yyval.node)->lineno = (yyvsp[-4].node)->lineno;
-		free_treenode((yyvsp[-4].node));
-		(yyval.node)->child[0] = (yyvsp[-2].node);
-		(yyvsp[-2].node)->parent = (yyval.node);
-		(yyval.node)->child[1] = (yyvsp[0].node);
-		(yyvsp[0].node)->parent = (yyval.node);
-	}
-#line 1441 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 14:
-#line 120 "eeyore.y" /* yacc.c:1646  */
-    {
-		switch ((yyvsp[-1].val))
+		struct TreeNode* tmp_node;
+		(yyval.node) = alloc_treenode((yyvsp[-7].node)->lineno, TN_FUNCDEFN, NULL);
+		(yyval.node)->child[0] = (yyvsp[-7].node); (yyvsp[-7].node)->parent = (yyval.node); (yyvsp[-7].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[-6].node); (yyvsp[-6].node)->parent = (yyval.node); (yyvsp[-6].node)->child_idx = 1;
+		tmp_node = (yyvsp[-4].node);
+		while(tmp_node->sibling_l != NULL)
 		{
-		case OP_ADD: (yyval.node) = alloc_treenode(TN_EXPR_UNI_ARITH, (yyvsp[-3].node)->str, OP_POS); break;
-		case OP_SUB: (yyval.node) = alloc_treenode(TN_EXPR_UNI_ARITH, (yyvsp[-3].node)->str, OP_NEG); break;
-		default: yyerror("wrong syntax."); break;
+			tmp_node->parent = (yyval.node); tmp_node->child_idx = 2;
+			tmp_node = tmp_node->sibling_l;
 		}
-		(yyval.node)->lineno = (yyvsp[-3].node)->lineno;
-		free_treenode((yyvsp[-3].node));
-		(yyval.node)->child[0] = (yyvsp[0].node);
-		(yyvsp[0].node)->parent = (yyval.node);
-	}
-#line 1458 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 15:
-#line 132 "eeyore.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(TN_EXPR_UNI_LOGIC, (yyvsp[-3].node)->str, (yyvsp[-1].val));
-		(yyval.node)->lineno = (yyvsp[-3].node)->lineno;
-		free_treenode((yyvsp[-3].node));
-		(yyval.node)->child[0] = (yyvsp[0].node);
-		(yyvsp[0].node)->parent = (yyval.node);
-	}
-#line 1470 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 16:
-#line 139 "eeyore.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(TN_EXPR_ASSN, (yyvsp[-2].node)->str, -1);
-		(yyval.node)->lineno = (yyvsp[-2].node)->lineno;
-		free_treenode((yyvsp[-2].node));
-		(yyval.node)->child[0] = NULL;
-		(yyval.node)->child[1] = (yyvsp[0].node);
-		(yyvsp[0].node)->parent = (yyval.node);
-		(yyval.node)->child[2] = NULL;
-	}
-#line 1484 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 17:
-#line 148 "eeyore.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(TN_EXPR_ASSN, (yyvsp[-5].node)->str, -1);
-		(yyval.node)->lineno = (yyvsp[-5].node)->lineno;
-		free_treenode((yyvsp[-5].node));
-		(yyval.node)->child[0] = (yyvsp[-3].node);
-		(yyvsp[-3].node)->parent = (yyval.node);
-		(yyval.node)->child[1] = (yyvsp[0].node);
-		(yyvsp[0].node)->parent = (yyval.node);
-		(yyval.node)->child[2] = NULL;
-	}
-#line 1499 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 18:
-#line 158 "eeyore.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(TN_EXPR_ASSN, (yyvsp[-5].node)->str, -1);
-		(yyval.node)->lineno = (yyvsp[-5].node)->lineno;
-		free_treenode((yyvsp[-5].node));
-		(yyval.node)->child[0] = NULL;
-		(yyval.node)->child[1] = (yyvsp[-3].node);
-		(yyvsp[-3].node)->parent = (yyval.node);
-		(yyval.node)->child[2] = (yyvsp[-1].node);
-		(yyvsp[-1].node)->parent = (yyval.node);
-	}
-#line 1514 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 19:
-#line 168 "eeyore.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(TN_EXPR_IF_GOTO, (yyvsp[0].node)->str, (yyvsp[-3].val));
-		(yyval.node)->lineno = (yyvsp[-4].node)->lineno;
-		free_treenode((yyvsp[0].node));
-		(yyval.node)->child[0] = (yyvsp[-4].node);
-		(yyvsp[-4].node)->parent = (yyval.node);
-		(yyval.node)->child[1] = (yyvsp[-2].node);
-		(yyvsp[-2].node)->parent = (yyval.node);
+		(yyval.node)->child[2] = tmp_node; tmp_node->parent = (yyval.node); tmp_node->child_idx = 2;
+		tmp_node = (yyvsp[-1].node);
+		while(tmp_node != NULL && tmp_node->sibling_l != NULL)
+		{
+			tmp_node->parent = (yyval.node); tmp_node->child_idx = 3;
+			tmp_node = tmp_node->sibling_l;
+		}
+		(yyval.node)->child[3] = tmp_node;
+		if (tmp_node != NULL)
+		{
+			tmp_node->parent = (yyval.node);
+			tmp_node->child_idx = 3;
+		}
+		set_death((yyvsp[-5].value), lineno);
+		alloc_symbol((yyvsp[-7].node)->lineno, ST_FUNC, (yyvsp[-6].node)->name, (yyval.node));
+		if ((yyvsp[-1].node) == NULL)
+			alloc_ew(WARN_NO_RETURN, (yyval.node), NULL, NULL);
+		else
+		{
+			for (tmp_node = (yyvsp[-1].node); tmp_node->sibling_r != NULL;
+				tmp_node = tmp_node->sibling_r);
+			if (tmp_node->type != TN_STMT_RETURN)
+				alloc_ew(WARN_NO_RETURN, (yyval.node), NULL, NULL);
+		}
 	}
 #line 1528 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 20:
-#line 177 "eeyore.y" /* yacc.c:1646  */
+  case 10:
+#line 188 "minic.y" /* yacc.c:1646  */
     {
-		(yyval.node) = alloc_treenode(TN_EXPR_GOTO, (yyvsp[0].node)->str, -1);
-		(yyval.node)->lineno = (yyvsp[0].node)->lineno;
-		free_treenode((yyvsp[0].node));
+		(yyval.node) = alloc_treenode(lineno, TN_FUNCDECL, NULL);
+		(yyval.node)->child[0] = (yyvsp[-4].node); (yyvsp[-4].node)->parent = (yyval.node); (yyvsp[-4].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[-3].node); (yyvsp[-3].node)->parent = (yyval.node); (yyvsp[-3].node)->child_idx = 1;
+		(yyval.node)->child[2] = NULL;
+		if (strcmp((yyvsp[-4].node)->name, "int") == 0
+		    && (strcmp((yyvsp[-3].node)->name, "getint") == 0 || strcmp((yyvsp[-3].node)->name, "getchar") == 0))
+			alloc_symbol((yyvsp[-4].node)->lineno, ST_FUNC, (yyvsp[-3].node)->name, (yyval.node));
 	}
-#line 1538 "y.tab.c" /* yacc.c:1646  */
+#line 1542 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 21:
-#line 182 "eeyore.y" /* yacc.c:1646  */
+  case 11:
+#line 197 "minic.y" /* yacc.c:1646  */
     {
-		(yyval.node) = alloc_treenode(TN_EXPR_LABEL, (yyvsp[-1].node)->str, -1);
-		(yyval.node)->lineno = (yyvsp[-1].node)->lineno;
-		free_treenode((yyvsp[-1].node));
+		struct TreeNode* tmp_node;
+		(yyval.node) = alloc_treenode(lineno, TN_FUNCDECL, NULL);
+		(yyval.node)->child[0] = (yyvsp[-5].node); (yyvsp[-5].node)->parent = (yyval.node); (yyvsp[-5].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[-4].node); (yyvsp[-4].node)->parent = (yyval.node); (yyvsp[-4].node)->child_idx = 1;
+		tmp_node = (yyvsp[-2].node);
+		while(tmp_node->sibling_l != NULL)
+		{
+			tmp_node->parent = (yyval.node); tmp_node->child_idx = 2;
+			tmp_node = tmp_node->sibling_l;
+		}
+		(yyval.node)->child[2] = tmp_node; tmp_node->parent = (yyval.node); tmp_node->child_idx = 2;
+		if (strcmp((yyvsp[-5].node)->name, "int") == 0
+		    && (strcmp((yyvsp[-4].node)->name, "putint") == 0 || strcmp((yyvsp[-4].node)->name, "putchar") == 0)
+		    && (strcmp((yyvsp[-2].node)->child[0]->name, "int") == 0 && (yyvsp[-2].node)->child[2] == NULL)
+		    && (yyvsp[-2].node)->sibling_r == NULL)
+		{
+			set_death((yyvsp[-3].value), lineno);
+			alloc_symbol((yyvsp[-5].node)->lineno, ST_FUNC, (yyvsp[-4].node)->name, (yyval.node));
+		}
+		else
+			purge_var((yyvsp[-3].value), lineno);
 	}
-#line 1548 "y.tab.c" /* yacc.c:1646  */
+#line 1570 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 22:
-#line 187 "eeyore.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(TN_EXPR_PARAM, NULL, -1);
-		(yyval.node)->lineno = (yyvsp[0].node)->lineno;
-		(yyval.node)->child[0] = (yyvsp[0].node);
-		(yyvsp[0].node)->parent = (yyval.node);
-	}
-#line 1559 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 23:
-#line 193 "eeyore.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(TN_EXPR_CALL, (yyvsp[-3].node)->str, -1);
-		(yyval.node)->lineno = (yyvsp[-3].node)->lineno;
-		free_treenode((yyvsp[-3].node));
-		(yyval.node)->child[0] = (yyvsp[0].node);
-		(yyvsp[0].node)->parent = (yyval.node);
-	}
-#line 1571 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 24:
-#line 200 "eeyore.y" /* yacc.c:1646  */
-    {
-		(yyval.node) = alloc_treenode(TN_EXPR_RETURN, NULL, -1);
-		(yyval.node)->lineno = (yyvsp[0].node)->lineno;
-		(yyval.node)->child[0] = (yyvsp[0].node);
-		(yyvsp[0].node)->parent = (yyval.node);
-	}
-#line 1582 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 25:
-#line 208 "eeyore.y" /* yacc.c:1646  */
+  case 12:
+#line 222 "minic.y" /* yacc.c:1646  */
     { (yyval.node) = (yyvsp[0].node); }
-#line 1588 "y.tab.c" /* yacc.c:1646  */
+#line 1576 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 26:
-#line 209 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = (yyvsp[0].node); }
-#line 1594 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 27:
-#line 212 "eeyore.y" /* yacc.c:1646  */
+  case 13:
+#line 223 "minic.y" /* yacc.c:1646  */
     {
-		(yyval.node) = alloc_treenode(TN_VAR, (yyvsp[0].node)->str, -1);
-		(yyval.node)->lineno = (yyvsp[0].node)->lineno;
-		free_treenode((yyvsp[0].node));
+		(yyvsp[-2].node)->sibling_r = (yyvsp[0].node);
+		(yyvsp[0].node)->sibling_l = (yyvsp[-2].node);
+		(yyval.node) = (yyvsp[0].node);
 	}
-#line 1604 "y.tab.c" /* yacc.c:1646  */
+#line 1586 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 28:
-#line 217 "eeyore.y" /* yacc.c:1646  */
+  case 14:
+#line 230 "minic.y" /* yacc.c:1646  */
     {
-		(yyval.node) = alloc_treenode(TN_VAR, (yyvsp[0].node)->str, (yyvsp[-1].node)->val);
-		(yyval.node)->lineno = (yyvsp[-1].node)->lineno;
-		free_treenode((yyvsp[-1].node));
-		free_treenode((yyvsp[0].node));
+		if ((yyvsp[-1].node) != NULL)
+			(yyvsp[-1].node)->sibling_r = (yyvsp[0].node);
+		(yyvsp[0].node)->sibling_l = (yyvsp[-1].node);
+		(yyval.node) = (yyvsp[0].node);
 	}
+#line 1597 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 15:
+#line 236 "minic.y" /* yacc.c:1646  */
+    {
+		if ((yyvsp[-1].node) != NULL)
+			(yyvsp[-1].node)->sibling_r = (yyvsp[0].node);
+		(yyvsp[0].node)->sibling_l = (yyvsp[-1].node);
+		(yyval.node) = (yyvsp[0].node);
+		alloc_ew(WARN_FUNCDECL_IN_BODY, (yyvsp[0].node), NULL, NULL);
+	}
+#line 1609 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 16:
+#line 243 "minic.y" /* yacc.c:1646  */
+    { (yyval.node) = NULL; }
 #line 1615 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 29:
-#line 225 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = alloc_treenode(TN_NUM, NULL, (yyvsp[0].val)); (yyval.node)->lineno = lineno; }
-#line 1621 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 30:
-#line 228 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = alloc_treenode(TN_ID, (yyvsp[0].str), -1); (yyval.node)->lineno = lineno; }
+  case 17:
+#line 246 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_VARDEFN, NULL);
+		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[-1].node); (yyvsp[-1].node)->parent = (yyval.node); (yyvsp[-1].node)->child_idx = 1;
+		(yyval.node)->child[2] = NULL;
+		alloc_symbol((yyvsp[-2].node)->lineno, ST_INT, (yyvsp[-1].node)->name, (yyval.node));
+	}
 #line 1627 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 31:
-#line 229 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = alloc_treenode(TN_ID, (yyvsp[0].str), -1); (yyval.node)->lineno = lineno; }
-#line 1633 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 32:
-#line 230 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = alloc_treenode(TN_ID, (yyvsp[0].str), -1); (yyval.node)->lineno = lineno; }
+  case 18:
+#line 253 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_VARDEFN, NULL);
+		(yyval.node)->child[0] = (yyvsp[-5].node); (yyvsp[-5].node)->parent = (yyval.node); (yyvsp[-5].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[-4].node); (yyvsp[-4].node)->parent = (yyval.node); (yyvsp[-4].node)->child_idx = 1;
+		(yyval.node)->child[2] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 2;
+		alloc_symbol((yyvsp[-5].node)->lineno, ST_ARR, (yyvsp[-4].node)->name, (yyval.node));
+	}
 #line 1639 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 33:
-#line 231 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = alloc_treenode(TN_ID, (yyvsp[0].str), -1); (yyval.node)->lineno = lineno; }
-#line 1645 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 34:
-#line 232 "eeyore.y" /* yacc.c:1646  */
-    { (yyval.node) = alloc_treenode(TN_ID, (yyvsp[0].str), -1); (yyval.node)->lineno = lineno; }
+  case 19:
+#line 262 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_VARDECL, NULL);
+		(yyval.node)->child[0] = (yyvsp[-1].node); (yyvsp[-1].node)->parent = (yyval.node); (yyvsp[-1].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
+		(yyval.node)->child[2] = NULL;
+		alloc_symbol((yyvsp[-1].node)->lineno, ST_INT, (yyvsp[0].node)->name, (yyval.node));
+	}
 #line 1651 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 20:
+#line 269 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_VARDECL, NULL);
+		(yyval.node)->child[0] = (yyvsp[-4].node); (yyvsp[-4].node)->parent = (yyval.node); (yyvsp[-4].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[-3].node); (yyvsp[-3].node)->parent = (yyval.node); (yyvsp[-3].node)->child_idx = 1;
+		(yyval.node)->child[2] = (yyvsp[-1].node); (yyvsp[-1].node)->parent = (yyval.node); (yyvsp[-1].node)->child_idx = 2;
+		alloc_symbol((yyvsp[-4].node)->lineno, ST_ARR, (yyvsp[-3].node)->name, (yyval.node));
+	}
+#line 1663 "y.tab.c" /* yacc.c:1646  */
+    break;
 
-#line 1655 "y.tab.c" /* yacc.c:1646  */
+  case 21:
+#line 278 "minic.y" /* yacc.c:1646  */
+    {
+		struct TreeNode* tmp_node;
+		(yyval.node) = alloc_treenode(lineno, TN_STMT_BLOCK, NULL);
+		tmp_node = (yyvsp[-1].node);
+		while(tmp_node != NULL && tmp_node->sibling_l != NULL)
+		{
+			tmp_node->parent = (yyval.node); tmp_node->child_idx = 1;
+			tmp_node = tmp_node->sibling_l;
+		}
+		(yyval.node)->child[0] = tmp_node;
+		if (tmp_node != NULL)
+		{
+			tmp_node->parent = (yyval.node);
+			tmp_node->child_idx = 0;
+		}
+		set_death((yyvsp[-2].value), lineno);
+	}
+#line 1685 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 22:
+#line 295 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_STMT_IF, NULL);
+		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
+		(yyval.node)->child[2] = NULL;
+		set_death((yyvsp[-3].value), lineno);
+		if ((yyvsp[-2].node)->type != TN_EXPR_BILOGIC
+			&& !((yyvsp[-2].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-2].node)->name, "!") == 0))
+		{
+			alloc_ew(ERR_WRONG_EXPR, (yyvsp[-2].node), NULL, NULL);
+			print_ew();
+		}
+	}
+#line 1703 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 23:
+#line 308 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_STMT_IF, NULL);
+		(yyval.node)->child[0] = (yyvsp[-4].node); (yyvsp[-4].node)->parent = (yyval.node); (yyvsp[-4].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 1;
+		(yyval.node)->child[2] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 2;
+		set_death((yyvsp[-5].value), (yyvsp[0].node)->lineno-1);
+		set_death((yyvsp[0].node)->lineno, lineno);
+		if ((yyvsp[-4].node)->type != TN_EXPR_BILOGIC
+			&& !((yyvsp[-4].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-4].node)->name, "!") == 0))
+		{
+			alloc_ew(ERR_WRONG_EXPR, (yyvsp[-4].node), NULL, NULL);
+			print_ew();
+		}
+	}
+#line 1722 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 24:
+#line 322 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_STMT_WHILE, NULL);
+		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
+		set_death((yyvsp[-3].value), lineno);
+		if ((yyvsp[-2].node)->type != TN_EXPR_BILOGIC
+			&& !((yyvsp[-2].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-2].node)->name, "!") == 0))
+		{
+			alloc_ew(ERR_WRONG_EXPR, (yyvsp[-2].node), NULL, NULL);
+			print_ew();
+		}
+	}
+#line 1739 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 25:
+#line 334 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_STMT_VARASSN, NULL);
+		(yyval.node)->child[0] = (yyvsp[-3].node); (yyvsp[-3].node)->parent = (yyval.node); (yyvsp[-3].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[-1].node); (yyvsp[-1].node)->parent = (yyval.node); (yyvsp[-1].node)->child_idx = 1;
+		if ((yyvsp[-1].node)->type == TN_EXPR_BILOGIC
+			|| ((yyvsp[-1].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-1].node)->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, (yyvsp[-1].node), NULL, NULL);
+		if (find_var(ST_INT, (yyvsp[-3].node)) == 0)
+			print_ew();
+	}
+#line 1754 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 26:
+#line 344 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_STMT_ARRASSN, NULL);
+		(yyval.node)->child[0] = (yyvsp[-6].node); (yyvsp[-6].node)->parent = (yyval.node); (yyvsp[-6].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[-4].node); (yyvsp[-4].node)->parent = (yyval.node); (yyvsp[-4].node)->child_idx = 1;
+		(yyval.node)->child[2] = (yyvsp[-1].node); (yyvsp[-1].node)->parent = (yyval.node); (yyvsp[-1].node)->child_idx = 2;
+		if ((yyvsp[-4].node)->type == TN_EXPR_BILOGIC
+			|| ((yyvsp[-4].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-4].node)->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, (yyvsp[-4].node), NULL, NULL);
+		if ((yyvsp[-1].node)->type == TN_EXPR_BILOGIC
+			|| ((yyvsp[-1].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-1].node)->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, (yyvsp[-1].node), NULL, NULL);
+		if (find_var(ST_ARR, (yyvsp[-6].node)) == 0)
+			print_ew();
+	}
+#line 1773 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 27:
+#line 358 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_STMT_VARDEFN, NULL);
+		(yyval.node)->child[0] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 0;
+	}
+#line 1782 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 28:
+#line 362 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_STMT_RETURN, NULL);
+		(yyval.node)->child[0] = (yyvsp[-1].node); (yyvsp[-1].node)->parent = (yyval.node); (yyvsp[-1].node)->child_idx = 0;
+		if ((yyvsp[-1].node)->type == TN_EXPR_BILOGIC
+			|| ((yyvsp[-1].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-1].node)->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, (yyvsp[-1].node), NULL, NULL);
+	}
+#line 1794 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 29:
+#line 371 "minic.y" /* yacc.c:1646  */
+    {
+		if ((yyvsp[-1].node) != NULL)
+			(yyvsp[-1].node)->sibling_r = (yyvsp[0].node);
+		(yyvsp[0].node)->sibling_l = (yyvsp[-1].node);
+		(yyval.node) = (yyvsp[0].node);
+	}
+#line 1805 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 30:
+#line 377 "minic.y" /* yacc.c:1646  */
+    { (yyval.node) = NULL; }
+#line 1811 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 31:
+#line 380 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_EXPR_BILOGIC, strdup((yyvsp[-1].name)));
+		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
+		if (((yyvsp[-2].node)->type != TN_EXPR_BILOGIC && (yyvsp[-2].node)->type != TN_EXPR_UNI
+				&& ((yyvsp[-2].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-2].node)->name, "!") != 0))
+			|| ((yyvsp[0].node)->type != TN_EXPR_BILOGIC && (yyvsp[0].node)->type != TN_EXPR_UNI
+				&& ((yyvsp[0].node)->type == TN_EXPR_UNI && strcmp((yyvsp[0].node)->name, "!") != 0)))
+			alloc_ew(WARN_MIXED_EXPR, (yyval.node), NULL, NULL);
+	}
+#line 1826 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 32:
+#line 390 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_EXPR_BILOGIC, strdup((yyvsp[-1].name)));
+		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
+		if ((yyvsp[-2].node)->type == TN_EXPR_BILOGIC
+				|| ((yyvsp[-2].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-2].node)->name, "!") == 0)
+			|| (yyvsp[0].node)->type == TN_EXPR_BILOGIC
+				|| ((yyvsp[0].node)->type == TN_EXPR_UNI && strcmp((yyvsp[0].node)->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, (yyval.node), NULL, NULL);
+	}
+#line 1841 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 33:
+#line 400 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_EXPR_BILOGIC, strdup((yyvsp[-1].name)));
+		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
+		if ((yyvsp[-2].node)->type == TN_EXPR_BILOGIC
+				|| ((yyvsp[-2].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-2].node)->name, "!") == 0)
+			|| (yyvsp[0].node)->type == TN_EXPR_BILOGIC
+				|| ((yyvsp[0].node)->type == TN_EXPR_UNI && strcmp((yyvsp[0].node)->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, (yyval.node), NULL, NULL);
+	}
+#line 1856 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 34:
+#line 410 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_EXPR_BIARITH, strdup((yyvsp[-1].name)));
+		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
+		if ((yyvsp[-2].node)->type == TN_EXPR_BILOGIC
+				|| ((yyvsp[-2].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-2].node)->name, "!") == 0)
+			|| (yyvsp[0].node)->type == TN_EXPR_BILOGIC
+				|| ((yyvsp[0].node)->type == TN_EXPR_UNI && strcmp((yyvsp[0].node)->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, (yyval.node), NULL, NULL);
+	}
+#line 1871 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 35:
+#line 420 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_EXPR_BIARITH, strdup((yyvsp[-1].name)));
+		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 1;
+		if ((yyvsp[-2].node)->type == TN_EXPR_BILOGIC
+				|| ((yyvsp[-2].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-2].node)->name, "!") == 0)
+			|| (yyvsp[0].node)->type == TN_EXPR_BILOGIC
+				|| ((yyvsp[0].node)->type == TN_EXPR_UNI && strcmp((yyvsp[0].node)->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, (yyval.node), NULL, NULL);
+	}
+#line 1886 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 36:
+#line 430 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_EXPR_ARR, NULL);
+		(yyval.node)->child[0] = (yyvsp[-3].node); (yyvsp[-3].node)->parent = (yyval.node); (yyvsp[-3].node)->child_idx = 0;
+		(yyval.node)->child[1] = (yyvsp[-1].node); (yyvsp[-1].node)->parent = (yyval.node); (yyvsp[-1].node)->child_idx = 1;
+		if ((yyvsp[-1].node)->type == TN_EXPR_BILOGIC
+				|| ((yyvsp[-1].node)->type == TN_EXPR_UNI && strcmp((yyvsp[-1].node)->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, (yyvsp[-1].node), NULL, NULL);
+		if (find_var(ST_ARR, (yyvsp[-3].node)))
+			print_ew();
+	}
+#line 1901 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 37:
+#line 440 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_EXPR_INTEGER, NULL);
+		(yyval.node)->child[0] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 0;
+	}
+#line 1910 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 38:
+#line 444 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_EXPR_IDENTIFIER, NULL);
+		(yyval.node)->child[0] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 0;
+		if (find_var(ST_INT, (yyvsp[0].node)) == 0)
+			print_ew();
+	}
+#line 1921 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 39:
+#line 450 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_EXPR_UNI, strdup((yyvsp[-1].name)));
+		(yyval.node)->child[0] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 0;
+		if ((yyvsp[0].node)->type == TN_EXPR_BILOGIC
+			|| ((yyvsp[0].node)->type == TN_EXPR_UNI && strcmp((yyvsp[0].node)->name, "!") == 0))
+			alloc_ew(WARN_MIXED_EXPR, (yyval.node), NULL, NULL);
+	}
+#line 1933 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 40:
+#line 457 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_EXPR_UNI, strdup((yyvsp[-1].name)));
+		(yyval.node)->child[0] = (yyvsp[0].node); (yyvsp[0].node)->parent = (yyval.node); (yyvsp[0].node)->child_idx = 0;
+		if ((yyvsp[0].node)->type != TN_EXPR_BILOGIC && (yyvsp[0].node)->type != TN_EXPR_UNI
+			&& ((yyvsp[0].node)->type == TN_EXPR_UNI && strcmp((yyvsp[0].node)->name, "!") != 0))
+			alloc_ew(WARN_MIXED_EXPR, (yyval.node), NULL, NULL);
+	}
+#line 1945 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 41:
+#line 464 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_EXPR_CALL, NULL);
+		(yyval.node)->child[0] = (yyvsp[-2].node); (yyvsp[-2].node)->parent = (yyval.node); (yyvsp[-2].node)->child_idx = 0;
+		(yyval.node)->child[1] = NULL;
+	}
+#line 1955 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 42:
+#line 469 "minic.y" /* yacc.c:1646  */
+    {
+		struct TreeNode *tmp_node;
+		(yyval.node) = alloc_treenode(lineno, TN_EXPR_CALL, NULL);
+		(yyval.node)->child[0] = (yyvsp[-3].node); (yyvsp[-3].node)->parent = (yyval.node); (yyvsp[-3].node)->child_idx = 0;
+		tmp_node = (yyvsp[-1].node);
+		while(tmp_node->sibling_l != NULL)
+		{
+			tmp_node->parent = (yyval.node); tmp_node->child_idx = 1;
+			tmp_node = tmp_node->sibling_l;
+		}
+		(yyval.node)->child[1] = tmp_node; tmp_node->parent = (yyval.node); tmp_node->child_idx = 1;
+	}
+#line 1972 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 43:
+#line 481 "minic.y" /* yacc.c:1646  */
+    { (yyval.node) = (yyvsp[-1].node); }
+#line 1978 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 44:
+#line 484 "minic.y" /* yacc.c:1646  */
+    { (yyval.node) = (yyvsp[0].node); }
+#line 1984 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 45:
+#line 485 "minic.y" /* yacc.c:1646  */
+    {
+		(yyvsp[-2].node)->sibling_r = (yyvsp[0].node);
+		(yyvsp[0].node)->sibling_l = (yyvsp[-2].node);
+		(yyval.node) = (yyvsp[0].node);
+	}
+#line 1994 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 46:
+#line 492 "minic.y" /* yacc.c:1646  */
+    { (yyval.node) = alloc_treenode(lineno, TN_TYPE, strdup((yyvsp[0].name))); }
+#line 2000 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 47:
+#line 495 "minic.y" /* yacc.c:1646  */
+    {
+		(yyval.node) = alloc_treenode(lineno, TN_INTEGER, NULL);
+		(yyval.node)->val = (yyvsp[0].value);
+	}
+#line 2009 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 48:
+#line 501 "minic.y" /* yacc.c:1646  */
+    { (yyval.node) = alloc_treenode(lineno, TN_IDENTIFIER, strdup((yyvsp[0].name))); }
+#line 2015 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+
+#line 2019 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1879,7 +2243,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 235 "eeyore.y" /* yacc.c:1906  */
+#line 504 "minic.y" /* yacc.c:1906  */
 
 
 void yyerror(char* s)
@@ -1890,22 +2254,27 @@ void yyerror(char* s)
 
 int main(int argc, char** argv)
 {
-	char *infile_path = NULL, *outfile_path = NULL;
-	lineno = 1;
+	cheating_file = fopen("null.minic", "w");
+	infile_path = NULL;
+	outfile_path = NULL;
 	for (int i = 1; i < argc; i++)
 	{
+		if (strcmp(argv[i], "-T") == 0 || strcmp(argv[i], "--tree") == 0)
+			continue;
+		if (strcmp(argv[i], "-S") == 0 || strcmp(argv[i], "--symtab") == 0)
+			continue;
 		if (strcmp(argv[i], "--infile") == 0 || strcmp(argv[i], "--input") == 0
 			|| strcmp(argv[i], "-I") == 0)
 		{
 			if (i + 1 >= argc)
 			{
-				fprintf(stderr, "No input file\n");
+				printf("No input file\n");
 				return -1;
 			}
 			yyin = fopen(argv[i+1], "r");
 			if (yyin == NULL)
 			{
-				fprintf(stderr, "Cannot open file: %s\nPlease check if it is valid\n",
+				printf("Cannot open file: %s\nPlease check if it is valid\n",
 					argv[i+1]);
 				return -1;
 			}
@@ -1918,13 +2287,13 @@ int main(int argc, char** argv)
 		{
 			if (i + 1 >= argc)
 			{
-				fprintf(stderr, "No output file\n");
+				printf("No output file\n");
 				return -1;
 			}
 			yyout = fopen(argv[i+1], "w");
 			if (yyout == NULL)
 			{
-				fprintf(stderr, "Cannot open file: %s\nPlease check if it is valid\n",
+				printf("Cannot open file: %s\nPlease check if it is valid\n",
 					argv[i+1]);
 				return -1;
 			}
@@ -1932,66 +2301,57 @@ int main(int argc, char** argv)
 			outfile_path = argv[i];
 			continue;
 		}
-		fprintf(stderr, "Unknown option: %s\n", argv[i]);
+		if (strcmp(argv[i], "--cheatingfile") == 0 || strcmp(argv[i], "--cheating") == 0
+			|| strcmp(argv[i], "-C") == 0)
+		{
+			if (i + 1 >= argc)
+			{
+				printf("No cheating file\n");
+				return -1;
+			}
+			fclose(cheating_file);
+			cheating_file = fopen(argv[i+1], "w");
+			if (cheating_file == NULL)
+			{
+				printf("Cannot open file: %s\nPlease check if it is valid\n",
+					argv[i+1]);
+				return -1;
+			}
+			i++;
+			continue;
+		}
+		printf("Unknown option: %s\n", argv[i]);
 		return -2;
 	}
-
 	init_tree();
-	init_bb();
-	init_reg();
-
+	init_symtab();
+	init_ew();
+	init_trans();
 	yyparse();
-	//print_tree(root, 1, stdout);
-
-	n_funcs = 0;
-	funcs = tree2bbs(root, &n_funcs);
-
-	int convergence;
-	do
+	find_wrong_call(root);
+	find_conflict();
+	print_ew();
+	minic2eeyore(root, "");
+	for (int i = 2; i < argc; i++)
 	{
-		convergence = var_life_between_bbs(funcs[0]);
-		// printf("%d\n", convergence);
-	} while (convergence != 0);
-	
-	for (int i = 0; i < n_funcs; i++)
-	{
-		struct ListNode* lnode = funcs[i];
-		while(lnode != NULL)
+		if (strcmp(argv[i], "-T") == 0 || strcmp(argv[i], "--tree") == 0)
 		{
-			get_die_within_bb(lnode->obj);
-			lnode = lnode->nxt;
+			if (infile_path != NULL)
+				printf("\nMiniC parse tree of %s\n", infile_path);
+			else
+				printf("\nMiniC parse tree\n");
+			print_tree(root, 0, stdout);
+		}
+		if (strcmp(argv[i], "-S") == 0 || strcmp(argv[i], "--symtab") == 0)
+		{
+			if (infile_path != NULL)
+				printf("\nSymbol table of %s\n", infile_path);
+			else
+				printf("\nSymbol table\n");
+			print_symtab(stdout);
 		}
 	}
-	reg_alloced = (int**)malloc(sizeof(int*)*n_funcs);
-	stack_size = (int*)malloc(sizeof(int)*n_funcs);
-	for (int i = 0; i < n_funcs; i++)
-	{
-		struct ListNode* lnode = funcs[i];
-		reg_alloced[i] = (int*)malloc(sizeof(int) * REG_N);
-		memset(reg_alloced[i], 0, sizeof(int)*REG_N);
-		stack_size[i] = 1;
-		while (lnode != NULL)
-		{
-			stack_size[i] = reg_alloc(lnode->obj, stack_size[i], reg_alloced[i]);
-			lnode = lnode->nxt;
-		}
-	}
-
-	for (int i = 0; i < n_funcs; i++)
-	{
-		struct ListNode* lnode = funcs[i];
-		while(lnode != NULL)
-		{
-			print_bb(lnode->obj, stdout);
-			fprintf(stdout, "\n");
-			lnode = lnode->nxt;
-		}
-		fprintf(stdout, "\n");
-	}
-
-	if (yyin != stdin)
-		fclose(yyin);
-	if (yyout != stdout)
-		fclose(yyout);
+	fclose(yyin);
+	fclose(yyout);
 	return 0;
 }
