@@ -254,17 +254,17 @@ store s1 1
 s1 = 10		// REG(t0) = s1
 loadaddr v0 s0	// REG(e0) = s0
 s0[0] = s1
-s1 = 20
-loadaddr v1 s0
+s1 = 20		// REG(t1) = s1
+loadaddr v1 s0	// REG(e1) = s0
 s0[0] = s1
-loadaddr v0 s0
-s1 = s0[0]
-loadaddr v1 s0
-s0 = s0[0]
-a0 = s1 + s0
-load 0 s0
+loadaddr v0 s0	// REG(e2) = s0
+s1 = s0[0]	// REG(t2) = s1, e3 is coalesced
+loadaddr v1 s0	// REG(e4) = s0
+s0 = s0[0]	// REG(e5) = s0
+a0 = s1 + s0	// REG(t5) = a0, many variables are coalesced
+load 0 s0	// restore the callee-saved registers
 load 1 s1
-return
+return		// return
 load 0 s0
 load 1 s1
 return
