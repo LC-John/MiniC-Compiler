@@ -131,15 +131,148 @@ PHASE 1 (MiniC2Eeyore & type checking) COMPLETE!
 
 ## Phase 2. Eeyore2Tigger
 
-Eeyore parsing complete.
+It is in the directory "src/Eeyore2Tigger". Use the command "make" to compile the project, and get the executable compiler "tiggerC".
 
-Eeyore data-flow graph built.
+The work flow of this specific phase is shown below.
 
-Live variable analysis complete.
+```
+Eeyore => Mid => Liveness Analysis => Conflict Graph => Coloring & Register Allocation => Tigger
+```
 
-Register allocation complete.
+**Mid** is a medium representation between Eeyore and Tigger. It is very similiar to Tigger, while it uses the variables in Eeyore (eg. "T0", "t1", etc), instead of registers in Tigger (eg. "a0", "s1", "t2", etc), and the function stacks are not allocated as well. The translation from Eeyore to Mid is the same as MiniC2Eeyore.
 
-TODO: tigger code generation
+Although, register allocation is not performed within Mid, as we stated before, there are still some registers applied in Mid. For example, ```a0-a7``` is always used as function parameters, and ```a0``` is always used as function return value. Such static allocation can be performed in Eeyore2Mid translation.
+
+The arithmatic and logical and assignment operations, etc, are translated directly into Mid (Tigger-like style). However, there is a trick for variables:
+
+1. Global variables/arrays. The load/store operation in Tigger for global variables are not symmetric. So we use sets of operations to make it symmetric.
+
+```
+GlobalVar = SrcVal
+{
+	loadaddr GlobalVar TempVar
+	TempVar[0] = SrcVal
+}
+TgtVar = GlobalVar
+{
+	loadaddr GlobalVar TempVar
+	TgtVar = TempVar[0]
+}
+GlobalVar[Idx] = SrcVal
+{
+	loadaddr GlobalVar TempVar
+	TempVar = TempVar + Idx
+	TempVar[0] = SrcVal
+}
+TgtVar = GlobalVar[Idx]
+{
+	loadaddr GlobalVar TempVar
+	TempVar = TempVar + Idx
+	TgtVar = TempVar[0]
+}
+```
+
+2. Temparory variables/arrays. The temparory variables are applied within the function stack itself, and the registers and stacks are not allocated yet in Mid, thus the operations upon the temparory variables remains the same as Eeyore. Yet the temparory arrays are operated in similar way of global arrays.
+
+The Mid code generated from "example.c" is shown as below. (The comments are added manually.) Notice there are two ```return``` in the end of ```f_main```. The last one is added manually, to make sure the function will return. Although ungly, it is effective. Maybe later, we will come up with a better solution.
+
+```
+v0 = 0		// Global variables
+v1 = 0
+f_main [ 0 ] 	// main function, with 0 parameter
+t0 = 10		// a = 10
+loadaddr v0 e0
+e0[0] = t0
+t1 = 20		// b = 20
+loadaddr v1 e1
+e1[0] = t1
+loadaddr v0 e2	// get value of global variable "v0"
+e3 = e2[0]
+t2 = e3
+loadaddr v1 e4	// get value of global variable "v1"
+e5 = e4[0]
+t3 = e5
+t4 = t2 + t3	// c = a + b
+T2 = t4
+t5 = T2		// return value
+__a0 = t5
+return
+return
+end f_main
+```
+
+**Liveness analysis** is performed statement-wise. More specificly, each basic block contains one and only one statement of Mid. A backward analysis is performed upon this flow graph. For each statement, there is a USE set, and a DEF set, and for each block, there is a IN set and a OUT set. The rules are shown below, and the algorithm halt until it reaches the fixed point. (i.e. After one iteration, all IN's and OUT's remain the same.) As a result, the elements in the IN set of each basic block are live variables for this specific basic block.
+
+```
+OUT[BB] <= Union(IN[BB->nxt[i]])  // OUT set of BB is the union of all IN sets of BB's nxt basic block
+IN[BB] <= Union(OUT[BB]/DEF[BB->Stmt], USE[BB->stmt])	// IN set of BB is the union of OUT set of BB without elements from DEF set of statement in BB, and USE set of statement in BB.
+```
+
+The liveness analysis result generated from "example.c" is shown as below.
+
+```
+1	v0 = 0		
+2	v1 = 0		
+3	f_main [ 0 ] 	
+4	t0 = 10		// { }
+5	loadaddr v0 e0	// { t0 }
+6	e0[0] = t0	// { t0, e0 }
+7	t1 = 20		// { }
+8	loadaddr v1 e1	// { t1 }
+9	e1[0] = t1	// { t1, e1 }
+10	loadaddr v0 e2	// { }
+11	e3 = e2[0]	// { e2 }
+12	t2 = e3		// { e3 }
+13	loadaddr v1 e4	// { t2 }
+14	e5 = e4[0]	// { t2, e4 }
+15	t3 = e5		// { t2, e5 }
+16	t4 = t2 + t3	// { t2, t3 }
+17	T2 = t4		// { t4 }
+18	t5 = T2		// { T2 }
+19	__a0 = t5	// { t5 }
+20	return		// { __a0 }
+21	return		
+22	end f_main
+```
+
+**Conflict graph** is built based on the result of liveness analysis. For each basic block, any pair of variables in its live variable set are conflict, and there is an edge linking them in the conflict graph, indicating that these two variables cannot have the same color.
+
+**Coloring & register allocation** is performed following the classic graph coloring algorithm. The allocation result genreated from "example.c" is shown below.
+
+The final work is to generate the **Tigger** code. As a matter of fact, the translation from Mid to Tigger is mainly done after register allocation. The major work is just replace the variables in Mid with the corresponding registers. Function stack allocation and loading/storing caller/callee-saved registers are also doen in this step.
+
+The Tigger code generated from "example.c" is shown as [below](#tigger_example). The comments are added manually.
+
+<div id="tigger_example"></div>
+```
+v0 = 0		// Global variables
+v1 = 0
+f_main [0] [2]	// main function with 0 parameter and stack size of 2
+store s0 0	// save the callee-saved registers
+store s1 1
+s1 = 10		// REG(t0) = s1
+loadaddr v0 s0	// REG(e0) = s0
+s0[0] = s1
+s1 = 20
+loadaddr v1 s0
+s0[0] = s1
+loadaddr v0 s0
+s1 = s0[0]
+loadaddr v1 s0
+s0 = s0[0]
+a0 = s1 + s0
+load 0 s0
+load 1 s1
+return
+load 0 s0
+load 1 s1
+return
+end f_main
+```
+
+It has passed the MiniC Checker automatic testing.
+
+PHASE 2 (Eeyore2Tigger) COMPLETE!
 
 ## Phase 3. Tigger2RISC-V
 

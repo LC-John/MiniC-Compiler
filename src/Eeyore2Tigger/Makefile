@@ -1,10 +1,15 @@
-all:	tigger
-
-tigger:	eeyore.lex eeyore.y
-	bison -d -y eeyore.y
-	flex eeyore.lex
-	gcc -c y.tab.h list.h tree.h bb.h regalloc.h y.tab.c lex.yy.c list.c tree.c bb.c regalloc.c
-	gcc y.tab.o lex.yy.o tree.o bb.o list.o regalloc.o -o $@ -lm
-
+all: tiggerC.cpp sdriver.cpp
+	(cd minic2eeyore; make)
+	(cd eeyore2mid; make)
+	(cd mid2tigger; make)
+	g++ -o tiggerC tiggerC.cpp
+	g++ -o sdriver sdriver.cpp
 clean:
-	rm -rf tigger *.o lex.yy.* y.tab.* *.gch
+	(cd minic2eeyore; make clean)
+	(cd eeyore2mid; make clean)
+	(cd mid2tigger; make clean)
+	rm tiggerC
+	rm sdriver
+	rm -rf *.log
+	rm -rf *.out
+	rm -rf null.minic
