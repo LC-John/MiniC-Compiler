@@ -273,6 +273,8 @@ end f_main
 
 It has passed the MiniC Checker automatic testing.
 
+![pass_tigger](images/pass_tigger.png)
+
 PHASE 2 (Eeyore2Tigger) COMPLETE!
 
 ## Phase 3. Tigger2RISC-V
