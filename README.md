@@ -237,13 +237,14 @@ The liveness analysis result generated from "example.c" is shown as below.
 
 **Conflict graph** is built based on the result of liveness analysis. For each basic block, any pair of variables in its live variable set are conflict, and there is an edge linking them in the conflict graph, indicating that these two variables cannot have the same color.
 
-**Coloring & register allocation** is performed following the classic graph coloring algorithm. The allocation result genreated from "example.c" is shown below.
+**Coloring & register allocation** is performed following the classic graph coloring algorithm. The allocation result genreated from "example.c" is shown [below](#tigger_example).
 
 The final work is to generate the **Tigger** code. As a matter of fact, the translation from Mid to Tigger is mainly done after register allocation. The major work is just replace the variables in Mid with the corresponding registers. Function stack allocation and loading/storing caller/callee-saved registers are also doen in this step.
 
-The Tigger code generated from "example.c" is shown as [below](#tigger_example). The comments are added manually.
+The Tigger code generated from "example.c" is shown as below. The comments are added manually.
 
 <div id="tigger_example"></div>
+
 ```
 v0 = 0		// Global variables
 v1 = 0
