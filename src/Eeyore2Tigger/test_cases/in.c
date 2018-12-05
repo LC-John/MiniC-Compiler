@@ -1,5 +1,4 @@
-//sample:input n number, sort them and print them;
-   int n;
+int n;
    int getint();
    int putint(int i);
    int putchar(int c);
@@ -77,4 +76,3 @@
       t=putchar(newline);
       return a25;
    }
-

@@ -1,15 +1,12 @@
-all: tiggerC.cpp sdriver.cpp
-	(cd minic2eeyore; make)
+all: merge.cpp
 	(cd eeyore2mid; make)
 	(cd mid2tigger; make)
-	g++ -o tiggerC tiggerC.cpp
-	g++ -o sdriver sdriver.cpp
+	g++ -o tiggerC merge.cpp
+
 clean:
-	(cd minic2eeyore; make clean)
 	(cd eeyore2mid; make clean)
 	(cd mid2tigger; make clean)
 	rm tiggerC
-	rm sdriver
 	rm -rf *.log
 	rm -rf *.out
 	rm -rf null.minic
