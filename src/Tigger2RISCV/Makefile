@@ -1,13 +1,9 @@
-all:	tigger2riscv
-
-tigger2riscv:	bison flex main.cpp
-	gcc -o $@ y.tab.c lex.yy.c main.cpp
-
-bison:
-	bison -d -y tigger2riscv.y
-
-flex:	bison
-	flex tigger2riscv.lex
+all: merge.c
+	(cd tigger2riscv; make)
+	g++ -o riscvC merge.c
 
 clean:
-	rm -rf y.tab.* lex.yy.* tigger2riscv
+	(cd tigger2riscv; make clean)
+	rm -rf riscvC
+	rm -rf *.log
+	rm -rf *.out

@@ -166,9 +166,8 @@ func_body	: func_body REG ASSIGN REG OP REG EOL	{	// rd = rs1 op rs2
 			fprintf(yyout, "\t\tsnez %s, %s\n", $2, $2);
 			break;
 		case '<':
-			fprintf(yyout, "\t\taddi %s, x0, %d\t;; %s = %s < %d @L%d\n",
-					$2, $6, $2, $4, $6, lineno);
-			fprintf(yyout, "\t\tslt %s, %s, %s\n", $2, $4, $2);
+			fprintf(yyout, "\t\tslti %s, %s, %d\t;; %s = %s < %d @L%d\n",
+					$2, $4, $6, $2, $4, $6, lineno);
 			break;
 		case '>':
 			fprintf(yyout, "\t\taddi %s, x0, %d\t;; %s = %s > %d @L%d\n",
