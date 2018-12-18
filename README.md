@@ -378,7 +378,7 @@ The statements of Tigger and their corresponding RISC-V instructions are shown i
 | (SIZE is from “FUNC\[INT1\]\[INT2\]”) | addi sp, sp, SIZE       |
 |                                       | jr ra                   |
 
-The Tigger code generated from "example.c" is shown as below.
+The RISC-V (64bit) code generated from "example.c" is shown as below.
 
 ```
 	.global v0
