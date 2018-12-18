@@ -289,13 +289,96 @@ Tigger => Parsed statements => RISC-V instructions => RISC-V assembly => RISC-V 
 
 Parsing schedule of Tigger is the same as MiniC/Eeyore/Mid. However, since parse tree for Tigger is extremely simple, (which at most has only 3 layers,) there is no need to organize it as a tree. Instead, it is organized as a list of statements.
 
-Each statement of Tigger can be translated into a series of RISC-V instructions. The translation process is almost independent, (meaning the RISC-V instructions generated are related and only related to the specific Tigger statement,) it can be carried out sequentially. The only dependency of the translation processes is the stack size, which is defined in the function definination statement, and used in the return statement. This can be resolved by using a global stack size variable, for there cannot be two living stack size at the same time.
-
-The statements of Tigger and their corresponding RISC-V instructions are shown in the table [below](#tigger_stmt2riscv_inst).
+The statements of Tigger and their corresponding RISC-V instructions are shown in the table [below](#tigger_stmt2riscv_inst). Each statement of Tigger can be translated into a series of RISC-V instructions. The translation process is almost independent, (meaning the RISC-V instructions generated are related and only related to the specific Tigger statement,) it can be carried out sequentially. The only dependency of the translation processes is the stack size, which is defined in the function definination statement, and used in the return statement. This can be resolved by using a global stack size variable, for there cannot be two living stack size at the same time.
 
 <div id="tigger_stmt2riscv_inst"></div>
 
+| Tigger Statement                      | RISC-V Instructions     |
+| ------------------------------------- | ----------------------- |
+| VAR = VAL                             | .global VAR             |
+|                                       | .section .sdata         |
+|                                       | .align 2                |
+|                                       | .type VAR, @object      |
+|                                       | .size VAR, 4            |
+|                                       | VAR:                    |
+|                                       | .word VAL               |
+| ARR = malloc SIZE                     | .comm ARR, SIZE*4, 4    |
+| FUNC\[INT1\]\[INT2\]                  | .text                   |
+| (SIZE=INT2/4+1)*16                    | .align 2                |
+|                                       | .type FUNC, @function   |
+|                                       | FUNC:                   |
+|                                       | add sp, sp, SIZE        |
+|                                       | sw ra, SIZE(sp)         |
+| end FUNC                              | .size FUNC, .-FUNC      |
+| REG = REG1 + REG2                     | add REG, REG1, REG2     |
+| REG = REG1 - REG2                     | sub REG, REG1, REG2     |
+| REG = REG1 * REG2                     | mul REG, REG1, REG2     |
+| REG = REG1 / REG2                     | div REG, REG1, REG2     |
+| REG = REG1 % REG2                     | rem REG, REG1, REG2     |
+| REG = REG1 && REG2                    | seqz REG, REG1          |
+|                                       | addi REG REG, -1        |
+|                                       | and REG, REG, REG2      |
+|                                       | snez REG, REG           |
+| REG = REG1 \|\| REG2                  | or REG, REG1, REG2      |
+|                                       | snez REG, REG           |
+| REG = REG1 == REG2                    | xor REG, REG1, REG2     |
+|                                       | seqz REG, REG           |
+| REG = REG1 != REG2                    | xor REG, REG1, REG2     |
+|                                       | snez REG, REG           |
+| REG = REG1 < REG2                     | slt REG, REG1, REG2     |
+| REG = REG1 > REG2                     | slt REG, REG2, REG1     |
+| REG = REG1 + IMM                      | addi REG, REG1, IMM     |
+| REG = REG1 - IMM                      | addi REG, REG1, -IMM    |
+| REG = REG1 * IMM                      | addi REG, x0, IMM       |
+|                                       | mul REG, REG1, REG      |
+| REG = REG1 / IMM                      | addi REG, x0, IMM       |
+|                                       | div REG, REG1, REG      |
+| REG = REG1 % IMM                      | addi REG, x0, IMM       |
+|                                       | rem REG, REG1, REG      |
+| REG = REG1 && IMM                     | seqz REG, REG1          |
+|                                       | addi REG, REG, -1       |
+|                                       | andi REG, REG, IMM      |
+|                                       | snez REG, REG           |
+| REG = REG1 \|\| REG2                  | ori REG, REG1, IMM      |
+|                                       | snez REG, REG           |
+| REG = REG1 == IMM                     | addi REG, x0, IMM       |
+|                                       | xor REG, REG1, REG      |
+|                                       | seqz REG, REG           |
+| REG = REG1 != IMM                     | addi REG, x0, IMM       |
+|                                       | xor REG, REG1, REG      |
+|                                       | snez REG, REG           |
+| REG = REG1 < IMM                      | slti REG, REG1, IMM     |
+| REG = REG1 > IMM                      | addi REG, x0, IMM       |
+|                                       | slt REG, REG, REG1      |
+| REG = + REG1                          | add REG, REG1, x0       |
+| REG = - REG1                          | sub REG, x0, REG1       |
+| REG = ! REG1                          | xori REG, REG1, -1      |
+|                                       | snez REG, REG           |
+| REG = REG1                            | add REG, x0, REG1       |
+| REG = IMM                             | addi REG, x0, IMM       |
+| REG[IMM] = REG1                       | sw REG1, IMM(REG)       |
+| REG = REG1[IMM]                       | lw REG, IMM(REG1)       |
+| if REG1 < REG2 goto LABEL             | blt REG1, REG2, .LABEL  |
+| if REG1 > REG2 goto LABEL             | blt REG2, REG1, .LABEL  |
+| if REG1 <= REG2 goto LABEL            | ble REG1, REG2, .LABEL  |
+| if REG1 >= REG2 goto LABEL            | ble REG2, REG1, .LABEL  |
+| if REG1 == REG2 goto LABEL            | beq REG1, REG2, .LABEL  |
+| if REG1 != REG2 goto LABEL            | bne REG1, REG2, .LABEL  |
+| goto LABEL                            | j .LABEL                |
+| LABEL:                                | .LABEL:                 |
+| call FUNC                             | call FUNC               |
+| store REG IMM                         | sw REG, IMM(sp)         |
+| load IMM REG                          | lw REG, IMM(sp)         |
+| load VAR REG                          | lui REG, %hi(VAR)       |
+|                                       | lw REG, %lo(VAR)(REG)   |
+| loadaddr IMM REG                      | add REG, sp, IMM        |
+| loadaddr VAR REG                      | lui REG, %hi(VAR)       |
+|                                       | addi REG, %lo(VAR)(REG) |
+| return                                | lw ra, SIZE-4(sp)       |
+| (SIZE is from “FUNC\[INT1\]\[INT2\]”) | addi sp, sp, SIZE       |
+|                                       | jr ra                   |
 
+The Tigger code generated from "example.c" is shown as below.
 
 ```
 	.global v0
@@ -351,5 +434,7 @@ v2:
 ```
 
 It has passed the MiniC Checker automatic testing.
+
+![pass_tigger](images/pass_riscv.png)
 
 PHASE 3 (Tigger2RISCV) COMPLETE!
