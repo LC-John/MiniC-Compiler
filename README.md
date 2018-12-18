@@ -279,4 +279,77 @@ PHASE 2 (Eeyore2Tigger) COMPLETE!
 
 ## Phase 3. Tigger2RISC-V
 
-To be continued...
+It is in the directory "src/Eeyore2Tigger". Use the command "make" to compile the project, and get the executable compiler "tiggerC".
+
+The work flow of this specific phase is shown below.
+
+```
+Tigger => Parsed statements => RISC-V instructions => RISC-V assembly => RISC-V objective/executable
+```
+
+Parsing schedule of Tigger is the same as MiniC/Eeyore/Mid. However, since parse tree for Tigger is extremely simple, (which at most has only 3 layers,) there is no need to organize it as a tree. Instead, it is organized as a list of statements.
+
+Each statement of Tigger can be translated into a series of RISC-V instructions. The translation process is almost independent, (meaning the RISC-V instructions generated are related and only related to the specific Tigger statement,) it can be carried out sequentially. The only dependency of the translation processes is the stack size, which is defined in the function definination statement, and used in the return statement. This can be resolved by using a global stack size variable, for there cannot be two living stack size at the same time.
+
+The statements of Tigger and their corresponding RISC-V instructions are shown in the table [below](#tigger_stmt2riscv_inst).
+
+<div id="tigger_stmt2riscv_inst"></div>
+
+
+
+```
+	.global v0
+	.section .sdata
+	.align 2
+	.type v0, @object
+	.size v0, 4
+v0:
+	.word 0
+	.global v1
+	.section .sdata
+	.align 2
+	.type v1, @object
+	.size v1, 4
+v1:
+	.word 0
+	.text	
+	.align 2
+	.global main
+	.type main, @function
+main:
+	add sp, sp, -16
+	sw ra, 12(sp)
+		addi a1, x0, 10
+		lui a0, %hi(v0)
+		addi a0, a0, %lo(v0)
+		sw a1, 0(a0)
+		addi a1, x0, 20
+		lui a0, %hi(v1)
+		addi a0, a0, %lo(v1)
+		sw a1, 0(a0)
+		lui a0, %hi(v0)
+		addi a0, a0, %lo(v0)
+		lw a1, 0(a0)
+		lui a0, %hi(v1)
+		addi a0, a0, %lo(v1)
+		lw a0, 0(a0)
+		add a0, a1, a0
+		lw ra, 12(sp)
+		addi sp, sp, 16
+		jr ra
+		lw ra, 12(sp)
+		addi sp, sp, 16
+		jr ra
+	.size main, .-main
+	.global v2
+	.section .sdata
+	.align 2
+	.type v2, @object
+	.size v2, 4
+v2:
+	.word 0
+```
+
+It has passed the MiniC Checker automatic testing.
+
+PHASE 3 (Tigger2RISCV) COMPLETE!
