@@ -14,6 +14,8 @@ The three-phase work flow is shown below.
 MiniC => Eeyore => Tigger => RISC-V
 ```
 
+You can find the BNF rules and instructions [here](./appendices/README.md).
+
 ## Requirement
 
 ```
