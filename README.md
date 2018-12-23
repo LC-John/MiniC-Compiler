@@ -454,4 +454,8 @@ PHASE 3 (Tigger2RISCV) COMPLETE!
 
 Successfully generate RISC-V executables from MiniC source codes! HOORAY!
 
+## Acknowledgements
+
 **Thank my classmate Zhao Yikai for his help during Eeyore2Tigger!**
+
+[TOC]
