@@ -452,4 +452,6 @@ It has passed the MiniC Checker automatic testing.
 
 PHASE 3 (Tigger2RISCV) COMPLETE!
 
-HOORAY!!!
+Successfully generate RISC-V executables from MiniC source codes! HOORAY!
+
+**Thank my classmate Zhao Yikai for his help during Eeyore2Tigger!**
