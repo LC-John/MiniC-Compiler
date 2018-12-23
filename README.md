@@ -16,9 +16,7 @@ The three-phase work flow is shown below.
 MiniC => Eeyore => Tigger => RISC-V
 ```
 
-You can find the BNF rules and instructions [here](./appendices/README.md).
-
-**What's in this repo:**
+**About this repository --**
 
 [**Requirements**](#section_requirement)
 
@@ -29,6 +27,8 @@ You can find the BNF rules and instructions [here](./appendices/README.md).
 [**Phase 3. Tigger2RISC-V**](#section_tigger2riscv)
 
 [**Acknowledgements**](#section_acknowledgements)
+
+[**Appendices**](./appendices/README.md)
 
 <div id="section_requirement"></div>
 
