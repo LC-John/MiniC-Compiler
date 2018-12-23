@@ -18,6 +18,15 @@ MiniC => Eeyore => Tigger => RISC-V
 
 You can find the BNF rules and instructions [here](./appendices/README.md).
 
+**What's in this repo:**
+
+[**Requirements**](#section_requirement)
+[**Phase 1. MiniC2Eeyore**](#section_minic2eeyore)
+[**Phase 2. Eeyore2Tigger**](#section_eeyore2tigger)
+[**Phase 3. Tigger2RISC-V**](#section_tigger2riscv)
+[**Acknowledgements**](#section_acknowledgements)
+
+<div id="section_requirement"></div>
 ## Requirement
 
 ```
@@ -25,8 +34,8 @@ gcc/g++		version == 7.3.0
 Flex/Lex	version == 2.6.0
 Bison/Yacc(GNU)	version == 3.0.4
 ```
-
-## Phase 1. MiniC2Eeyore & Type Checking
+<div id="section_minic2eeyore"></div>
+## Phase 1. MiniC2Eeyore
 
 It is in the directory "src/MiniC2Eeyore". Use the command "make" to compile the project, and get the executable compiler "eeyore". The options of "eeyore" is shown as below.
 
@@ -133,6 +142,7 @@ It has passed the MiniC Checker automatic testing.
 
 PHASE 1 (MiniC2Eeyore & type checking) COMPLETE!
 
+<div id="section_eeyore2tigger"></div>
 ## Phase 2. Eeyore2Tigger
 
 It is in the directory "src/Eeyore2Tigger". Use the command "make" to compile the project, and get the executable compiler "tiggerC".
@@ -281,6 +291,7 @@ It has passed the MiniC Checker automatic testing.
 
 PHASE 2 (Eeyore2Tigger) COMPLETE!
 
+<div id="section_tigger2riscv"></div>
 ## Phase 3. Tigger2RISC-V
 
 It is in the directory "src/Eeyore2Tigger". Use the command "make" to compile the project, and get the executable compiler "tiggerC".
@@ -454,8 +465,7 @@ PHASE 3 (Tigger2RISCV) COMPLETE!
 
 Successfully generate RISC-V executables from MiniC source codes! HOORAY!
 
+<div id="section_acknowledgements"></div>
 ## Acknowledgements
 
 **Thank my classmate Zhao Yikai for his help during Eeyore2Tigger!**
-
-[TOC]
