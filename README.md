@@ -4,6 +4,8 @@
 
 This repo is a series of labs from the Compiler Lab course, EECS, PKU, which aims for a compiler to compile miniC (a subset of C language) source code to RISC-V (majorly RV64I) executable.
 
+It is now completed! HOORAY!
+
 Repo site: https://github.com/LC-John/MiniC-Compiler
 
 ![pooh](images/pooh.jpg)
@@ -435,8 +437,19 @@ v2:
 	.word 0
 ```
 
+When the asembly codes are generated, use the [risc-v GNU tool chain](https://github.com/riscv/riscv-gnu-toolchain) to convert it into risc-v binary machine codes. The command is shown below.
+
+```
+$> gcc example.s -o example.o
+$> gcc example.o -o example
+```
+
+The binary machine code file can be executed by the [RISC-V RV64 simulator](https://github.com/LC-John/RISCV-Simulator)!
+
 It has passed the MiniC Checker automatic testing.
 
 ![pass_tigger](images/pass_riscv.png)
 
 PHASE 3 (Tigger2RISCV) COMPLETE!
+
+HOORAY!!!
