@@ -4,6 +4,8 @@
 
 This repo is a series of labs from the Compiler Lab course, EECS, PKU, which aims for a compiler to compile miniC (a subset of C language) source code to RISC-V (majorly RV64I) executable.
 
+It is now completed! HOORAY!
+
 Repo site: https://github.com/LC-John/MiniC-Compiler
 
 ![pooh](images/pooh.jpg)
@@ -14,6 +16,22 @@ The three-phase work flow is shown below.
 MiniC => Eeyore => Tigger => RISC-V
 ```
 
+**About this repository --**
+
+[**Requirements**](#section_requirement)
+
+[**Phase 1. MiniC2Eeyore**](#section_minic2eeyore)
+
+[**Phase 2. Eeyore2Tigger**](#section_eeyore2tigger)
+
+[**Phase 3. Tigger2RISC-V**](#section_tigger2riscv)
+
+[**Acknowledgements**](#section_acknowledgements)
+
+[**Appendices**](./appendices/README.md)
+
+<div id="section_requirement"></div>
+
 ## Requirement
 
 ```
@@ -21,8 +39,9 @@ gcc/g++		version == 7.3.0
 Flex/Lex	version == 2.6.0
 Bison/Yacc(GNU)	version == 3.0.4
 ```
+<div id="section_minic2eeyore"></div>
 
-## Phase 1. MiniC2Eeyore & Type Checking
+## Phase 1. MiniC2Eeyore
 
 It is in the directory "src/MiniC2Eeyore". Use the command "make" to compile the project, and get the executable compiler "eeyore". The options of "eeyore" is shown as below.
 
@@ -128,6 +147,8 @@ It has passed the MiniC Checker automatic testing.
 ![pass_eeyore](images/pass_eeyore.png)
 
 PHASE 1 (MiniC2Eeyore & type checking) COMPLETE!
+
+<div id="section_eeyore2tigger"></div>
 
 ## Phase 2. Eeyore2Tigger
 
@@ -277,6 +298,8 @@ It has passed the MiniC Checker automatic testing.
 
 PHASE 2 (Eeyore2Tigger) COMPLETE!
 
+<div id="section_tigger2riscv"></div>
+
 ## Phase 3. Tigger2RISC-V
 
 It is in the directory "src/Eeyore2Tigger". Use the command "make" to compile the project, and get the executable compiler "tiggerC".
@@ -378,7 +401,7 @@ The statements of Tigger and their corresponding RISC-V instructions are shown i
 | (SIZE is from “FUNC\[INT1\]\[INT2\]”) | addi sp, sp, SIZE       |
 |                                       | jr ra                   |
 
-The Tigger code generated from "example.c" is shown as below.
+The RISC-V (64bit) code generated from "example.c" is shown as below.
 
 ```
 	.global v0
@@ -433,8 +456,25 @@ v2:
 	.word 0
 ```
 
+When the asembly codes are generated, use the [risc-v GNU tool chain](https://github.com/riscv/riscv-gnu-toolchain) to convert it into risc-v binary machine codes. The command is shown below.
+
+```
+$> gcc example.s -o example.o
+$> gcc example.o -o example
+```
+
+The binary machine code file can be executed by the [RISC-V RV64 simulator](https://github.com/LC-John/RISCV-Simulator)!
+
 It has passed the MiniC Checker automatic testing.
 
 ![pass_tigger](images/pass_riscv.png)
 
 PHASE 3 (Tigger2RISCV) COMPLETE!
+
+Successfully generate RISC-V executables from MiniC source codes! HOORAY!
+
+<div id="section_acknowledgements"></div>
+
+## Acknowledgements
+
+**Thank my classmate Zhao Yikai for his help during Eeyore2Tigger!**
